@@ -17,9 +17,12 @@ public class ClientService {
     @Inject
     private ClientDAO clientDAO;
 
+    @Inject
+    private com.subtrack.dao.UserDAO userDAO;
+
     public Client registerClient(String email, String password, String firstName, 
                                   String lastName, AccountType accountType) {
-        if (clientDAO.existsByEmail(email)) {
+        if (userDAO.existsByEmail(email)) {
             throw new IllegalArgumentException("Email already registered");
         }
         
@@ -33,33 +36,33 @@ public class ClientService {
         client.setFirstName(firstName);
         client.setLastName(lastName);
         client.setAccountType(accountType != null ? accountType : AccountType.B2C);
-        client.setRole(Role.CLIENT);
         client.setIsActive(true);
+        // role is automatically set to CLIENT in Client.java's constructor
         
         clientDAO.create(client);
         return client;
     }
 
-    public Optional<Client> authenticate(String email, String password) {
+    public Optional<com.subtrack.entity.User> authenticate(String email, String password) {
         System.out.println(">>> ClientService.authenticate called for email: " + email);
-        Optional<Client> clientOpt = clientDAO.findByEmail(email);
+        Optional<com.subtrack.entity.User> userOpt = userDAO.findByEmail(email);
         
-        System.out.println(">>> Client found in DB: " + clientOpt.isPresent());
-        if (clientOpt.isEmpty()) {
+        System.out.println(">>> User found in DB: " + userOpt.isPresent());
+        if (userOpt.isEmpty()) {
             return Optional.empty();
         }
         
-        Client client = clientOpt.get();
+        com.subtrack.entity.User user = userOpt.get();
         
-        if (client.getIsActive() == null || !client.getIsActive()) {
-            System.out.println(">>> Client account is deactivated");
+        if (user.getIsActive() == null || !user.getIsActive()) {
+            System.out.println(">>> User account is deactivated");
             throw new IllegalStateException("Account is deactivated");
         }
         
-        boolean pwMatch = PasswordUtil.verifyPassword(password, client.getPassword());
+        boolean pwMatch = PasswordUtil.verifyPassword(password, user.getPassword());
         System.out.println(">>> Password match: " + pwMatch);
         if (pwMatch) {
-            return Optional.of(client);
+            return Optional.of(user);
         }
         
         return Optional.empty();

@@ -48,14 +48,14 @@ public class EmailController implements Serializable {
     
     public String connectEmail() {
         try {
-            Client user = userContext.getCurrentUser();
-            if (user == null) {
+            com.subtrack.entity.User user = userContext.getCurrentUser();
+            if (!(user instanceof Client client)) {
                 FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "User not logged in"));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "User not logged in or invalid role"));
                 return null;
             }
             
-            emailIntegrationService.connectEmail(user, emailAddress, "mock_access_token", 
+            emailIntegrationService.connectEmail(client, emailAddress, "mock_access_token", 
                 "mock_refresh_token", LocalDateTime.now().plusHours(1));
             
             FacesContext.getCurrentInstance().addMessage(null,

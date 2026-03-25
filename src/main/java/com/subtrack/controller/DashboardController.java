@@ -43,7 +43,7 @@ public class DashboardController implements Serializable {
     private List<CategoryBreakdown> categoryBreakdown;
 
     public void loadDashboard() {
-        Client user = userContext.getCurrentUser();
+        com.subtrack.entity.User user = userContext.getCurrentUser();
         if (user == null) {
             return;
         }
@@ -62,7 +62,7 @@ public class DashboardController implements Serializable {
     }
 
     private void calculateTotals() {
-        Client user = userContext.getCurrentUser();
+        com.subtrack.entity.User user = userContext.getCurrentUser();
         List<Subscription> allSubscriptions = subscriptionService.findByClientId(user.getId());
         
         totalMonthlyCost = BigDecimal.ZERO;
@@ -80,7 +80,7 @@ public class DashboardController implements Serializable {
 
     private void calculateCategoryBreakdown() {
         categoryBreakdown = new ArrayList<>();
-        Client user = userContext.getCurrentUser();
+        com.subtrack.entity.User user = userContext.getCurrentUser();
         List<Subscription> allSubscriptions = subscriptionService.findByClientId(user.getId());
         List<Category> categories = categoryService.findAll();
 

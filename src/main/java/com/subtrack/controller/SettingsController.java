@@ -1,6 +1,7 @@
 package com.subtrack.controller;
 
 import com.subtrack.entity.Client;
+import com.subtrack.entity.User;
 import com.subtrack.service.ClientService;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.SessionScoped;
@@ -39,8 +40,8 @@ public class SettingsController implements Serializable {
     }
 
     public void loadSettings() {
-        Client client = userContext.getCurrentUser();
-        if (client != null) {
+        User user = userContext.getCurrentUser();
+        if (user instanceof Client client) {
             fullName = client.getFullName();
             timezone = client.getTimezone();
         }
@@ -48,8 +49,8 @@ public class SettingsController implements Serializable {
 
     public String updateProfile() {
         try {
-            Client client = userContext.getCurrentUser();
-            if (client != null) {
+            User user = userContext.getCurrentUser();
+            if (user instanceof Client client) {
                 String[] nameParts = fullName != null ? fullName.split(" ", 2) : new String[2];
                 client.setFirstName(nameParts[0]);
                 if (nameParts.length > 1) {
@@ -83,8 +84,8 @@ public class SettingsController implements Serializable {
                 return null;
             }
 
-            Client client = userContext.getCurrentUser();
-            if (client != null) {
+            User user = userContext.getCurrentUser();
+            if (user instanceof Client client) {
                 clientService.changePassword(client.getId(), currentPassword, newPassword);
                 
                 FacesContext.getCurrentInstance().addMessage(null,
@@ -104,8 +105,8 @@ public class SettingsController implements Serializable {
 
     public String updateNotificationPreferences() {
         try {
-            Client client = userContext.getCurrentUser();
-            if (client != null) {
+            User user = userContext.getCurrentUser();
+            if (user instanceof Client client) {
                 clientService.updateNotificationPreferences(
                     client.getId(), 
                     emailNotifications, 
@@ -128,8 +129,8 @@ public class SettingsController implements Serializable {
 
     public String deleteAccount() {
         try {
-            Client client = userContext.getCurrentUser();
-            if (client != null) {
+            User user = userContext.getCurrentUser();
+            if (user instanceof Client client) {
                 clientService.deleteAccount(client.getId());
                 return "/login.xhtml?faces-redirect=true";
             }

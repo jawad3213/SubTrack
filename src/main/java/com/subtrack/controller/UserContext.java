@@ -1,6 +1,6 @@
 package com.subtrack.controller;
 
-import com.subtrack.entity.Client;
+import com.subtrack.entity.User;
 import com.subtrack.enums.Role;
 import jakarta.enterprise.context.SessionScoped;
 import jakarta.faces.context.FacesContext;
@@ -13,9 +13,9 @@ public class UserContext implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private Client currentUser;
+    private User currentUser;
 
-    public void setCurrentUser(Client user) {
+    public void setCurrentUser(User user) {
         this.currentUser = user;
         FacesContext context = FacesContext.getCurrentInstance();
         if (context != null) {
@@ -23,10 +23,10 @@ public class UserContext implements Serializable {
         }
     }
 
-    public Client getCurrentUser() {
+    public User getCurrentUser() {
         FacesContext context = FacesContext.getCurrentInstance();
         if (context != null) {
-            Client sessionUser = (Client) context.getExternalContext().getSessionMap().get("user");
+            User sessionUser = (User) context.getExternalContext().getSessionMap().get("user");
             if (sessionUser != null) {
                 currentUser = sessionUser;
             }

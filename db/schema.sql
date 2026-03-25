@@ -9,24 +9,34 @@ CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 -- TABLES
 -- ============================================
 
--- Client (User) Table
-CREATE TABLE client (
+-- Users (Base User) Table
+CREATE TABLE users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     first_name VARCHAR(100),
     last_name VARCHAR(100),
-    account_type VARCHAR(20) NOT NULL DEFAULT 'B2C',
-    role VARCHAR(10) NOT NULL DEFAULT 'CLIENT',
-    timezone VARCHAR(50) DEFAULT 'UTC',
+    role VARCHAR(10) NOT NULL,
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Client Table
+CREATE TABLE client (
+    id UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+    account_type VARCHAR(20) NOT NULL DEFAULT 'B2C',
+    timezone VARCHAR(50) DEFAULT 'UTC',
     email_notifications BOOLEAN NOT NULL DEFAULT TRUE,
     telegram_enabled BOOLEAN NOT NULL DEFAULT FALSE,
     telegram_chat_id VARCHAR(50),
     whatsapp_enabled BOOLEAN NOT NULL DEFAULT FALSE,
-    whatsapp_number VARCHAR(20),
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    whatsapp_number VARCHAR(20)
+);
+
+-- Admin Table
+CREATE TABLE admin (
+    id UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE
 );
 
 -- Category Table

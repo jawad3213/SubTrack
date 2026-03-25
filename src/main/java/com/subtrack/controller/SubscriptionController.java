@@ -1,6 +1,7 @@
 package com.subtrack.controller;
 
 import com.subtrack.entity.Category;
+import com.subtrack.entity.Client;
 import com.subtrack.entity.Subscription;
 import com.subtrack.enums.Frequency;
 import com.subtrack.enums.SubscriptionStatus;
@@ -72,9 +73,10 @@ public class SubscriptionController implements Serializable {
     
     public String createSubscription() {
         try {
-            if (userContext.getClientId() == null) {
+            com.subtrack.entity.User user = userContext.getCurrentUser();
+            if (!(user instanceof Client client)) {
                 FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "User not logged in"));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "User not logged in or invalid role"));
                 return null;
             }
             
@@ -90,7 +92,7 @@ public class SubscriptionController implements Serializable {
             subscription.setCancelLink(cancelLink);
             subscription.setNotes(notes);
             subscription.setStatus(SubscriptionStatus.ACTIVE);
-            subscription.setClient(userContext.getCurrentUser());
+            subscription.setClient(client);
             
             subscriptionService.create(subscription);
             

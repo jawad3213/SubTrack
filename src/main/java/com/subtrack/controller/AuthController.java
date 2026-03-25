@@ -1,6 +1,7 @@
 package com.subtrack.controller;
 
 import com.subtrack.entity.Client;
+import com.subtrack.entity.User;
 import com.subtrack.enums.AccountType;
 import com.subtrack.enums.Role;
 import com.subtrack.service.ClientService;
@@ -9,7 +10,6 @@ import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
-import jakarta.servlet.http.HttpSession;
 import java.io.Serializable;
 
 @Named
@@ -30,7 +30,7 @@ public class AuthController implements Serializable {
     private String firstName;
     private String lastName;
     private AccountType accountType;
-    private Client loggedInUser;
+    private User loggedInUser;
     private boolean loggedIn = false;
 
     public String login() {
@@ -154,11 +154,11 @@ public class AuthController implements Serializable {
         this.accountType = accountType;
     }
 
-    public Client getLoggedInUser() {
+    public User getLoggedInUser() {
         return loggedInUser;
     }
 
-    public void setLoggedInUser(Client loggedInUser) {
+    public void setLoggedInUser(User loggedInUser) {
         this.loggedInUser = loggedInUser;
     }
 }

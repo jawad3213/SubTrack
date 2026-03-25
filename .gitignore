@@ -78,11 +78,6 @@ standalone/deployments/*.pending
 # === Docker ===
 docker-compose.override.yml
 
-# === Tools / Environment ===
-.opencode/
-.specify/
-acli.exe
-
 # === Misc ===
 *.swp
 *.swo

@@ -9,6 +9,8 @@
         <jta-data-source>java:global/SubtrackDS</jta-data-source>
         
         <!-- Entity Classes -->
+        <class>com.subtrack.entity.User</class>
+        <class>com.subtrack.entity.Admin</class>
         <class>com.subtrack.entity.Client</class>
         <class>com.subtrack.entity.Subscription</class>
         <class>com.subtrack.entity.PaymentHistory</class>

@@ -11,7 +11,7 @@
         <class-name>org.postgresql.ds.PGSimpleDataSource</class-name>
         <url>jdbc:postgresql://localhost:5432/subtrack</url>
         <user>postgres</user>
-        <password>12345</password>
+        <password>khoukahajar</password>
     </data-source>
     
     <!-- Jakarta Faces Configuration -->
