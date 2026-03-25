@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="https://jakarta.ee/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_1.xsd"
+             version="3.1">
+    
+    <persistence-unit name="subtrackPU" transaction-type="JTA">
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+        <jta-data-source>java:global/SubtrackDS</jta-data-source>
+        
+        <!-- Entity Classes -->
+        <class>com.subtrack.entity.Client</class>
+        <class>com.subtrack.entity.Subscription</class>
+        <class>com.subtrack.entity.PaymentHistory</class>
+        <class>com.subtrack.entity.Category</class>
+        <class>com.subtrack.entity.AlertRule</class>
+        <class>com.subtrack.entity.EmailIntegration</class>
+        <class>com.subtrack.entity.Invoice</class>
+        <class>com.subtrack.entity.ExchangeRate</class>
+        <class>com.subtrack.entity.SaaSService</class>
+        
+        <properties>
+            <!-- JDBC Configuration moved to DataSourceDefinition -->
+            
+            <!-- Hibernate Configuration -->
+            <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect"/>
+            <property name="hibernate.hbm2ddl.auto" value="none"/>
+            <property name="hibernate.show_sql" value="true"/>
+            <property name="hibernate.format_sql" value="true"/>
+            <property name="hibernate.use_sql_comments" value="true"/>
+            
+            <!-- Connection Pool -->
+            <property name="hibernate.connection.pool_size" value="10"/>
+            
+            <!-- Second Level Cache disabled for EE compatibility -->
+            <property name="hibernate.cache.use_second_level_cache" value="false"/>
+            
+            <!-- Statistics -->
+            <property name="hibernate.generate_statistics" value="false"/>
+        </properties>
+    </persistence-unit>
+    
+</persistence>

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+<ui:composition template="/templates/admin-layout.xhtml">
+    <ui:define name="title">User Management - SubTrack Admin</ui:define>
+
+    <ui:define name="content">
+        <!-- Page Header -->
+        <div class="page-header" style="margin-bottom: 28px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h1 style="color: #1A1A1A; font-size: 22px; font-weight: 700;">Users &amp; Clients</h1>
+                <p style="color: #5F5E5A; font-size: 14px;">View and manage all registered platform users</p>
+            </div>
+        </div>
+
+        <h:form id="userMgmtForm">
+            <!-- Filter Bar -->
+            <div class="admin-filter-bar">
+                <h:inputText value="#{adminUserBean.searchQuery}" placeholder="Search by name or email..." styleClass="admin-search-input"/>
+                <h:selectOneMenu value="#{adminUserBean.filterAccountType}" style="min-width: 140px;">
+                    <f:selectItem itemLabel="All Types" itemValue=""/>
+                    <f:selectItem itemLabel="Individual" itemValue="B2C"/>
+                    <f:selectItem itemLabel="Freelance" itemValue="FREELANCE"/>
+                    <f:selectItem itemLabel="Business" itemValue="B2B"/>
+                </h:selectOneMenu>
+                <h:selectOneMenu value="#{adminUserBean.filterStatus}" style="min-width: 130px;">
+                    <f:selectItem itemLabel="All Status" itemValue=""/>
+                    <f:selectItem itemLabel="Active" itemValue="true"/>
+                    <f:selectItem itemLabel="Suspended" itemValue="false"/>
+                </h:selectOneMenu>
+                <h:commandButton value="Search" action="#{adminUserBean.search}" styleClass="btn-primary" style="height:34px; padding: 0 16px; font-size: 13px;"/>
+            </div>
+
+            <!-- Users Table -->
+            <div class="card" style="padding: 0; overflow: hidden;">
+                <h:dataTable value="#{adminUserBean.users}" var="user" styleClass="data-table"
+                             rendered="#{not empty adminUserBean.users}">
+                    <h:column>
+                        <f:facet name="header">User</f:facet>
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <span class="avatar-initials">
+                                #{user.firstName != null and user.firstName.length() > 0 ? user.firstName.substring(0,1) : '?'}#{user.lastName != null and user.lastName.length() > 0 ? user.lastName.substring(0,1) : '?'}
+                            </span>
+                            <div>
+                                <div style="font-weight: 600; color: #1A1A1A; font-size: 14px;">#{user.fullName}</div>
+                                <div style="font-size: 12px; color: #5F5E5A;">#{user.email}</div>
+                            </div>
+                        </div>
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Role</f:facet>
+                        <span class="badge" style="#{user.role.name() == 'ADMIN' ? 'background: #FAEEDA; color: #633806;' : 'background: #E6F1FB; color: #185FA5;'}">
+                            #{user.role.name()}
+                        </span>
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Account Type</f:facet>
+                        <span class="badge" style="background: #F5F5F3; color: #1A1A1A;">
+                            #{user.accountType != null ? user.accountType.displayName : 'N/A'}
+                        </span>
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Registered</f:facet>
+                        <span style="font-size: 13px; color: #5F5E5A;">
+                            #{user.createdAt != null ? user.createdAt.toLocalDate().toString() : 'Unknown'}
+                        </span>
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Status</f:facet>
+                        <span class="badge #{user.isActive ? 'active' : 'cancelled'}">
+                            #{user.isActive ? 'Active' : 'Suspended'}
+                        </span>
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Actions</f:facet>
+                        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                            <h:link outcome="/admin/user-detail" value="View" styleClass="btn-secondary" style="padding: 4px 12px; font-size: 12px; height: 28px;">
+                                <f:param name="id" value="#{user.id}"/>
+                            </h:link>
+                            <h:commandButton value="Suspend" action="#{adminUserBean.suspendUser}" 
+                                             styleClass="btn-danger" style="padding: 4px 12px; font-size: 12px; height: 28px;"
+                                             rendered="#{user.isActive and user.role.name() != 'ADMIN'}">
+                                <f:setPropertyActionListener target="#{adminUserBean.selectedUser}" value="#{user}"/>
+                            </h:commandButton>
+                            <h:commandButton value="Activate" action="#{adminUserBean.activateUser}" 
+                                             styleClass="btn-success" style="padding: 4px 12px; font-size: 12px; height: 28px;"
+                                             rendered="#{not user.isActive}">
+                                <f:setPropertyActionListener target="#{adminUserBean.selectedUser}" value="#{user}"/>
+                            </h:commandButton>
+                        </div>
+                    </h:column>
+                </h:dataTable>
+
+                <h:panelGroup rendered="#{empty adminUserBean.users}">
+                    <div class="empty-state" style="padding: 60px 20px;">
+                        <svg style="width: 48px; height: 48px; stroke: #B4B2A9; fill: none; stroke-width: 1.5; margin-bottom: 16px;" viewBox="0 0 24 24">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                        <p style="font-size: 15px; font-weight: 500; color: #5F5E5A;">No users found matching your criteria.</p>
+                        <p style="font-size: 13px; color: #B4B2A9;">Try adjusting your search or filters.</p>
+                    </div>
+                </h:panelGroup>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>
+</html>

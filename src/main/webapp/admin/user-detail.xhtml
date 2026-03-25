@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+<ui:composition template="/templates/admin-layout.xhtml">
+    <ui:define name="title">User Detail - SubTrack Admin</ui:define>
+
+    <ui:define name="content">
+        <f:metadata>
+            <f:viewParam name="id" value="#{adminUserDetailBean.clientId}"/>
+            <f:viewAction action="#{adminUserDetailBean.loadUser}"/>
+        </f:metadata>
+
+        <!-- Page Header -->
+        <div class="page-header" style="margin-bottom: 28px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h1 style="color: #1A1A1A; font-size: 22px; font-weight: 700;">User Detail</h1>
+                <p style="color: #5F5E5A; font-size: 14px;">Detailed view of client account</p>
+            </div>
+            <h:link outcome="/admin/users" value="← Back to Users" styleClass="btn-secondary"/>
+        </div>
+
+        <h:panelGroup rendered="#{adminUserDetailBean.user != null}">
+            <!-- Profile Card -->
+            <div class="card" style="margin-bottom: 24px;">
+                <div style="display: flex; align-items: center; gap: 20px;">
+                    <span class="avatar-initials" style="width: 56px; height: 56px; font-size: 20px;">
+                        #{adminUserDetailBean.user.firstName != null and adminUserDetailBean.user.firstName.length() > 0 ? adminUserDetailBean.user.firstName.substring(0,1) : '?'}#{adminUserDetailBean.user.lastName != null and adminUserDetailBean.user.lastName.length() > 0 ? adminUserDetailBean.user.lastName.substring(0,1) : '?'}
+                    </span>
+                    <div style="flex: 1;">
+                        <h2 style="font-size: 20px; font-weight: 700; color: #1A1A1A; margin-bottom: 4px;">#{adminUserDetailBean.user.fullName}</h2>
+                        <p style="color: #5F5E5A; font-size: 14px;">#{adminUserDetailBean.user.email}</p>
+                    </div>
+                    <div style="text-align: right;">
+                        <span class="badge #{adminUserDetailBean.user.isActive ? 'active' : 'cancelled'}" style="font-size: 13px; padding: 5px 14px;">
+                            #{adminUserDetailBean.user.isActive ? 'Active' : 'Suspended'}
+                        </span>
+                        <div style="margin-top: 8px;">
+                            <span class="badge" style="background: #E6F1FB; color: #185FA5;">
+                                #{adminUserDetailBean.user.accountType != null ? adminUserDetailBean.user.accountType.displayName : 'N/A'}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 40px; margin-top: 20px; padding-top: 16px; border-top: 0.5px solid rgba(0,0,0,0.08);">
+                    <div>
+                        <span style="font-size: 11px; color: #5F5E5A; text-transform: uppercase; letter-spacing: 0.08em;">Registered</span>
+                        <div style="font-size: 14px; color: #1A1A1A; font-weight: 500; margin-top: 2px;">
+                            #{adminUserDetailBean.user.createdAt != null ? adminUserDetailBean.user.createdAt.toLocalDate().toString() : 'Unknown'}
+                        </div>
+                    </div>
+                    <div>
+                        <span style="font-size: 11px; color: #5F5E5A; text-transform: uppercase; letter-spacing: 0.08em;">Role</span>
+                        <div style="font-size: 14px; color: #1A1A1A; font-weight: 500; margin-top: 2px;">#{adminUserDetailBean.user.role.displayName}</div>
+                    </div>
+                    <div>
+                        <span style="font-size: 11px; color: #5F5E5A; text-transform: uppercase; letter-spacing: 0.08em;">Email</span>
+                        <div style="font-size: 14px; color: #1A1A1A; font-weight: 500; margin-top: 2px;">#{adminUserDetailBean.user.email}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Subscriptions -->
+            <div class="card" style="margin-bottom: 24px;">
+                <div class="card-header">
+                    <h2 class="card-title">Subscriptions</h2>
+                </div>
+                <h:dataTable value="#{adminUserDetailBean.user.subscriptions}" var="sub" styleClass="data-table"
+                             rendered="#{not empty adminUserDetailBean.user.subscriptions}">
+                    <h:column>
+                        <f:facet name="header">Service</f:facet>
+                        #{sub.name}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Price</f:facet>
+                        <h:outputText value="#{sub.price}"><f:convertNumber pattern="#,##0.00"/></h:outputText>
+                        #{sub.originalCurrency}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Frequency</f:facet>
+                        #{sub.frequency.displayName}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Status</f:facet>
+                        <span class="badge #{sub.status.name().toLowerCase()}">#{sub.status}</span>
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Next Billing</f:facet>
+                        #{sub.nextBillingDate != null ? sub.nextBillingDate.toString() : 'N/A'}
+                    </h:column>
+                </h:dataTable>
+                <h:panelGroup rendered="#{empty adminUserDetailBean.user.subscriptions}">
+                    <div class="empty-state"><p>No subscriptions for this user.</p></div>
+                </h:panelGroup>
+            </div>
+
+            <!-- Admin Actions -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Admin Actions</h2>
+                </div>
+                <h:form>
+                    <div style="display: flex; gap: 10px;">
+                        <h:commandButton value="Suspend Account" action="#{adminUserDetailBean.suspendUser}"
+                                         styleClass="btn-danger" rendered="#{adminUserDetailBean.user.isActive}"
+                                         onclick="return confirm('Suspend this user?');"/>
+                        <h:commandButton value="Reactivate Account" action="#{adminUserDetailBean.activateUser}"
+                                         styleClass="btn-success" rendered="#{not adminUserDetailBean.user.isActive}"/>
+                        <h:commandButton value="Delete Account" action="#{adminUserDetailBean.deleteUser}"
+                                         styleClass="btn-danger" onclick="return confirm('Permanently delete this user? This cannot be undone.');"/>
+                    </div>
+                </h:form>
+            </div>
+        </h:panelGroup>
+
+        <h:panelGroup rendered="#{adminUserDetailBean.user == null}">
+            <div class="alert alert-danger"><p>User not found.</p></div>
+        </h:panelGroup>
+    </ui:define>
+</ui:composition>
+</html>

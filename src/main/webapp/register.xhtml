@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+<h:head>
+    <title>Register - SubTrack</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <h:outputStylesheet name="css/auth.css"/>
+</h:head>
+<h:body>
+    <div class="auth-wrapper">
+        <div class="auth-card">
+            
+            <div class="logo-block">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    </svg>
+                </div>
+                <span class="brand-name">SubTrack</span>
+            </div>
+            
+            <div class="auth-header" style="margin-bottom: 1.5rem;">
+                <h1 class="page-title">Create account</h1>
+                <p class="page-subtitle">Join us to manage subscriptions easily</p>
+            </div>
+            
+            <h:form id="registerForm" prependId="false" styleClass="auth-form">
+                
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <div class="segmented-control">
+                        <div class="segment-btn active" onclick="selectType(this, 'B2C')">Personal</div>
+                        <div class="segment-btn" onclick="selectType(this, 'FREELANCE')">Freelance</div>
+                        <div class="segment-btn" onclick="selectType(this, 'B2B')">Business</div>
+                    </div>
+                    <h:inputHidden id="accountType" value="#{authController.accountType}" required="true" requiredMessage="Account Type is required"/>
+                    <h:message for="accountType" styleClass="field-error"/>
+                </div>
+
+                <div style="display: flex; gap: 12px; margin-bottom: 12px;">
+                    <div class="form-group" style="flex: 1; margin: 0;">
+                        <h:outputLabel for="firstName" value="First name" styleClass="form-label" />
+                        <h:inputText id="firstName" 
+                                     value="#{authController.firstName}" 
+                                     required="true"
+                                     requiredMessage="First name required"
+                                     styleClass="form-input"
+                                     html5:placeholder="First"
+                                     xmlns:html5="http://xmlns.jcp.org/jsf/passthrough"/>
+                        <h:message for="firstName" styleClass="field-error"/>
+                    </div>
+                    
+                    <div class="form-group" style="flex: 1; margin: 0;">
+                        <h:outputLabel for="lastName" value="Last name" styleClass="form-label" />
+                        <h:inputText id="lastName" 
+                                     value="#{authController.lastName}" 
+                                     required="true"
+                                     requiredMessage="Last name required"
+                                     styleClass="form-input"
+                                     html5:placeholder="Last"
+                                     xmlns:html5="http://xmlns.jcp.org/jsf/passthrough"/>
+                        <h:message for="lastName" styleClass="field-error"/>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <h:outputLabel for="email" value="Email address" styleClass="form-label" />
+                    <h:inputText id="email" 
+                                 value="#{authController.email}" 
+                                 required="true"
+                                 requiredMessage="Email is required"
+                                 validatorMessage="Invalid email format"
+                                 styleClass="form-input"
+                                 html5:placeholder="name@company.com" 
+                                 xmlns:html5="http://xmlns.jcp.org/jsf/passthrough">
+                        <f:validateRegex pattern="^[^@\s]+@[^@\s]+\.[^@\s]+$" />
+                    </h:inputText>
+                    <h:message for="email" styleClass="field-error"/>
+                </div>
+                
+                <div class="form-group">
+                    <h:outputLabel for="password" value="Password" styleClass="form-label" />
+                    <div style="position: relative;">
+                        <h:inputSecret id="password" 
+                                       value="#{authController.password}" 
+                                       required="true"
+                                       requiredMessage="Password is required"
+                                       styleClass="form-input password-input"
+                                       html5:placeholder="Create a password"
+                                       xmlns:html5="http://xmlns.jcp.org/jsf/passthrough" />
+                        <button type="button" class="password-toggle" onclick="togglePassword('password')">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                        </button>
+                    </div>
+                    <h:message for="password" styleClass="field-error"/>
+                </div>
+
+                <div class="form-group">
+                    <h:outputLabel for="confirmPassword" value="Confirm password" styleClass="form-label" />
+                    <div style="position: relative;">
+                        <h:inputSecret id="confirmPassword" 
+                                       value="#{authController.confirmPassword}" 
+                                       required="true"
+                                       requiredMessage="Confirmation is required"
+                                       styleClass="form-input password-input"
+                                       html5:placeholder="Confirm password"
+                                       xmlns:html5="http://xmlns.jcp.org/jsf/passthrough" />
+                        <button type="button" class="password-toggle" onclick="togglePassword('confirmPassword')">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                        </button>
+                    </div>
+                    <h:message for="confirmPassword" styleClass="field-error"/>
+                </div>
+                
+                <h:messages globalOnly="true" styleClass="msg-error"/>
+                
+                <h:commandButton value="Create account" 
+                                 action="#{authController.register}" 
+                                 styleClass="btn-primary"/>
+                                 
+                <div class="auth-footer">
+                    Already have an account? <h:link outcome="login" value="Sign in" styleClass="auth-link"/>
+                </div>
+            </h:form>
+        </div>
+    </div>
+    
+    <script>
+        function togglePassword(id) {
+            var pwdField = document.getElementById(id);
+            if (pwdField.type === 'password') {
+                pwdField.type = 'text';
+            } else {
+                pwdField.type = 'password';
+            }
+        }
+
+        function selectType(btn, type) {
+            // Update UI buttons
+            var buttons = document.querySelectorAll('.segment-btn');
+            buttons.forEach(function(b) {
+                b.classList.remove('active');
+            });
+            btn.classList.add('active');
+            
+            // Set hidden input value for JSF submission
+            document.getElementById('accountType').value = type;
+        }
+
+        // Initialize segmented control based on prepopulated value (if any), fallback to B2C
+        window.addEventListener('load', function() {
+            var input = document.getElementById('accountType');
+            if(!input.value) {
+                input.value = 'B2C'; // Default to Personal
+            } else {
+                var buttons = document.querySelectorAll('.segment-btn');
+                buttons.forEach(function(b) {
+                    if(b.getAttribute('onclick').includes(input.value)) {
+                        b.classList.add('active');
+                    } else {
+                        b.classList.remove('active');
+                    }
+                });
+            }
+        });
+    </script>
+</h:body>
+</html>

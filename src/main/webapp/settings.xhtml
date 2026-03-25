@@ -1,0 +1,193 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+<ui:composition template="/templates/layout.xhtml">
+    <ui:define name="title">Settings - SubTrack</ui:define>
+    
+    <ui:define name="content">
+        <div class="page-header" style="margin-bottom: 30px;">
+            <h1 style="color: #1A1A1A;">Settings</h1>
+            <p style="color: #5F5E5A;">Manage your account preferences</p>
+        </div>
+
+        <ul class="nav-tabs">
+            <li class="active">
+                <a href="#" onclick="showTab('profile',this);return false;">Profile</a>
+            </li>
+            <li>
+                <a href="#" onclick="showTab('security',this);return false;">Security</a>
+            </li>
+            <li>
+                <a href="#" onclick="showTab('notifications',this);return false;">Notifications</a>
+            </li>
+            <li>
+                <a href="#" onclick="showTab('danger',this);return false;">Danger Zone</a>
+            </li>
+        </ul>
+        
+        <div class="tab-content">
+            <!-- Profile Tab -->
+            <div class="tab-pane" id="profile">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Profile Information</h2>
+                    </div>
+                    
+                    <h:form>
+                        <div class="form-group">
+                            <h:outputLabel for="email" value="Email Address:" styleClass="form-label"/>
+                            <h:inputText id="email" value="#{userContext.currentUser.email}" 
+                                         styleClass="form-control" disabled="true"/>
+                            <small style="color: #999;">Email cannot be changed</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <h:outputLabel for="fullName" value="Full Name:" styleClass="form-label"/>
+                            <h:inputText id="fullName" value="#{settingsController.fullName}" 
+                                         styleClass="form-control"/>
+                        </div>
+                        
+                        <div class="form-group">
+                            <h:outputLabel for="timezone" value="Timezone:" styleClass="form-label"/>
+                            <h:selectOneMenu id="timezone" value="#{settingsController.timezone}" 
+                                             styleClass="form-control">
+                                <f:selectItem itemLabel="UTC" itemValue="UTC"/>
+                                <f:selectItem itemLabel="Europe/Paris" itemValue="Europe/Paris"/>
+                                <f:selectItem itemLabel="Europe/London" itemValue="Europe/London"/>
+                                <f:selectItem itemLabel="America/New_York" itemValue="America/New_York"/>
+                                <f:selectItem itemLabel="America/Los_Angeles" itemValue="America/Los_Angeles"/>
+                                <f:selectItem itemLabel="Asia/Tokyo" itemValue="Asia/Tokyo"/>
+                                <f:selectItem itemLabel="Asia/Dubai" itemValue="Asia/Dubai"/>
+                            </h:selectOneMenu>
+                        </div>
+                        
+                        <div class="form-group">
+                            <h:outputLabel for="accountType" value="Account Type:" styleClass="form-label"/>
+                            <h:inputText id="accountType" value="#{userContext.currentUser.accountType}" 
+                                         styleClass="form-control" disabled="true"/>
+                        </div>
+                        
+                        <h:commandButton value="Save Changes" action="#{settingsController.updateProfile}" 
+                                         styleClass="btn-primary"/>
+                    </h:form>
+                </div>
+            </div>
+            
+            <!-- Security Tab -->
+            <div class="tab-pane" id="security">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Change Password</h2>
+                    </div>
+                    
+                    <h:form>
+                        <div class="form-group">
+                            <h:outputLabel for="currentPassword" value="Current Password:" styleClass="form-label"/>
+                            <h:inputSecret id="currentPassword" value="#{settingsController.currentPassword}" 
+                                           styleClass="form-control" required="true"/>
+                        </div>
+                        
+                        <div class="form-group">
+                            <h:outputLabel for="newPassword" value="New Password:" styleClass="form-label"/>
+                            <h:inputSecret id="newPassword" value="#{settingsController.newPassword}" 
+                                           styleClass="form-control" required="true"/>
+                            <small style="color: #999;">Minimum 8 characters</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <h:outputLabel for="confirmPassword" value="Confirm New Password:" styleClass="form-label"/>
+                            <h:inputSecret id="confirmPassword" value="#{settingsController.confirmPassword}" 
+                                           styleClass="form-control" required="true"/>
+                        </div>
+                        
+                        <h:commandButton value="Change Password" action="#{settingsController.changePassword}" 
+                                         styleClass="btn-primary"/>
+                    </h:form>
+                </div>
+            </div>
+            
+            <!-- Notifications Tab -->
+            <div class="tab-pane" id="notifications">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Notification Preferences</h2>
+                    </div>
+                    
+                    <h:form>
+                        <div class="form-group">
+                            <h:selectBooleanCheckbox id="emailNotif" value="#{settingsController.emailNotifications}"/>
+                            <h:outputLabel for="emailNotif" value=" Email Notifications" style="margin-left: 8px;"/>
+                            <p style="color: #999; margin-top: 5px; margin-left: 24px;">Receive billing reminders and alerts via email</p>
+                        </div>
+                        
+                        <hr style="margin: 20px 0;"/>
+                        
+                        <div class="form-group">
+                            <h:selectBooleanCheckbox id="telegramEnabled" value="#{settingsController.telegramEnabled}"/>
+                            <h:outputLabel for="telegramEnabled" value=" Telegram Notifications" style="margin-left: 8px;"/>
+                        </div>
+                        
+                        <div class="form-group" style="margin-left: 24px;">
+                            <h:outputLabel for="telegramChatId" value="Telegram Chat ID:" styleClass="form-label"/>
+                            <h:inputText id="telegramChatId" value="#{settingsController.telegramChatId}" 
+                                         styleClass="form-control"
+                                         disabled="#{not settingsController.telegramEnabled}"/>
+                        </div>
+                        
+                        <hr style="margin: 20px 0;"/>
+                        
+                        <div class="form-group">
+                            <h:selectBooleanCheckbox id="whatsappEnabled" value="#{settingsController.whatsappEnabled}"/>
+                            <h:outputLabel for="whatsappEnabled" value=" WhatsApp Notifications" style="margin-left: 8px;"/>
+                        </div>
+                        
+                        <div class="form-group" style="margin-left: 24px;">
+                            <h:outputLabel for="whatsappNumber" value="WhatsApp Number:" styleClass="form-label"/>
+                            <h:inputText id="whatsappNumber" value="#{settingsController.whatsappNumber}" 
+                                         styleClass="form-control"
+                                         disabled="#{not settingsController.whatsappEnabled}"/>
+                        </div>
+                        
+                        <h:commandButton value="Save Preferences" action="#{settingsController.updateNotificationPreferences}" 
+                                         styleClass="btn-primary"/>
+                    </h:form>
+                </div>
+            </div>
+            
+            <!-- Danger Zone Tab -->
+            <div class="tab-pane" id="danger">
+                <div class="card" style="border: 1px solid #791F1F;">
+                    <div class="card-header" style="background: #791F1F; color: white;">
+                        <h2 class="card-title" style="color: white;">Danger Zone</h2>
+                    </div>
+                    
+                    <div class="alert alert-danger">
+                        <p style="font-weight: 600; margin-bottom: 10px;">Delete Account</p>
+                        <p>Once you delete your account, there is no going back. Please be certain.</p>
+                    </div>
+                    
+                    <h:form>
+                        <p style="margin-bottom: 15px;">
+                            This will permanently delete your account and all associated data including:
+                        </p>
+                        <ul style="margin-bottom: 15px;">
+                            <li>All subscriptions</li>
+                            <li>Payment history</li>
+                            <li>Alert configurations</li>
+                            <li>Invoice records</li>
+                        </ul>
+                        
+                        <h:commandButton value="Delete My Account" action="#{settingsController.deleteAccount}" 
+                                         styleClass="btn-danger"
+                                         onclick="return confirm('Are you absolutely sure? This action cannot be undone.');"/>
+                    </h:form>
+                </div>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>
+</html>

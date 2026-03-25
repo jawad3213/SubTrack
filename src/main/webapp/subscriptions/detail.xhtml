@@ -1,0 +1,197 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+<ui:composition template="/templates/layout.xhtml">
+    <ui:define name="title">Subscription Details - SubTrack</ui:define>
+    
+    <ui:define name="content">
+        <div class="page-header" style="margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h1 style="color: #1A1A1A;">
+                    <h:outputText value="#{subscriptionController.selectedSubscription.name}"/>
+                </h1>
+                <p style="color: #5F5E5A;">Subscription details and history</p>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <h:link outcome="/subscriptions/edit" styleClass="btn-secondary">
+                    <f:param name="id" value="#{subscriptionController.selectedSubscription.id}"/>
+                    Edit
+                </h:link>
+                <h:commandButton value="Delete" action="#{subscriptionController.deleteSubscription}" 
+                                 styleClass="btn-danger"
+                                 onclick="return confirm('Are you sure you want to delete this subscription?');"/>
+            </div>
+        </div>
+
+        <h:panelGroup rendered="#{subscriptionController.selectedSubscription == null}">
+            <div class="alert alert-warning">
+                <p>No subscription selected. <h:link outcome="/subscriptions/list" value="Go to subscriptions list"/></p>
+            </div>
+        </h:panelGroup>
+
+        <h:panelGroup rendered="#{subscriptionController.selectedSubscription != null}">
+            <!-- Subscription Info -->
+            <div class="row" style="display: flex; gap: 20px; margin-bottom: 20px;">
+                <div class="col-md-6" style="flex: 1;">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Subscription Information</h2>
+                        </div>
+                        
+                        <dl class="dl-horizontal" style="display: grid; grid-template-columns: 140px 1fr; gap: 12px;">
+                            <dt style="color: #5F5E5A;">Service Name:</dt>
+                            <dd>#{subscriptionController.selectedSubscription.name}</dd>
+                            
+                            <dt style="color: #5F5E5A;">Description:</dt>
+                            <dd>#{subscriptionController.selectedSubscription.description != null ? subscriptionController.selectedSubscription.description : '-'}</dd>
+                            
+                            <dt style="color: #5F5E5A;">Category:</dt>
+                            <dd>#{subscriptionController.selectedSubscription.category != null ? subscriptionController.selectedSubscription.category.name : 'Uncategorized'}</dd>
+                            
+                            <dt style="color: #5F5E5A;">Status:</dt>
+                            <dd>
+                                <span class="badge #{subscriptionController.selectedSubscription.status.name().toLowerCase()}">
+                                    #{subscriptionController.selectedSubscription.status}
+                                </span>
+                            </dd>
+                            
+                            <dt style="color: #5F5E5A;">Start Date:</dt>
+                            <dd>
+                                <h:outputText value="#{subscriptionController.selectedSubscription.startDate}">
+                                    <f:convertDateTime type="date" dateStyle="medium"/>
+                                </h:outputText>
+                            </dd>
+                            
+                            <dt style="color: #5F5E5A;">Next Billing:</dt>
+                            <dd>
+                                <h:outputText value="#{subscriptionController.selectedSubscription.nextBillingDate}">
+                                    <f:convertDateTime type="date" dateStyle="medium"/>
+                                </h:outputText>
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+                
+                <div class="col-md-6" style="flex: 1;">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Pricing</h2>
+                        </div>
+                        
+                        <dl class="dl-horizontal" style="display: grid; grid-template-columns: 140px 1fr; gap: 12px;">
+                            <dt style="color: #5F5E5A;">Price:</dt>
+                            <dd>
+                                <h:outputText value="#{subscriptionController.selectedSubscription.price}">
+                                    <f:convertNumber pattern="#,##0.00"/>
+                                </h:outputText>
+                                #{subscriptionController.selectedSubscription.originalCurrency} 
+                                / #{subscriptionController.selectedSubscription.frequency.displayName}
+                            </dd>
+                            
+                            <dt style="color: #5F5E5A;">Monthly Cost:</dt>
+                            <dd>
+                                <h:outputText value="#{subscriptionController.selectedSubscription.monthlyCost}">
+                                    <f:convertNumber pattern="#,##0.00"/>
+                                </h:outputText> MAD
+                            </dd>
+                            
+                            <dt style="color: #5F5E5A;">Annual Cost:</dt>
+                            <dd>
+                                <h:outputText value="#{subscriptionController.selectedSubscription.annualCost}">
+                                    <f:convertNumber pattern="#,##0.00"/>
+                                </h:outputText> MAD
+                            </dd>
+                            
+                            <dt style="color: #5F5E5A;">Cancel Link:</dt>
+                            <dd>
+                                <h:panelGroup rendered="#{subscriptionController.selectedSubscription.cancelLink != null}">
+                                    <a href="#{subscriptionController.selectedSubscription.cancelLink}" target="_blank">View Cancellation Page</a>
+                                </h:panelGroup>
+                                <h:panelGroup rendered="#{subscriptionController.selectedSubscription.cancelLink == null}">
+                                    -
+                                </h:panelGroup>
+                            </dd>
+                        </dl>
+                    </div>
+                    
+                    <div class="card" style="margin-top: 20px;">
+                        <div class="card-header">
+                            <h2 class="card-title">Actions</h2>
+                        </div>
+                        
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            <h:commandButton value="Pause" action="#{subscriptionController.pauseSubscription}" 
+                                             styleClass="btn-warning"
+                                             rendered="#{subscriptionController.selectedSubscription.status.name() == 'ACTIVE'}"/>
+                            <h:commandButton value="Cancel" action="#{subscriptionController.cancelSubscription}" 
+                                             styleClass="btn-danger"
+                                             rendered="#{subscriptionController.selectedSubscription.status.name() == 'ACTIVE'}"/>
+                            <h:commandButton value="Reactivate" action="#{subscriptionController.reactivateSubscription}" 
+                                             styleClass="btn-success"
+                                             rendered="#{subscriptionController.selectedSubscription.status.name() != 'ACTIVE'}"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notes -->
+            <h:panelGroup rendered="#{subscriptionController.selectedSubscription.notes != null}">
+                <div class="card" style="margin-bottom: 20px;">
+                    <div class="card-header">
+                        <h2 class="card-title">Notes</h2>
+                    </div>
+                    <p>#{subscriptionController.selectedSubscription.notes}</p>
+                </div>
+            </h:panelGroup>
+
+            <!-- Payment History for this Subscription -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Payment History</h2>
+                </div>
+                
+                <h:dataTable value="#{subscriptionController.selectedSubscription.paymentHistory}" var="payment" 
+                             styleClass="data-table"
+                             rendered="#{not empty subscriptionController.selectedSubscription.paymentHistory}">
+                    <h:column>
+                        <f:facet name="header">Date</f:facet>
+                        <h:outputText value="#{payment.paymentDate}">
+                            <f:convertDateTime type="date" dateStyle="medium"/>
+                        </h:outputText>
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Amount</f:facet>
+                        <h:outputText value="#{payment.amount}">
+                            <f:convertNumber pattern="#,##0.00"/>
+                        </h:outputText>
+                        #{payment.currency}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Invoice</f:facet>
+                        <h:panelGroup rendered="#{payment.invoiceUrl != null}">
+                            <a href="#{payment.invoiceUrl}" target="_blank">View</a>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{payment.invoiceUrl == null}">
+                            -
+                        </h:panelGroup>
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Notes</f:facet>
+                        <h:outputText value="#{payment.notes}"/>
+                    </h:column>
+                </h:dataTable>
+                
+                <h:panelGroup rendered="#{empty subscriptionController.selectedSubscription.paymentHistory}">
+                    <div class="empty-state">
+                        <p>No payment history recorded for this subscription.</p>
+                    </div>
+                </h:panelGroup>
+            </div>
+        </h:panelGroup>
+    </ui:define>
+</ui:composition>
+</html>

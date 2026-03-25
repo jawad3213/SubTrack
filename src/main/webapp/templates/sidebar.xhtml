@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nav class="sidebar" xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:h="http://xmlns.jcp.org/jsf/html"
+     xmlns:f="http://xmlns.jcp.org/jsf/core"
+     xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+    <div class="sidebar-logo">
+        <svg class="sidebar-icon" style="width: 22px; height: 22px; stroke: #FFFFFF;" viewBox="0 0 24 24">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+        <span style="font-size: 17px; font-weight: 500; margin-left: 2px;">SubTrack</span>
+    </div>
+
+    <ul class="sidebar-menu">
+        <li>
+            <h:link outcome="/dashboard">
+                <svg class="sidebar-icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                Dashboard
+            </h:link>
+        </li>
+        <li>
+            <h:link outcome="/subscriptions/list">
+                <svg class="sidebar-icon" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
+                My Subscriptions
+            </h:link>
+        </li>
+        <li>
+            <h:link outcome="/payments">
+                <svg class="sidebar-icon" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                Payments
+            </h:link>
+        </li>
+        <li>
+            <h:link outcome="/invoices">
+                <svg class="sidebar-icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                Invoices
+            </h:link>
+        </li>
+        <li>
+            <h:link outcome="/analytics">
+                <svg class="sidebar-icon" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                Analytics
+            </h:link>
+        </li>
+        <li>
+            <h:link outcome="/alerts">
+                <svg class="sidebar-icon" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                Alerts
+            </h:link>
+        </li>
+        <li>
+            <h:link outcome="/export">
+                <svg class="sidebar-icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                Export Data
+            </h:link>
+        </li>
+        <li style="margin-top:10px; padding-top:10px; border-top:0.5px solid rgba(255,255,255,0.15);">
+            <h:link outcome="/profile">
+                <svg class="sidebar-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                Profile
+            </h:link>
+        </li>
+        <li>
+            <h:link outcome="/settings">
+                <svg class="sidebar-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                Settings
+            </h:link>
+        </li>
+
+        <li style="margin-top:15px; padding-top:15px; border-top:0.5px solid rgba(255,255,255,0.15);">
+            <h:form id="logoutForm" style="margin:0; padding:0;">
+                <h:commandLink action="#{authController.logout}" styleClass="sidebar-menu-btn" style="color:#B5D4F4; display:flex; align-items:center; gap:12px; padding:10px 15px; border-radius:8px; text-decoration:none; transition: all 0.3s;">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                    Logout
+                </h:commandLink>
+            </h:form>
+        </li>
+    </ul>
+
+    <div class="sidebar-user" style="position: relative; margin-top: 25px; border-top: 0.5px solid rgba(255,255,255,0.15); padding-top: 15px; text-align: center;">
+        <p style="color:#B5D4F4; font-size:12px; margin-bottom:4px;">Logged in as</p>
+        <p style="color:#FFFFFF; font-weight:500; font-size:14px; word-break:break-word;">#{userContext.userName}</p>
+    </div>
+</nav>

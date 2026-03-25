@@ -1,0 +1,84 @@
+# === Maven ===
+HELP.md
+target/
+!**/src/main/**/target/
+!**/src/test/**/target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# === IDE - IntelliJ IDEA ===
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# === IDE - Eclipse / STS ===
+.project
+.classpath
+.factorypath
+.settings/
+.springBeans
+.sts4-cache
+.apt_generated
+bin/
+
+# === IDE - VS Code ===
+.vscode/
+
+# === IDE - NetBeans ===
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# === OS Files ===
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# === Java ===
+*.class
+*.jar
+*.war
+*.ear
+hs_err_pid*
+replay_pid*
+
+# === Logs ===
+*.log
+
+# === Environment / Secrets ===
+.env
+.env.*
+!.env.example
+
+# === WildFly / JBoss ===
+standalone/data/
+standalone/log/
+standalone/tmp/
+standalone/deployments/*.deployed
+standalone/deployments/*.dodeploy
+standalone/deployments/*.failed
+standalone/deployments/*.isdeploying
+standalone/deployments/*.isundeploying
+standalone/deployments/*.pending
+
+# === Docker ===
+docker-compose.override.yml
+
+# === Misc ===
+*.swp
+*.swo
+*~

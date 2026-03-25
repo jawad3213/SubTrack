@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+<ui:composition template="/templates/admin-layout.xhtml">
+    <ui:define name="title">Admin - SubTrack</ui:define>
+
+    <ui:define name="content">
+        <f:metadata>
+            <f:viewAction action="/admin/dashboard?faces-redirect=true" onPostback="false"/>
+        </f:metadata>
+        <!-- This page redirects to admin/dashboard. If you see this, navigate manually. -->
+        <div style="text-align: center; padding: 60px;">
+            <h2 style="color: #1A1A1A;">Redirecting to Admin Dashboard...</h2>
+            <p style="color: #5F5E5A; margin-top: 10px;">
+                If you are not redirected, <h:link outcome="/admin/dashboard" value="click here"/>.
+            </p>
+        </div>
+    </ui:define>
+</ui:composition>
+</html>

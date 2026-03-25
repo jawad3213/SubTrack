@@ -1,0 +1,538 @@
+Apache Maven 3.9.12 (848fbb4bf2d427b72bdb2471c22fced7ebd9a7a1)
+Maven home: C:\Users\elhai\.m2\wrapper\dists\apache-maven-3.9.12\6068d197
+Java version: 17.0.12, vendor: Oracle Corporation, runtime: C:\Program Files\Java\jdk-17
+Default locale: en_US, platform encoding: Cp1252
+OS name: "windows 11", version: "10.0", arch: "amd64", family: "windows"
+[DEBUG] Created new class realm maven.api
+[DEBUG] Importing foreign packages into class realm maven.api
+[DEBUG]   Imported: javax.annotation.* < plexus.core
+[DEBUG]   Imported: javax.annotation.security.* < plexus.core
+[DEBUG]   Imported: javax.inject.* < plexus.core
+[DEBUG]   Imported: org.apache.maven.* < plexus.core
+[DEBUG]   Imported: org.apache.maven.artifact < plexus.core
+[DEBUG]   Imported: org.apache.maven.classrealm < plexus.core
+[DEBUG]   Imported: org.apache.maven.cli < plexus.core
+[DEBUG]   Imported: org.apache.maven.configuration < plexus.core
+[DEBUG]   Imported: org.apache.maven.exception < plexus.core
+[DEBUG]   Imported: org.apache.maven.execution < plexus.core
+[DEBUG]   Imported: org.apache.maven.execution.scope < plexus.core
+[DEBUG]   Imported: org.apache.maven.graph < plexus.core
+[DEBUG]   Imported: org.apache.maven.lifecycle < plexus.core
+[DEBUG]   Imported: org.apache.maven.model < plexus.core
+[DEBUG]   Imported: org.apache.maven.monitor < plexus.core
+[DEBUG]   Imported: org.apache.maven.plugin < plexus.core
+[DEBUG]   Imported: org.apache.maven.profiles < plexus.core
+[DEBUG]   Imported: org.apache.maven.project < plexus.core
+[DEBUG]   Imported: org.apache.maven.reporting < plexus.core
+[DEBUG]   Imported: org.apache.maven.repository < plexus.core
+[DEBUG]   Imported: org.apache.maven.rtinfo < plexus.core
+[DEBUG]   Imported: org.apache.maven.settings < plexus.core
+[DEBUG]   Imported: org.apache.maven.toolchain < plexus.core
+[DEBUG]   Imported: org.apache.maven.usability < plexus.core
+[DEBUG]   Imported: org.apache.maven.wagon.* < plexus.core
+[DEBUG]   Imported: org.apache.maven.wagon.authentication < plexus.core
+[DEBUG]   Imported: org.apache.maven.wagon.authorization < plexus.core
+[DEBUG]   Imported: org.apache.maven.wagon.events < plexus.core
+[DEBUG]   Imported: org.apache.maven.wagon.observers < plexus.core
+[DEBUG]   Imported: org.apache.maven.wagon.proxy < plexus.core
+[DEBUG]   Imported: org.apache.maven.wagon.repository < plexus.core
+[DEBUG]   Imported: org.apache.maven.wagon.resource < plexus.core
+[DEBUG]   Imported: org.codehaus.classworlds < plexus.core
+[DEBUG]   Imported: org.codehaus.plexus.* < plexus.core
+[DEBUG]   Imported: org.codehaus.plexus.classworlds < plexus.core
+[DEBUG]   Imported: org.codehaus.plexus.component < plexus.core
+[DEBUG]   Imported: org.codehaus.plexus.configuration < plexus.core
+[DEBUG]   Imported: org.codehaus.plexus.container < plexus.core
+[DEBUG]   Imported: org.codehaus.plexus.context < plexus.core
+[DEBUG]   Imported: org.codehaus.plexus.lifecycle < plexus.core
+[DEBUG]   Imported: org.codehaus.plexus.logging < plexus.core
+[DEBUG]   Imported: org.codehaus.plexus.personality < plexus.core
+[DEBUG]   Imported: org.codehaus.plexus.util.xml.Xpp3Dom < plexus.core
+[DEBUG]   Imported: org.codehaus.plexus.util.xml.pull.XmlPullParser < plexus.core
+[DEBUG]   Imported: org.codehaus.plexus.util.xml.pull.XmlPullParserException < plexus.core
+[DEBUG]   Imported: org.codehaus.plexus.util.xml.pull.XmlSerializer < plexus.core
+[DEBUG]   Imported: org.eclipse.aether.* < plexus.core
+[DEBUG]   Imported: org.eclipse.aether.artifact < plexus.core
+[DEBUG]   Imported: org.eclipse.aether.collection < plexus.core
+[DEBUG]   Imported: org.eclipse.aether.deployment < plexus.core
+[DEBUG]   Imported: org.eclipse.aether.graph < plexus.core
+[DEBUG]   Imported: org.eclipse.aether.impl < plexus.core
+[DEBUG]   Imported: org.eclipse.aether.installation < plexus.core
+[DEBUG]   Imported: org.eclipse.aether.internal.impl < plexus.core
+[DEBUG]   Imported: org.eclipse.aether.metadata < plexus.core
+[DEBUG]   Imported: org.eclipse.aether.repository < plexus.core
+[DEBUG]   Imported: org.eclipse.aether.resolution < plexus.core
+[DEBUG]   Imported: org.eclipse.aether.spi < plexus.core
+[DEBUG]   Imported: org.eclipse.aether.transfer < plexus.core
+[DEBUG]   Imported: org.eclipse.aether.util < plexus.core
+[DEBUG]   Imported: org.eclipse.aether.version < plexus.core
+[DEBUG]   Imported: org.fusesource.jansi.* < plexus.core
+[DEBUG]   Imported: org.slf4j.* < plexus.core
+[DEBUG]   Imported: org.slf4j.event.* < plexus.core
+[DEBUG]   Imported: org.slf4j.helpers.* < plexus.core
+[DEBUG]   Imported: org.slf4j.spi.* < plexus.core
+[DEBUG] Populating class realm maven.api
+[DEBUG] Created adapter factory; available factories [file-lock, rwlock-local, semaphore-local, noop]; available name mappers [discriminating, file-gaecv, file-gav, file-hgaecv, file-hgav, file-static, gaecv, gav, static]
+[INFO] Error stacktraces are turned on.
+[DEBUG] Message scheme: color
+[DEBUG] Message styles: debug info warning error success failure strong mojo project
+[DEBUG] Reading global settings from C:\Users\elhai\.m2\wrapper\dists\apache-maven-3.9.12\6068d197\conf\settings.xml
+[DEBUG] Reading user settings from C:\Users\elhai\.m2\settings.xml
+[DEBUG] Reading global toolchains from C:\Users\elhai\.m2\wrapper\dists\apache-maven-3.9.12\6068d197\conf\toolchains.xml
+[DEBUG] Reading user toolchains from C:\Users\elhai\.m2\toolchains.xml
+[DEBUG] Using local repository at C:\Users\elhai\.m2\repository
+[DEBUG] Using manager EnhancedLocalRepositoryManager with priority 10.0 for C:\Users\elhai\.m2\repository
+[INFO] Scanning for projects...
+[DEBUG] Extension realms for project com.subtrack:subtrack:war:1.0.0-SNAPSHOT: (none)
+[DEBUG] Looking up lifecycle mappings for packaging war from ClassRealm[plexus.core, parent: null]
+[DEBUG] === REACTOR BUILD PLAN ================================================
+[DEBUG] Project: com.subtrack:subtrack:war:1.0.0-SNAPSHOT
+[DEBUG] Tasks:   [compile]
+[DEBUG] Style:   Regular
+[DEBUG] =======================================================================
+[INFO] 
+[INFO] -----------------------< com.subtrack:subtrack >------------------------
+[INFO] Building SubTrack 1.0.0-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ war ]---------------------------------
+[DEBUG] Lifecycle clean -> [pre-clean, clean, post-clean]
+[DEBUG] Lifecycle default -> [validate, initialize, generate-sources, process-sources, generate-resources, process-resources, compile, process-classes, generate-test-sources, process-test-sources, generate-test-resources, process-test-resources, test-compile, process-test-classes, test, prepare-package, package, pre-integration-test, integration-test, post-integration-test, verify, install, deploy]
+[DEBUG] Lifecycle site -> [pre-site, site, post-site, site-deploy]
+[DEBUG] Creating adapter using nameMapper 'gaecv' and factory 'rwlock-local'
+[DEBUG] Lifecycle clean -> [pre-clean, clean, post-clean]
+[DEBUG] Lifecycle default -> [validate, initialize, generate-sources, process-sources, generate-resources, process-resources, compile, process-classes, generate-test-sources, process-test-sources, generate-test-resources, process-test-resources, test-compile, process-test-classes, test, prepare-package, package, pre-integration-test, integration-test, post-integration-test, verify, install, deploy]
+[DEBUG] Lifecycle site -> [pre-site, site, post-site, site-deploy]
+[DEBUG] Lifecycle clean -> [pre-clean, clean, post-clean]
+[DEBUG] Lifecycle default -> [validate, initialize, generate-sources, process-sources, generate-resources, process-resources, compile, process-classes, generate-test-sources, process-test-sources, generate-test-resources, process-test-resources, test-compile, process-test-classes, test, prepare-package, package, pre-integration-test, integration-test, post-integration-test, verify, install, deploy]
+[DEBUG] Lifecycle site -> [pre-site, site, post-site, site-deploy]
+[DEBUG] === PROJECT BUILD PLAN ================================================
+[DEBUG] Project:       com.subtrack:subtrack:1.0.0-SNAPSHOT
+[DEBUG] Dependencies (collect): []
+[DEBUG] Dependencies (resolve): [compile]
+[DEBUG] Repositories (dependencies): [central (https://repo.maven.apache.org/maven2, default, releases)]
+[DEBUG] Repositories (plugins)     : [central (https://repo.maven.apache.org/maven2, default, releases)]
+[DEBUG] -----------------------------------------------------------------------
+[DEBUG] Goal:          org.apache.maven.plugins:maven-resources-plugin:3.3.1:resources (default-resources)
+[DEBUG] Style:         Regular
+[DEBUG] Configuration: <?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <addDefaultExcludes default-value="true"/>
+  <buildFilters default-value="${project.build.filters}"/>
+  <encoding default-value="${project.build.sourceEncoding}"/>
+  <escapeWindowsPaths default-value="true"/>
+  <fileNameFiltering default-value="false"/>
+  <includeEmptyDirs default-value="false"/>
+  <outputDirectory default-value="${project.build.outputDirectory}"/>
+  <overwrite default-value="false"/>
+  <project default-value="${project}"/>
+  <resources default-value="${project.resources}"/>
+  <session default-value="${session}"/>
+  <skip default-value="false">${maven.resources.skip}</skip>
+  <supportMultiLineFiltering default-value="false"/>
+  <useBuildFilters default-value="true"/>
+  <useDefaultDelimiters default-value="true"/>
+</configuration>
+[DEBUG] -----------------------------------------------------------------------
+[DEBUG] Goal:          org.apache.maven.plugins:maven-compiler-plugin:3.12.1:compile (default-compile)
+[DEBUG] Style:         Regular
+[DEBUG] Configuration: <?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <annotationProcessorPathsUseDepMgmt default-value="false"/>
+  <basedir default-value="${basedir}"/>
+  <buildDirectory default-value="${project.build.directory}"/>
+  <compilePath default-value="${project.compileClasspathElements}"/>
+  <compileSourceRoots default-value="${project.compileSourceRoots}"/>
+  <compilerId default-value="javac">${maven.compiler.compilerId}</compilerId>
+  <compilerReuseStrategy default-value="${reuseCreated}">${maven.compiler.compilerReuseStrategy}</compilerReuseStrategy>
+  <compilerVersion>${maven.compiler.compilerVersion}</compilerVersion>
+  <createMissingPackageInfoClass default-value="true">${maven.compiler.createMissingPackageInfoClass}</createMissingPackageInfoClass>
+  <debug default-value="true">${maven.compiler.debug}</debug>
+  <debugFileName default-value="javac"/>
+  <debuglevel>${maven.compiler.debuglevel}</debuglevel>
+  <enablePreview default-value="false">${maven.compiler.enablePreview}</enablePreview>
+  <encoding default-value="${project.build.sourceEncoding}">${encoding}</encoding>
+  <executable>${maven.compiler.executable}</executable>
+  <failOnError default-value="true">${maven.compiler.failOnError}</failOnError>
+  <failOnWarning default-value="false">${maven.compiler.failOnWarning}</failOnWarning>
+  <fileExtensions default-value="class,jar"/>
+  <forceJavacCompilerUse default-value="false">${maven.compiler.forceJavacCompilerUse}</forceJavacCompilerUse>
+  <fork default-value="false">${maven.compiler.fork}</fork>
+  <generatedSourcesDirectory default-value="${project.build.directory}/generated-sources/annotations"/>
+  <implicit>${maven.compiler.implicit}</implicit>
+  <maxmem>${maven.compiler.maxmem}</maxmem>
+  <meminitial>${maven.compiler.meminitial}</meminitial>
+  <mojoExecution default-value="${mojoExecution}"/>
+  <optimize default-value="false">${maven.compiler.optimize}</optimize>
+  <outputDirectory default-value="${project.build.outputDirectory}">${maven.compiler.outputDirectory}</outputDirectory>
+  <outputTimestamp default-value="${project.build.outputTimestamp}"/>
+  <parameters default-value="false">${maven.compiler.parameters}</parameters>
+  <project default-value="${project}"/>
+  <projectArtifact default-value="${project.artifact}"/>
+  <release>${maven.compiler.release}</release>
+  <session default-value="${session}"/>
+  <showCompilationChanges default-value="false">${maven.compiler.showCompilationChanges}</showCompilationChanges>
+  <showDeprecation default-value="false">${maven.compiler.showDeprecation}</showDeprecation>
+  <showWarnings default-value="true">${maven.compiler.showWarnings}</showWarnings>
+  <skipMain>${maven.main.skip}</skipMain>
+  <skipMultiThreadWarning default-value="false">${maven.compiler.skipMultiThreadWarning}</skipMultiThreadWarning>
+  <source default-value="1.8">17</source>
+  <staleMillis default-value="0">${lastModGranularityMs}</staleMillis>
+  <target default-value="1.8">17</target>
+  <useIncrementalCompilation default-value="true">${maven.compiler.useIncrementalCompilation}</useIncrementalCompilation>
+  <verbose default-value="false">${maven.compiler.verbose}</verbose>
+</configuration>
+[DEBUG] =======================================================================
+[DEBUG] Dependency collection stats {ConflictMarker.analyzeTime=8166600, ConflictMarker.markTime=622300, ConflictMarker.nodeCount=86, ConflictIdSorter.graphTime=4343000, ConflictIdSorter.topsortTime=1808400, ConflictIdSorter.conflictIdCount=58, ConflictIdSorter.conflictIdCycleCount=0, ConflictResolver.totalTime=50077300, ConflictResolver.conflictItemCount=83, DfDependencyCollector.collectTime=1164467500, DfDependencyCollector.transformTime=73161000}
+[DEBUG] com.subtrack:subtrack:war:1.0.0-SNAPSHOT
+[DEBUG]    jakarta.platform:jakarta.jakartaee-api:jar:10.0.0:provided
+[DEBUG]       jakarta.platform:jakarta.jakartaee-web-api:jar:10.0.0:provided
+[DEBUG]          jakarta.servlet.jsp:jakarta.servlet.jsp-api:jar:3.1.0:provided
+[DEBUG]          jakarta.el:jakarta.el-api:jar:5.0.1:provided
+[DEBUG]          jakarta.servlet.jsp.jstl:jakarta.servlet.jsp.jstl-api:jar:3.0.0:provided
+[DEBUG]          jakarta.ws.rs:jakarta.ws.rs-api:jar:3.1.0:provided
+[DEBUG]          jakarta.websocket:jakarta.websocket-api:jar:2.1.0:provided
+[DEBUG]          jakarta.websocket:jakarta.websocket-client-api:jar:2.1.0:provided
+[DEBUG]          jakarta.json.bind:jakarta.json.bind-api:jar:3.0.0:provided
+[DEBUG]          jakarta.annotation:jakarta.annotation-api:jar:2.1.1:provided
+[DEBUG]          jakarta.ejb:jakarta.ejb-api:jar:4.0.1:provided
+[DEBUG]          jakarta.interceptor:jakarta.interceptor-api:jar:2.1.0:provided
+[DEBUG]          jakarta.enterprise:jakarta.enterprise.cdi-api:jar:4.0.1:provided
+[DEBUG]          jakarta.enterprise:jakarta.enterprise.lang-model:jar:4.0.1:provided
+[DEBUG]          jakarta.authentication:jakarta.authentication-api:jar:3.0.0:provided
+[DEBUG]          jakarta.security.enterprise:jakarta.security.enterprise-api:jar:3.0.0:provided
+[DEBUG]       jakarta.jms:jakarta.jms-api:jar:3.1.0:provided
+[DEBUG]       jakarta.activation:jakarta.activation-api:jar:2.1.0:compile
+[DEBUG]       jakarta.mail:jakarta.mail-api:jar:2.1.0:compile
+[DEBUG]       jakarta.resource:jakarta.resource-api:jar:2.1.0:provided
+[DEBUG]       jakarta.authorization:jakarta.authorization-api:jar:2.1.0:provided
+[DEBUG]       jakarta.batch:jakarta.batch-api:jar:2.1.1:provided
+[DEBUG]    jakarta.faces:jakarta.faces-api:jar:4.0.1:provided
+[DEBUG]    jakarta.inject:jakarta.inject-api:jar:2.0.1:compile
+[DEBUG]    jakarta.persistence:jakarta.persistence-api:jar:3.1.0:compile
+[DEBUG]    jakarta.servlet:jakarta.servlet-api:jar:6.0.0:provided
+[DEBUG]    org.hibernate.orm:hibernate-core:jar:6.4.4.Final:compile
+[DEBUG]       jakarta.transaction:jakarta.transaction-api:jar:2.0.1:compile
+[DEBUG]       org.jboss.logging:jboss-logging:jar:3.5.0.Final:compile
+[DEBUG]       org.hibernate.common:hibernate-commons-annotations:jar:6.0.6.Final:runtime
+[DEBUG]       io.smallrye:jandex:jar:3.1.2:runtime
+[DEBUG]       com.fasterxml:classmate:jar:1.5.1:compile
+[DEBUG]       net.bytebuddy:byte-buddy:jar:1.14.11:runtime
+[DEBUG]       jakarta.xml.bind:jakarta.xml.bind-api:jar:4.0.0:runtime
+[DEBUG]       org.glassfish.jaxb:jaxb-runtime:jar:4.0.2:runtime
+[DEBUG]          org.glassfish.jaxb:jaxb-core:jar:4.0.2:runtime
+[DEBUG]             org.glassfish.jaxb:txw2:jar:4.0.2:runtime
+[DEBUG]             com.sun.istack:istack-commons-runtime:jar:4.1.1:runtime
+[DEBUG]       org.antlr:antlr4-runtime:jar:4.13.0:runtime
+[DEBUG]    org.hibernate.validator:hibernate-validator:jar:8.0.1.Final:compile
+[DEBUG]       jakarta.validation:jakarta.validation-api:jar:3.0.2:compile
+[DEBUG]    org.postgresql:postgresql:jar:42.7.1:compile
+[DEBUG]       org.checkerframework:checker-qual:jar:3.41.0:runtime
+[DEBUG]    org.eclipse.angus:angus-mail:jar:2.0.2:compile
+[DEBUG]       org.eclipse.angus:angus-activation:jar:2.0.1:runtime
+[DEBUG]    jakarta.json:jakarta.json-api:jar:2.1.3:compile
+[DEBUG]    commons-codec:commons-codec:jar:1.16.0:compile
+[DEBUG]    org.mindrot:jbcrypt:jar:0.4:compile
+[DEBUG]    org.primefaces:primefaces:jar:jakarta:14.0.4:compile
+[DEBUG]    org.junit.jupiter:junit-jupiter-api:jar:5.10.1:test
+[DEBUG]       org.opentest4j:opentest4j:jar:1.3.0:test
+[DEBUG]       org.junit.platform:junit-platform-commons:jar:1.10.1:test
+[DEBUG]       org.apiguardian:apiguardian-api:jar:1.1.2:test
+[DEBUG]    org.junit.jupiter:junit-jupiter-engine:jar:5.10.1:test
+[DEBUG]       org.junit.platform:junit-platform-engine:jar:1.10.1:test
+[DEBUG]    org.mockito:mockito-core:jar:5.8.0:test
+[DEBUG]       net.bytebuddy:byte-buddy-agent:jar:1.14.10:test
+[DEBUG]       org.objenesis:objenesis:jar:3.3:test
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ subtrack ---
+[DEBUG] Dependency collection stats {ConflictMarker.analyzeTime=185500, ConflictMarker.markTime=193600, ConflictMarker.nodeCount=13, ConflictIdSorter.graphTime=129600, ConflictIdSorter.topsortTime=29200, ConflictIdSorter.conflictIdCount=9, ConflictIdSorter.conflictIdCycleCount=0, ConflictResolver.totalTime=917900, ConflictResolver.conflictItemCount=13, DfDependencyCollector.collectTime=195031000, DfDependencyCollector.transformTime=1617000}
+[DEBUG] org.apache.maven.plugins:maven-resources-plugin:jar:3.3.1
+[DEBUG]    org.codehaus.plexus:plexus-interpolation:jar:1.26:runtime
+[DEBUG]    org.codehaus.plexus:plexus-utils:jar:3.5.1:compile
+[DEBUG]    org.apache.maven.shared:maven-filtering:jar:3.3.1:compile
+[DEBUG]       javax.inject:javax.inject:jar:1:compile
+[DEBUG]       org.slf4j:slf4j-api:jar:1.7.36:compile
+[DEBUG]       org.sonatype.plexus:plexus-build-api:jar:0.0.7:compile
+[DEBUG]    commons-io:commons-io:jar:2.11.0:compile
+[DEBUG]    org.apache.commons:commons-lang3:jar:3.12.0:compile
+[DEBUG] Created new class realm plugin>org.apache.maven.plugins:maven-resources-plugin:3.3.1
+[DEBUG] Importing foreign packages into class realm plugin>org.apache.maven.plugins:maven-resources-plugin:3.3.1
+[DEBUG]   Imported:  < maven.api
+[DEBUG] Populating class realm plugin>org.apache.maven.plugins:maven-resources-plugin:3.3.1
+[DEBUG]   Included: org.apache.maven.plugins:maven-resources-plugin:jar:3.3.1
+[DEBUG]   Included: org.codehaus.plexus:plexus-interpolation:jar:1.26
+[DEBUG]   Included: org.codehaus.plexus:plexus-utils:jar:3.5.1
+[DEBUG]   Included: org.apache.maven.shared:maven-filtering:jar:3.3.1
+[DEBUG]   Included: org.sonatype.plexus:plexus-build-api:jar:0.0.7
+[DEBUG]   Included: commons-io:commons-io:jar:2.11.0
+[DEBUG]   Included: org.apache.commons:commons-lang3:jar:3.12.0
+[DEBUG] Loading mojo org.apache.maven.plugins:maven-resources-plugin:3.3.1:resources from plugin realm ClassRealm[plugin>org.apache.maven.plugins:maven-resources-plugin:3.3.1, parent: jdk.internal.loader.ClassLoaders$AppClassLoader@73d16e93]
+[DEBUG] Configuring mojo execution 'org.apache.maven.plugins:maven-resources-plugin:3.3.1:resources:default-resources' with basic configurator -->
+[DEBUG]   (f) addDefaultExcludes = true
+[DEBUG]   (f) buildFilters = []
+[DEBUG]   (f) encoding = UTF-8
+[DEBUG]   (f) escapeWindowsPaths = true
+[DEBUG]   (f) fileNameFiltering = false
+[DEBUG]   (s) includeEmptyDirs = false
+[DEBUG]   (s) outputDirectory = C:\Users\elhai\OneDrive\Desktop\Jakarta Jaouad\target\classes
+[DEBUG]   (s) overwrite = false
+[DEBUG]   (f) project = MavenProject: com.subtrack:subtrack:1.0.0-SNAPSHOT @ C:\Users\elhai\OneDrive\Desktop\Jakarta Jaouad\pom.xml
+[DEBUG]   (s) resources = [Resource {targetPath: null, filtering: false, FileSet {directory: C:\Users\elhai\OneDrive\Desktop\Jakarta Jaouad\src\main\resources, PatternSet [includes: {}, excludes: {}]}}]
+[DEBUG]   (f) session = org.apache.maven.execution.MavenSession@77b919a3
+[DEBUG]   (f) skip = false
+[DEBUG]   (f) supportMultiLineFiltering = false
+[DEBUG]   (f) useBuildFilters = true
+[DEBUG]   (s) useDefaultDelimiters = true
+[DEBUG] -- end configuration --
+[DEBUG] properties used:
+[DEBUG] classworlds.conf: C:/Users/elhai/.m2/wrapper/dists/apache-maven-3.9.12/6068d197/bin/m2.conf
+[DEBUG] env.AGENT: 1
+[DEBUG] env.ALLUSERSPROFILE: C:\ProgramData
+[DEBUG] env.ANTIGRAVITY_CLI_ALIAS: agy
+[DEBUG] env.APPDATA: C:\Users\elhai\AppData\Roaming
+[DEBUG] env.CHOCOLATEYINSTALL: C:\ProgramData\chocolatey
+[DEBUG] env.CHOCOLATEYLASTPATHUPDATE: 133889570605454574
+[DEBUG] env.CHROME_CRASHPAD_PIPE_NAME: \\.\pipe\crashpad_14900_TAHEZSFXWUECRDBA
+[DEBUG] env.COLORTERM: truecolor
+[DEBUG] env.COMMONPROGRAMFILES: C:\Program Files\Common Files
+[DEBUG] env.COMMONPROGRAMFILES(X86): C:\Program Files (x86)\Common Files
+[DEBUG] env.COMMONPROGRAMW6432: C:\Program Files\Common Files
+[DEBUG] env.COMPUTERNAME: JAOUAD
+[DEBUG] env.COMSPEC: C:\WINDOWS\system32\cmd.exe
+[DEBUG] env.DRIVERDATA: C:\Windows\System32\Drivers\DriverData
+[DEBUG] env.EFC_9840_1592913036: 1
+[DEBUG] env.EXEPATH: C:\Program Files\Git\bin
+[DEBUG] env.GIT_ASKPASS: c:\Users\elhai\AppData\Local\Programs\Antigravity\resources\app\extensions\git\dist\askpass.sh
+[DEBUG] env.HOME: C:\Users\elhai
+[DEBUG] env.HOMEDRIVE: C:
+[DEBUG] env.HOMEPATH: \Users\elhai
+[DEBUG] env.INTELLIJ IDEA: C:\Program Files\JetBrains\IntelliJ IDEA 2024.3.5\bin;
+[DEBUG] env.JAVA_HOME: C:/Program Files/Java/jdk-17
+[DEBUG] env.LANG: en_US.UTF-8
+[DEBUG] env.LOCALAPPDATA: C:\Users\elhai\AppData\Local
+[DEBUG] env.LOGONSERVER: \\JAOUAD
+[DEBUG] env.MAVEN_CMD_LINE_ARGS:  compile -X
+[DEBUG] env.MAVEN_PROJECTBASEDIR: C:/Users/elhai/OneDrive/Desktop/Jakarta Jaouad
+[DEBUG] env.MSYSTEM: MINGW64
+[DEBUG] env.NUMBER_OF_PROCESSORS: 8
+[DEBUG] env.OLDPWD: C:/Users/elhai/OneDrive/Desktop/Jakarta Jaouad
+[DEBUG] env.ONEDRIVE: C:\Users\elhai\OneDrive
+[DEBUG] env.ONEDRIVECONSUMER: C:\Users\elhai\OneDrive
+[DEBUG] env.OPENCODE: 1
+[DEBUG] env.OPENCODE_CALLER: vscode
+[DEBUG] env.OPENCODE_PID: 820
+[DEBUG] env.OS: Windows_NT
+[DEBUG] env.PATH: C:\Program Files\Git\mingw64\bin;C:\Program Files\Git\usr\bin;C:\Users\elhai\bin;C:\Program Files\Common Files\Oracle\Java\javapath;C:\Program Files (x86)\VMware\VMware Workstation\bin;C:\app\elhai\product\23ai\dbhomeFree\bin;C:\Oracle\Orac\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0;C:\WINDOWS\System32\OpenSSH;C:\Program Files\Git\cmd;C:\Program Files\nodejs;C:\ProgramData\chocolatey\bin;C:\Program Files\PostgreSQL\17\bin;C:\Program Files\Docker\Docker\resources\bin;C:\php-8.4.15-Win32-vs17-x64;C:\composer;C:\Program Files\PuTTY;C:\minikube;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0;C:\WINDOWS\System32\OpenSSH;C:\Program Files\dotnet;C;C:\Program Files\Git\Program Files\Java\jdk-17;C:\Users\elhai\.local\bin;C:\Users\elhai\bin;C:\Users\elhai\.config\herd-lite\bin;C:\Users\elhai\AppData\Local\Programs\Python\Python312\Scripts;C:\Users\elhai\AppData\Local\Programs\Python\Python312;C:\Users\elhai\AppData\Local\Programs\Python\Launcher;C:\Users\elhai\AppData\Local\Microsoft\WindowsApps;C:\Users\elhai\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\elhai\AppData\Roaming\npm;C:\Program Files\JetBrains\IntelliJ IDEA 2024.3.5\bin;C:\Users\elhai\AppData\Local\Programs\Ollama;C:\Program Files\JetBrains\PyCharm 2025.2.3\bin;C:\Users\elhai\AppData\Local\Programs\Antigravity\bin;C:\Users\elhai\AppData\Roaming\Composer\vendor\bin;C:\Users\elhai\fLUTTER SDK\flutter\bin;C:\Users\elhai\AppData\Local\Microsoft\WindowsApps;C:\Users\elhai\flutter\bin;C:\Users\elhai\.dotnet\tools;C:\Users\elhai\.antigravity\extensions\vscjava.vscode-java-debug-0.58.5-universal\bundled\scripts\noConfigScripts
+[DEBUG] env.PATHEXT: .COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC;.CPL
+[DEBUG] env.PLINK_PROTOCOL: ssh
+[DEBUG] env.PROCESSOR_ARCHITECTURE: AMD64
+[DEBUG] env.PROCESSOR_IDENTIFIER: Intel64 Family 6 Model 142 Stepping 12, GenuineIntel
+[DEBUG] env.PROCESSOR_LEVEL: 6
+[DEBUG] env.PROCESSOR_REVISION: 8e0c
+[DEBUG] env.PROGRAMDATA: C:\ProgramData
+[DEBUG] env.PROGRAMFILES: C:\Program Files
+[DEBUG] env.PROGRAMFILES(X86): C:\Program Files (x86)
+[DEBUG] env.PROGRAMW6432: C:\Program Files
+[DEBUG] env.PSMODULEPATH: C:\Users\elhai\OneDrive\Documents\WindowsPowerShell\Modules;C:\Program Files\WindowsPowerShell\Modules;C:\WINDOWS\system32\WindowsPowerShell\v1.0\Modules
+[DEBUG] env.PUBLIC: C:\Users\Public
+[DEBUG] env.PWD: C:/Users/elhai/OneDrive/Desktop/Jakarta Jaouad
+[DEBUG] env.SESSIONNAME: Console
+[DEBUG] env.SHLVL: 1
+[DEBUG] env.SYSTEMDRIVE: C:
+[DEBUG] env.SYSTEMROOT: C:\WINDOWS
+[DEBUG] env.TEMP: C:\Users\elhai\AppData\Local\Temp
+[DEBUG] env.TERM: xterm-256color
+[DEBUG] env.TERM_PROGRAM: vscode
+[DEBUG] env.TERM_PROGRAM_VERSION: 1.107.0
+[DEBUG] env.TMP: C:\Users\elhai\AppData\Local\Temp
+[DEBUG] env.USERDOMAIN: JAOUAD
+[DEBUG] env.USERDOMAIN_ROAMINGPROFILE: JAOUAD
+[DEBUG] env.USERNAME: elhai
+[DEBUG] env.USERPROFILE: C:\Users\elhai
+[DEBUG] env.VSCODE_GIT_ASKPASS_EXTRA_ARGS: 
+[DEBUG] env.VSCODE_GIT_ASKPASS_MAIN: c:\Users\elhai\AppData\Local\Programs\Antigravity\resources\app\extensions\git\dist\askpass-main.js
+[DEBUG] env.VSCODE_GIT_ASKPASS_NODE: C:\Users\elhai\AppData\Local\Programs\Antigravity\Antigravity.exe
+[DEBUG] env.VSCODE_GIT_IPC_HANDLE: \\.\pipe\vscode-git-3bfd1255ac-sock
+[DEBUG] env.VSCODE_INJECTION: 1
+[DEBUG] env.VSCODE_JAVA_EXEC: C:\Program Files\Java\jdk-17\bin\java
+[DEBUG] env.VSCODE_JDWP_ADAPTER_ENDPOINTS: c:\Users\elhai\.antigravity\extensions\vscjava.vscode-java-debug-0.58.5-universal\.noConfigDebugAdapterEndpoints\endpoint-71759275d2a22c51.txt
+[DEBUG] env.VSCODE_PYTHON_AUTOACTIVATE_GUARD: 1
+[DEBUG] env.WINDIR: C:\WINDOWS
+[DEBUG] env.ZES_ENABLE_SYSMAN: 1
+[DEBUG] env._EXTENSION_OPENCODE_PORT: 57094
+[DEBUG] file.encoding: Cp1252
+[DEBUG] file.separator: \
+[DEBUG] hibernate.version: 6.4.4.Final
+[DEBUG] jakartaee.version: 10.0.0
+[DEBUG] java.class.path: C:/Users/elhai/.m2/wrapper/dists/apache-maven-3.9.12/6068d197/boot/plexus-classworlds-2.9.0.jar
+[DEBUG] java.class.version: 61.0
+[DEBUG] java.home: C:\Program Files\Java\jdk-17
+[DEBUG] java.io.tmpdir: C:\Users\elhai\AppData\Local\Temp\
+[DEBUG] java.library.path: C:\Program Files\Java\jdk-17\bin;C:\WINDOWS\Sun\Java\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\Program Files\Git\mingw64\bin;C:\Program Files\Git\usr\bin;C:\Users\elhai\bin;C:\Program Files\Common Files\Oracle\Java\javapath;C:\Program Files (x86)\VMware\VMware Workstation\bin;C:\app\elhai\product\23ai\dbhomeFree\bin;C:\Oracle\Orac\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0;C:\WINDOWS\System32\OpenSSH;C:\Program Files\Git\cmd;C:\Program Files\nodejs;C:\ProgramData\chocolatey\bin;C:\Program Files\PostgreSQL\17\bin;C:\Program Files\Docker\Docker\resources\bin;C:\php-8.4.15-Win32-vs17-x64;C:\composer;C:\Program Files\PuTTY;C:\minikube;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0;C:\WINDOWS\System32\OpenSSH;C:\Program Files\dotnet;C;C:\Program Files\Git\Program Files\Java\jdk-17;C:\Users\elhai\.local\bin;C:\Users\elhai\bin;C:\Users\elhai\.config\herd-lite\bin;C:\Users\elhai\AppData\Local\Programs\Python\Python312\Scripts;C:\Users\elhai\AppData\Local\Programs\Python\Python312;C:\Users\elhai\AppData\Local\Programs\Python\Launcher;C:\Users\elhai\AppData\Local\Microsoft\WindowsApps;C:\Users\elhai\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\elhai\AppData\Roaming\npm;C:\Program Files\JetBrains\IntelliJ IDEA 2024.3.5\bin;C:\Users\elhai\AppData\Local\Programs\Ollama;C:\Program Files\JetBrains\PyCharm 2025.2.3\bin;C:\Users\elhai\AppData\Local\Programs\Antigravity\bin;C:\Users\elhai\AppData\Roaming\Composer\vendor\bin;C:\Users\elhai\fLUTTER SDK\flutter\bin;C:\Users\elhai\AppData\Local\Microsoft\WindowsApps;C:\Users\elhai\flutter\bin;C:\Users\elhai\.dotnet\tools;C:\Users\elhai\.antigravity\extensions\vscjava.vscode-java-debug-0.58.5-universal\bundled\scripts\noConfigScripts;.
+[DEBUG] java.runtime.name: Java(TM) SE Runtime Environment
+[DEBUG] java.runtime.version: 17.0.12+8-LTS-286
+[DEBUG] java.specification.name: Java Platform API Specification
+[DEBUG] java.specification.vendor: Oracle Corporation
+[DEBUG] java.specification.version: 17
+[DEBUG] java.vendor: Oracle Corporation
+[DEBUG] java.vendor.url: https://java.oracle.com/
+[DEBUG] java.vendor.url.bug: https://bugreport.java.com/bugreport/
+[DEBUG] java.version: 17.0.12
+[DEBUG] java.version.date: 2024-07-16
+[DEBUG] java.vm.compressedOopsMode: Zero based
+[DEBUG] java.vm.info: mixed mode, sharing
+[DEBUG] java.vm.name: Java HotSpot(TM) 64-Bit Server VM
+[DEBUG] java.vm.specification.name: Java Virtual Machine Specification
+[DEBUG] java.vm.specification.vendor: Oracle Corporation
+[DEBUG] java.vm.specification.version: 17
+[DEBUG] java.vm.vendor: Oracle Corporation
+[DEBUG] java.vm.version: 17.0.12+8-LTS-286
+[DEBUG] jdk.debug: release
+[DEBUG] library.jansi.path: C:/Users/elhai/.m2/wrapper/dists/apache-maven-3.9.12/6068d197/lib/jansi-native
+[DEBUG] line.separator: 
+
+[DEBUG] maven.build.timestamp: 2026-03-12T15:46:30Z
+[DEBUG] maven.build.version: Apache Maven 3.9.12 (848fbb4bf2d427b72bdb2471c22fced7ebd9a7a1)
+[DEBUG] maven.compiler.source: 17
+[DEBUG] maven.compiler.target: 17
+[DEBUG] maven.conf: C:/Users/elhai/.m2/wrapper/dists/apache-maven-3.9.12/6068d197/conf
+[DEBUG] maven.home: C:\Users\elhai\.m2\wrapper\dists\apache-maven-3.9.12\6068d197
+[DEBUG] maven.multiModuleProjectDirectory: C:/Users/elhai/OneDrive/Desktop/Jakarta Jaouad
+[DEBUG] maven.version: 3.9.12
+[DEBUG] native.encoding: Cp1252
+[DEBUG] os.arch: amd64
+[DEBUG] os.name: Windows 11
+[DEBUG] os.version: 10.0
+[DEBUG] path.separator: ;
+[DEBUG] postgresql.version: 42.7.1
+[DEBUG] project.baseUri: file:/C:/Users/elhai/OneDrive/Desktop/Jakarta%20Jaouad/
+[DEBUG] project.build.sourceEncoding: UTF-8
+[DEBUG] sun.arch.data.model: 64
+[DEBUG] sun.boot.library.path: C:\Program Files\Java\jdk-17\bin
+[DEBUG] sun.cpu.endian: little
+[DEBUG] sun.cpu.isalist: amd64
+[DEBUG] sun.io.unicode.encoding: UnicodeLittle
+[DEBUG] sun.java.command: org.codehaus.plexus.classworlds.launcher.Launcher compile -X
+[DEBUG] sun.java.launcher: SUN_STANDARD
+[DEBUG] sun.jnu.encoding: Cp1252
+[DEBUG] sun.management.compiler: HotSpot 64-Bit Tiered Compilers
+[DEBUG] sun.os.patch.level: 
+[DEBUG] user.country: US
+[DEBUG] user.dir: C:\Users\elhai\OneDrive\Desktop\Jakarta Jaouad
+[DEBUG] user.home: C:\Users\elhai
+[DEBUG] user.language: en
+[DEBUG] user.name: elhai
+[DEBUG] user.script: 
+[DEBUG] user.variant: 
+[DEBUG] Using 'UTF-8' encoding to copy filtered resources.
+[DEBUG] Using 'UTF-8' encoding to copy filtered properties files.
+[DEBUG] resource with targetPath null
+directory C:\Users\elhai\OneDrive\Desktop\Jakarta Jaouad\src\main\resources
+excludes []
+includes []
+[DEBUG] ignoreDelta true
+[INFO] Copying 3 resources from src\main\resources to target\classes
+[DEBUG] Copying file application.properties
+[DEBUG] file application.properties has a filtered file extension
+[DEBUG] Using 'UTF-8' encoding to copy filtered resource 'application.properties'.
+[DEBUG] copy C:\Users\elhai\OneDrive\Desktop\Jakarta Jaouad\src\main\resources\application.properties to C:\Users\elhai\OneDrive\Desktop\Jakarta Jaouad\target\classes\application.properties
+[DEBUG] Copying file messages.properties
+[DEBUG] file messages.properties has a filtered file extension
+[DEBUG] Using 'UTF-8' encoding to copy filtered resource 'messages.properties'.
+[DEBUG] copy C:\Users\elhai\OneDrive\Desktop\Jakarta Jaouad\src\main\resources\messages.properties to C:\Users\elhai\OneDrive\Desktop\Jakarta Jaouad\target\classes\messages.properties
+[DEBUG] Copying file META-INF\persistence.xml
+[DEBUG] file persistence.xml has a filtered file extension
+[DEBUG] Using 'UTF-8' encoding to copy filtered resource 'persistence.xml'.
+[DEBUG] copy C:\Users\elhai\OneDrive\Desktop\Jakarta Jaouad\src\main\resources\META-INF\persistence.xml to C:\Users\elhai\OneDrive\Desktop\Jakarta Jaouad\target\classes\META-INF\persistence.xml
+[DEBUG] no user filter components
+[INFO] 
+[INFO] --- compiler:3.12.1:compile (default-compile) @ subtrack ---
+[DEBUG] Using mirror maven-default-http-blocker (http://0.0.0.0/) for apache.snapshots (http://repository.apache.org/snapshots).
+[DEBUG] Dependency collection stats {ConflictMarker.analyzeTime=197500, ConflictMarker.markTime=148100, ConflictMarker.nodeCount=21, ConflictIdSorter.graphTime=75400, ConflictIdSorter.topsortTime=36400, ConflictIdSorter.conflictIdCount=15, ConflictIdSorter.conflictIdCycleCount=0, ConflictResolver.totalTime=1066000, ConflictResolver.conflictItemCount=21, DfDependencyCollector.collectTime=375564000, DfDependencyCollector.transformTime=1586400}
+[DEBUG] org.apache.maven.plugins:maven-compiler-plugin:jar:3.12.1
+[DEBUG]    org.apache.maven.shared:maven-shared-utils:jar:3.4.2:compile
+[DEBUG]       org.slf4j:slf4j-api:jar:1.7.36:compile
+[DEBUG]       commons-io:commons-io:jar:2.11.0:compile
+[DEBUG]    org.apache.maven.shared:maven-shared-incremental:jar:1.1:compile
+[DEBUG]       org.codehaus.plexus:plexus-component-annotations:jar:1.5.5:compile
+[DEBUG]    org.codehaus.plexus:plexus-java:jar:1.2.0:compile
+[DEBUG]       org.ow2.asm:asm:jar:9.6:compile
+[DEBUG]       com.thoughtworks.qdox:qdox:jar:2.0.3:compile
+[DEBUG]    org.codehaus.plexus:plexus-compiler-api:jar:2.14.2:compile
+[DEBUG]    org.codehaus.plexus:plexus-compiler-manager:jar:2.14.2:compile
+[DEBUG]       javax.inject:javax.inject:jar:1:compile
+[DEBUG]       org.codehaus.plexus:plexus-xml:jar:3.0.0:compile (version managed from default)
+[DEBUG]    org.codehaus.plexus:plexus-compiler-javac:jar:2.14.2:runtime
+[DEBUG]    org.codehaus.plexus:plexus-utils:jar:4.0.0:compile
+[DEBUG] Created new class realm plugin>org.apache.maven.plugins:maven-compiler-plugin:3.12.1
+[DEBUG] Importing foreign packages into class realm plugin>org.apache.maven.plugins:maven-compiler-plugin:3.12.1
+[DEBUG]   Imported:  < maven.api
+[DEBUG] Populating class realm plugin>org.apache.maven.plugins:maven-compiler-plugin:3.12.1
+[DEBUG]   Included: org.apache.maven.plugins:maven-compiler-plugin:jar:3.12.1
+[DEBUG]   Included: org.apache.maven.shared:maven-shared-utils:jar:3.4.2
+[DEBUG]   Included: commons-io:commons-io:jar:2.11.0
+[DEBUG]   Included: org.apache.maven.shared:maven-shared-incremental:jar:1.1
+[DEBUG]   Included: org.codehaus.plexus:plexus-component-annotations:jar:1.5.5
+[DEBUG]   Included: org.codehaus.plexus:plexus-java:jar:1.2.0
+[DEBUG]   Included: org.ow2.asm:asm:jar:9.6
+[DEBUG]   Included: com.thoughtworks.qdox:qdox:jar:2.0.3
+[DEBUG]   Included: org.codehaus.plexus:plexus-compiler-api:jar:2.14.2
+[DEBUG]   Included: org.codehaus.plexus:plexus-compiler-manager:jar:2.14.2
+[DEBUG]   Included: org.codehaus.plexus:plexus-xml:jar:3.0.0
+[DEBUG]   Included: org.codehaus.plexus:plexus-compiler-javac:jar:2.14.2
+[DEBUG]   Included: org.codehaus.plexus:plexus-utils:jar:4.0.0
+[DEBUG] Loading mojo org.apache.maven.plugins:maven-compiler-plugin:3.12.1:compile from plugin realm ClassRealm[plugin>org.apache.maven.plugins:maven-compiler-plugin:3.12.1, parent: jdk.internal.loader.ClassLoaders$AppClassLoader@73d16e93]
+[DEBUG] Configuring mojo execution 'org.apache.maven.plugins:maven-compiler-plugin:3.12.1:compile:default-compile' with basic configurator -->
+[DEBUG]   (f) annotationProcessorPathsUseDepMgmt = false
+[DEBUG]   (f) basedir = C:\Users\elhai\OneDrive\Desktop\Jakarta Jaouad
+[DEBUG]   (f) buildDirectory = C:\Users\elhai\OneDrive\Desktop\Jakarta Jaouad\target
+[DEBUG]   (f) compilePath = [C:\Users\elhai\OneDrive\Desktop\Jakarta Jaouad\target\classes, C:\Users\elhai\.m2\repository\jakarta\platform\jakarta.jakartaee-api\10.0.0\jakarta.jakartaee-api-10.0.0.jar, C:\Users\elhai\.m2\repository\jakarta\platform\jakarta.jakartaee-web-api\10.0.0\jakarta.jakartaee-web-api-10.0.0.jar, C:\Users\elhai\.m2\repository\jakarta\servlet\jsp\jakarta.servlet.jsp-api\3.1.0\jakarta.servlet.jsp-api-3.1.0.jar, C:\Users\elhai\.m2\repository\jakarta\el\jakarta.el-api\5.0.1\jakarta.el-api-5.0.1.jar, C:\Users\elhai\.m2\repository\jakarta\servlet\jsp\jstl\jakarta.servlet.jsp.jstl-api\3.0.0\jakarta.servlet.jsp.jstl-api-3.0.0.jar, C:\Users\elhai\.m2\repository\jakarta\ws\rs\jakarta.ws.rs-api\3.1.0\jakarta.ws.rs-api-3.1.0.jar, C:\Users\elhai\.m2\repository\jakarta\websocket\jakarta.websocket-api\2.1.0\jakarta.websocket-api-2.1.0.jar, C:\Users\elhai\.m2\repository\jakarta\websocket\jakarta.websocket-client-api\2.1.0\jakarta.websocket-client-api-2.1.0.jar, C:\Users\elhai\.m2\repository\jakarta\json\bind\jakarta.json.bind-api\3.0.0\jakarta.json.bind-api-3.0.0.jar, C:\Users\elhai\.m2\repository\jakarta\annotation\jakarta.annotation-api\2.1.1\jakarta.annotation-api-2.1.1.jar, C:\Users\elhai\.m2\repository\jakarta\ejb\jakarta.ejb-api\4.0.1\jakarta.ejb-api-4.0.1.jar, C:\Users\elhai\.m2\repository\jakarta\interceptor\jakarta.interceptor-api\2.1.0\jakarta.interceptor-api-2.1.0.jar, C:\Users\elhai\.m2\repository\jakarta\enterprise\jakarta.enterprise.cdi-api\4.0.1\jakarta.enterprise.cdi-api-4.0.1.jar, C:\Users\elhai\.m2\repository\jakarta\enterprise\jakarta.enterprise.lang-model\4.0.1\jakarta.enterprise.lang-model-4.0.1.jar, C:\Users\elhai\.m2\repository\jakarta\authentication\jakarta.authentication-api\3.0.0\jakarta.authentication-api-3.0.0.jar, C:\Users\elhai\.m2\repository\jakarta\security\enterprise\jakarta.security.enterprise-api\3.0.0\jakarta.security.enterprise-api-3.0.0.jar, C:\Users\elhai\.m2\repository\jakarta\jms\jakarta.jms-api\3.1.0\jakarta.jms-api-3.1.0.jar, C:\Users\elhai\.m2\repository\jakarta\activation\jakarta.activation-api\2.1.0\jakarta.activation-api-2.1.0.jar, C:\Users\elhai\.m2\repository\jakarta\mail\jakarta.mail-api\2.1.0\jakarta.mail-api-2.1.0.jar, C:\Users\elhai\.m2\repository\jakarta\resource\jakarta.resource-api\2.1.0\jakarta.resource-api-2.1.0.jar, C:\Users\elhai\.m2\repository\jakarta\authorization\jakarta.authorization-api\2.1.0\jakarta.authorization-api-2.1.0.jar, C:\Users\elhai\.m2\repository\jakarta\batch\jakarta.batch-api\2.1.1\jakarta.batch-api-2.1.1.jar, C:\Users\elhai\.m2\repository\jakarta\faces\jakarta.faces-api\4.0.1\jakarta.faces-api-4.0.1.jar, C:\Users\elhai\.m2\repository\jakarta\inject\jakarta.inject-api\2.0.1\jakarta.inject-api-2.0.1.jar, C:\Users\elhai\.m2\repository\jakarta\persistence\jakarta.persistence-api\3.1.0\jakarta.persistence-api-3.1.0.jar, C:\Users\elhai\.m2\repository\jakarta\servlet\jakarta.servlet-api\6.0.0\jakarta.servlet-api-6.0.0.jar, C:\Users\elhai\.m2\repository\org\hibernate\orm\hibernate-core\6.4.4.Final\hibernate-core-6.4.4.Final.jar, C:\Users\elhai\.m2\repository\jakarta\transaction\jakarta.transaction-api\2.0.1\jakarta.transaction-api-2.0.1.jar, C:\Users\elhai\.m2\repository\org\jboss\logging\jboss-logging\3.5.0.Final\jboss-logging-3.5.0.Final.jar, C:\Users\elhai\.m2\repository\com\fasterxml\classmate\1.5.1\classmate-1.5.1.jar, C:\Users\elhai\.m2\repository\org\hibernate\validator\hibernate-validator\8.0.1.Final\hibernate-validator-8.0.1.Final.jar, C:\Users\elhai\.m2\repository\jakarta\validation\jakarta.validation-api\3.0.2\jakarta.validation-api-3.0.2.jar, C:\Users\elhai\.m2\repository\org\postgresql\postgresql\42.7.1\postgresql-42.7.1.jar, C:\Users\elhai\.m2\repository\org\eclipse\angus\angus-mail\2.0.2\angus-mail-2.0.2.jar, C:\Users\elhai\.m2\repository\jakarta\json\jakarta.json-api\2.1.3\jakarta.json-api-2.1.3.jar, C:\Users\elhai\.m2\repository\commons-codec\commons-codec\1.16.0\commons-codec-1.16.0.jar, C:\Users\elhai\.m2\repository\org\mindrot\jbcrypt\0.4\jbcrypt-0.4.jar, C:\Users\elhai\.m2\repository\org\primefaces\primefaces\14.0.4\primefaces-14.0.4-jakarta.jar]
+[DEBUG]   (f) compileSourceRoots = [C:\Users\elhai\OneDrive\Desktop\Jakarta Jaouad\src\main\java]
+[DEBUG]   (f) compilerId = javac
+[DEBUG]   (f) createMissingPackageInfoClass = true
+[DEBUG]   (f) debug = true
+[DEBUG]   (f) debugFileName = javac
+[DEBUG]   (f) enablePreview = false
+[DEBUG]   (f) encoding = UTF-8
+[DEBUG]   (f) failOnError = true
+[DEBUG]   (f) failOnWarning = false
+[DEBUG]   (f) fileExtensions = [jar, class]
+[DEBUG]   (f) forceJavacCompilerUse = false
+[DEBUG]   (f) fork = false
+[DEBUG]   (f) generatedSourcesDirectory = C:\Users\elhai\OneDrive\Desktop\Jakarta Jaouad\target\generated-sources\annotations
+[DEBUG]   (f) mojoExecution = org.apache.maven.plugins:maven-compiler-plugin:3.12.1:compile {execution: default-compile}
+[DEBUG]   (f) optimize = false
+[DEBUG]   (f) outputDirectory = C:\Users\elhai\OneDrive\Desktop\Jakarta Jaouad\target\classes
+[DEBUG]   (f) parameters = false
+[DEBUG]   (f) project = MavenProject: com.subtrack:subtrack:1.0.0-SNAPSHOT @ C:\Users\elhai\OneDrive\Desktop\Jakarta Jaouad\pom.xml
+[DEBUG]   (f) projectArtifact = com.subtrack:subtrack:war:1.0.0-SNAPSHOT
+[DEBUG]   (f) session = org.apache.maven.execution.MavenSession@77b919a3
+[DEBUG]   (f) showCompilationChanges = false
+[DEBUG]   (f) showDeprecation = false
+[DEBUG]   (f) showWarnings = true
+[DEBUG]   (f) skipMultiThreadWarning = false
+[DEBUG]   (f) source = 17
+[DEBUG]   (f) staleMillis = 0
+[DEBUG]   (s) target = 17
+[DEBUG]   (f) useIncrementalCompilation = true
+[DEBUG]   (f) verbose = false
+[DEBUG] -- end configuration --
+[DEBUG] Using compiler 'javac'.
+[DEBUG] Adding C:\Users\elhai\OneDrive\Desktop\Jakarta Jaouad\target\generated-sources\annotations to compile source roots:
+  C:\Users\elhai\OneDrive\Desktop\Jakarta Jaouad\src\main\java
+[DEBUG] New compile source roots:
+  C:\Users\elhai\OneDrive\Desktop\Jakarta Jaouad\src\main\java
+  C:\Users\elhai\OneDrive\Desktop\Jakarta Jaouad\target\generated-sources\annotations
+[DEBUG] CompilerReuseStrategy: reuseCreated
+[DEBUG] useIncrementalCompilation enabled
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  3.548 s
+[INFO] Finished at: 2026-03-12T15:46:31Z
+[INFO] ------------------------------------------------------------------------
+[DEBUG] Shutting down adapter factory; available factories [file-lock, rwlock-local, semaphore-local, noop]; available name mappers [discriminating, file-gaecv, file-gav, file-hgaecv, file-hgav, file-static, gaecv, gav, static]
+[DEBUG] Shutting down 'file-lock' factory
+[DEBUG] Shutting down 'rwlock-local' factory
+[DEBUG] Shutting down 'semaphore-local' factory
+[DEBUG] Shutting down 'noop' factory

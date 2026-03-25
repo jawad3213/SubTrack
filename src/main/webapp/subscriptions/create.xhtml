@@ -1,0 +1,105 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+<ui:composition template="/templates/layout.xhtml">
+    <ui:define name="title">Add Subscription - SubTrack</ui:define>
+    
+    <ui:define name="content">
+        <div class="page-header" style="margin-bottom: 30px;">
+            <h1 style="color: #1A1A1A;">Add New Subscription</h1>
+            <p style="color: #5F5E5A;">Track a new recurring payment</p>
+        </div>
+
+        <div class="card" style="max-width: 600px;">
+            <h:form id="createForm" styleClass="form-horizontal">
+                <div class="form-group">
+                    <h:outputLabel for="name" value="Subscription Name *" styleClass="form-label"/>
+                    <h:inputText id="name" value="#{subscriptionController.name}" 
+                                 styleClass="form-control" required="true"
+                                 requiredMessage="Name is required"/>
+                    <h:message for="name" styleClass="error-message"/>
+                </div>
+                
+                <div class="form-group">
+                    <h:outputLabel for="description" value="Description" styleClass="form-label"/>
+                    <h:inputTextarea id="description" value="#{subscriptionController.description}" 
+                                     styleClass="form-control" rows="2"/>
+                </div>
+                
+                <div class="form-group">
+                    <h:outputLabel for="price" value="Price *" styleClass="form-label"/>
+                    <h:inputText id="price" value="#{subscriptionController.price}" 
+                                 styleClass="form-control" required="true"
+                                 requiredMessage="Price is required">
+                        <f:convertNumber pattern="#,##0.00"/>
+                    </h:inputText>
+                    <h:message for="price" styleClass="error-message"/>
+                </div>
+                
+                <div class="form-group">
+                    <h:outputLabel for="currency" value="Currency" styleClass="form-label"/>
+                    <h:selectOneMenu id="currency" value="#{subscriptionController.originalCurrency}" 
+                                     styleClass="form-control">
+                        <f:selectItem itemLabel="USD" itemValue="USD"/>
+                        <f:selectItem itemLabel="EUR" itemValue="EUR"/>
+                        <f:selectItem itemLabel="GBP" itemValue="GBP"/>
+                        <f:selectItem itemLabel="JPY" itemValue="JPY"/>
+                        <f:selectItem itemLabel="CAD" itemValue="CAD"/>
+                        <f:selectItem itemLabel="AUD" itemValue="AUD"/>
+                        <f:selectItem itemLabel="MAD" itemValue="MAD"/>
+                    </h:selectOneMenu>
+                </div>
+                
+                <div class="form-group">
+                    <h:outputLabel for="frequency" value="Billing Frequency *" styleClass="form-label"/>
+                    <h:selectOneMenu id="frequency" value="#{subscriptionController.frequency}" 
+                                     styleClass="form-control" required="true">
+                        <f:selectItems value="#{subscriptionController.frequencies}" var="freq"
+                                       itemLabel="#{freq.displayName}" itemValue="#{freq}"/>
+                    </h:selectOneMenu>
+                </div>
+                
+                <div class="form-group">
+                    <h:outputLabel for="category" value="Category" styleClass="form-label"/>
+                    <h:selectOneMenu id="category" value="#{subscriptionController.category}" 
+                                     styleClass="form-control"
+                                     converter="#{categoryConverter}">
+                        <f:selectItem itemLabel="Select Category" itemValue="#{null}"/>
+                        <f:selectItems value="#{subscriptionController.categories}" var="cat"
+                                       itemLabel="#{cat.name}" itemValue="#{cat}"/>
+                    </h:selectOneMenu>
+                </div>
+                
+                <div class="form-group">
+                    <h:outputLabel for="startDate" value="Start Date" styleClass="form-label"/>
+                    <h:inputText id="startDate" value="#{subscriptionController.startDate}" 
+                                 styleClass="form-control">
+                        <f:convertDateTime pattern="yyyy-MM-dd"/>
+                    </h:inputText>
+                </div>
+                
+                <div class="form-group">
+                    <h:outputLabel for="logoUrl" value="Logo URL" styleClass="form-label"/>
+                    <h:inputText id="logoUrl" value="#{subscriptionController.logoUrl}" 
+                                 styleClass="form-control"/>
+                </div>
+                
+                <div class="form-group">
+                    <h:outputLabel for="notes" value="Notes" styleClass="form-label"/>
+                    <h:inputTextarea id="notes" value="#{subscriptionController.notes}" 
+                                     styleClass="form-control" rows="3"/>
+                </div>
+                
+                <div class="form-actions" style="display: flex; gap: 10px; margin-top: 20px;">
+                    <h:commandButton value="Create Subscription" action="#{subscriptionController.createSubscription}" 
+                                     styleClass="btn-primary"/>
+                    <h:link outcome="/subscriptions/list" value="Cancel" styleClass="btn-secondary" style="padding: 14px 24px;"/>
+                </div>
+            </h:form>
+        </div>
+    </ui:define>
+</ui:composition>
+</html>

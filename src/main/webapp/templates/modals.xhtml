@@ -1,0 +1,65 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+<!-- Delete Confirmation Modal -->
+<p:dialog widgetVar="deleteConfirmDialog" header="Confirm Delete" modal="true" width="400">
+    <div style="padding: 20px;">
+        <p style="margin-bottom: 20px;">Are you sure you want to delete this item? This action cannot be undone.</p>
+        <div style="display: flex; gap: 10px; justify-content: flex-end;">
+            <p:commandButton value="Cancel" onclick="PF('deleteConfirmDialog').hide()" styleClass="ui-button-secondary"/>
+        </div>
+    </div>
+</p:dialog>
+
+<!-- Subscription Quick View Modal -->
+<p:dialog widgetVar="subscriptionQuickViewDialog" header="Subscription Details" modal="true" width="500">
+    <h:panelGroup rendered="#{subscriptionController.selectedSubscription != null}">
+        <div style="padding: 20px;">
+            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+                <div>
+                    <h3 style="margin: 0; color: #1A1A1A;">
+                        #{subscriptionController.selectedSubscription.name}
+                    </h3>
+                    <span class="badge #{subscriptionController.selectedSubscription.status.name().toLowerCase()}">
+                        #{subscriptionController.selectedSubscription.status}
+                    </span>
+                </div>
+            </div>
+            
+            <dl class="dl-horizontal" style="display: grid; grid-template-columns: 100px 1fr; gap: 8px;">
+                <dt style="color: #5F5E5A;">Price:</dt>
+                <dd>
+                    <h:outputText value="#{subscriptionController.selectedSubscription.price}">
+                        <f:convertNumber pattern="#,##0.00"/>
+                    </h:outputText>
+                    #{subscriptionController.selectedSubscription.originalCurrency}
+                </dd>
+                
+                <dt style="color: #5F5E5A;">Billing:</dt>
+                <dd>#{subscriptionController.selectedSubscription.frequency.displayName}</dd>
+                
+                <dt style="color: #5F5E5A;">Category:</dt>
+                <dd>#{subscriptionController.selectedSubscription.category.name}</dd>
+                
+                <dt style="color: #5F5E5A;">Next Bill:</dt>
+                <dd>
+                    <h:outputText value="#{subscriptionController.selectedSubscription.nextBillingDate}">
+                        <f:convertDateTime type="date" dateStyle="medium"/>
+                    </h:outputText>
+                </dd>
+            </dl>
+            
+            <div style="margin-top: 20px; display: flex; gap: 10px;">
+                <p:commandButton value="Edit" action="/subscriptions/edit" styleClass="ui-button-secondary">
+                    <f:param name="id" value="#{subscriptionController.selectedSubscription.id}"/>
+                </p:commandButton>
+            </div>
+        </div>
+    </h:panelGroup>
+</p:dialog>
+
+</html>

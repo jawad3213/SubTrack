@@ -1,0 +1,162 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+<ui:composition template="/templates/layout.xhtml">
+    <ui:define name="title">Dashboard - SubTrack</ui:define>
+    
+    <ui:define name="content">
+        <div class="page-header" style="margin-bottom: 30px;">
+            <h1 style="color: #1A1A1A;">Dashboard</h1>
+            <p style="color: #5F5E5A;">Welcome back, #{userContext.userName}!</p>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card primary">
+                <div class="stat-value">
+                    <h:outputText value="#{dashboardController.totalMonthlyCost}">
+                        <f:convertNumber type="currency" currencyCode="MAD"/>
+                    </h:outputText>
+                </div>
+                <div class="stat-label">Monthly Cost</div>
+            </div>
+            
+            <div class="stat-card success">
+                <div class="stat-value">
+                    <h:outputText value="#{dashboardController.totalAnnualCost}">
+                        <f:convertNumber type="currency" currencyCode="MAD"/>
+                    </h:outputText>
+                </div>
+                <div class="stat-label">Annual Cost</div>
+            </div>
+            
+            <div class="stat-card warning">
+                <div class="stat-value">
+                    <h:outputText value="#{dashboardController.activeSubscriptionCount}"/>
+                </div>
+                <div class="stat-label">Active Subscriptions</div>
+            </div>
+        </div>
+
+        <!-- Recent Subscriptions -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Recent Subscriptions</h2>
+                <div>
+                    <h:link outcome="/subscriptions/create" value="Add New" styleClass="btn-success"/>
+                </div>
+            </div>
+            
+            <h:dataTable value="#{dashboardController.recentSubscriptions}" 
+                         var="sub"
+                         styleClass="data-table"
+                         rendered="#{not empty dashboardController.recentSubscriptions}">
+                <h:column>
+                    <f:facet name="header">Service</f:facet>
+                    <h:outputText value="#{sub.name}"/>
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Price</f:facet>
+                    <h:outputText value="#{sub.price}">
+                        <f:convertNumber type="currency" currencyCode="#{sub.originalCurrency}"/>
+                    </h:outputText>
+                    <h:outputText value=" / #{sub.frequency.displayName}"/>
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Status</f:facet>
+                    <span class="badge #{sub.status.name().toLowerCase()}">
+                        <h:outputText value="#{sub.status.displayName}"/>
+                    </span>
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Next Billing</f:facet>
+                    <h:outputText value="#{sub.nextBillingDate}">
+                        <f:convertDateTime type="date" dateStyle="medium"/>
+                    </h:outputText>
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Actions</f:facet>
+                    <h:link outcome="/subscriptions/edit" styleClass="btn-secondary">
+                        <f:param name="id" value="#{sub.id}"/>
+                        Edit
+                    </h:link>
+                </h:column>
+            </h:dataTable>
+            
+            <h:panelGroup rendered="#{empty dashboardController.recentSubscriptions}">
+                <div class="empty-state" style="text-align: center; padding: 40px;">
+                    <p style="color: #5F5E5A; margin-bottom: 15px;">You don't have any subscriptions yet.</p>
+                    <h:link outcome="/subscriptions/create" value="Add Your First Subscription" styleClass="btn-primary"/>
+                </div>
+            </h:panelGroup>
+        </div>
+
+        <!-- Category Breakdown -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Spending by Category</h2>
+            </div>
+            
+            <h:dataTable value="#{dashboardController.categoryBreakdown}" 
+                         var="cat"
+                         styleClass="data-table"
+                         rendered="#{not empty dashboardController.categoryBreakdown}">
+                <h:column>
+                    <f:facet name="header">Category</f:facet>
+                    <h:outputText value="#{cat.categoryName}"/>
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Subscriptions</f:facet>
+                    <h:outputText value="#{cat.count}"/>
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Monthly Cost</f:facet>
+                    <h:outputText value="#{cat.monthlyCost}">
+                        <f:convertNumber pattern="#,##0.00"/>
+                    </h:outputText>
+                </h:column>
+            </h:dataTable>
+            <h:panelGroup rendered="#{empty dashboardController.categoryBreakdown}">
+                <div class="empty-state">
+                    <p>No category data yet. Add subscriptions to see breakdown.</p>
+                </div>
+            </h:panelGroup>
+        </div>
+        
+        <!-- Optimization Suggestions -->
+        <h:panelGroup rendered="#{not empty dashboardController.optimizationSuggestions}">
+            <div class="card" style="margin-top: 20px;">
+                <div class="card-header">
+                    <h2 class="card-title" style="color: #BA7517;">&#9888; Optimization Suggestions</h2>
+                    <span style="color: #5F5E5A;">Potential savings: 
+                        <h:outputText value="#{dashboardController.totalPotentialSavings}">
+                            <f:convertNumber pattern="#,##0.00"/>
+                        </h:outputText>/mo
+                    </span>
+                </div>
+                <h:dataTable value="#{dashboardController.optimizationSuggestions}" var="sug"
+                             styleClass="data-table">
+                    <h:column>
+                        <f:facet name="header">Issue</f:facet>
+                        <strong>#{sug.title}</strong>
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Recommendation</f:facet>
+                        #{sug.description}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Potential Savings/mo</f:facet>
+                        <h:outputText value="#{sug.potentialSavings}">
+                            <f:convertNumber pattern="#,##0.00"/>
+                        </h:outputText>
+                    </h:column>
+                </h:dataTable>
+            </div>
+        </h:panelGroup>
+    </ui:define>
+</ui:composition>
+</html>

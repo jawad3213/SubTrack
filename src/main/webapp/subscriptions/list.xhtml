@@ -1,0 +1,95 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+<ui:composition template="/templates/layout.xhtml">
+    <ui:define name="title">My Subscriptions - SubTrack</ui:define>
+    
+    <ui:define name="content">
+        <div class="page-header" style="margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h1 style="color: #1A1A1A;">My Subscriptions</h1>
+                <p style="color: #5F5E5A;">Manage your recurring payments</p>
+            </div>
+            <div>
+                <h:link outcome="/subscriptions/create" value="Add New Subscription" styleClass="btn-success"/>
+            </div>
+        </div>
+
+        <h:form id="subscriptionForm">
+            <div class="card">
+                <h:dataTable value="#{subscriptionController.subscriptions}" var="sub" 
+                             styleClass="data-table"
+                             rendered="#{not empty subscriptionController.subscriptions}">
+                    <h:column>
+                        <f:facet name="header">Service</f:facet>
+                        <h:outputText value="#{sub.name}"/>
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Price</f:facet>
+                        <h:outputText value="#{sub.price}">
+                            <f:convertNumber pattern="#,##0.00"/>
+                        </h:outputText>
+                        <h:outputText value=" #{sub.originalCurrency}"/>
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Frequency</f:facet>
+                        <h:outputText value="#{sub.frequency.displayName}"/>
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Monthly Cost</f:facet>
+                        <h:outputText value="#{sub.monthlyCost}">
+                            <f:convertNumber pattern="#,##0.00"/>
+                        </h:outputText>
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Status</f:facet>
+                        <span class="badge #{sub.status.name().toLowerCase()}">
+                            #{sub.status}
+                        </span>
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Next Billing</f:facet>
+                        <h:outputText value="#{sub.nextBillingDate}">
+                            <f:convertDateTime type="date" dateStyle="medium"/>
+                        </h:outputText>
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Actions</f:facet>
+                        <div style="display: flex; gap: 5px;">
+                            <h:commandButton value="Edit" action="#{subscriptionController.prepareEdit(sub)}" 
+                                             styleClass="btn-secondary" style="padding: 5px 10px; font-size: 0.85rem;">
+                                <f:setPropertyActionListener target="#{subscriptionController.selectedSubscription}" value="#{sub}"/>
+                            </h:commandButton>
+                            <h:commandButton value="Pause" action="#{subscriptionController.pauseSubscription}" 
+                                             styleClass="btn-secondary" style="padding: 5px 10px; font-size: 0.85rem;"
+                                             rendered="#{sub.status.name() == 'ACTIVE'}">
+                                <f:setPropertyActionListener target="#{subscriptionController.selectedSubscription}" value="#{sub}"/>
+                            </h:commandButton>
+                            <h:commandButton value="Cancel" action="#{subscriptionController.cancelSubscription}" 
+                                             styleClass="btn-danger" style="padding: 5px 10px; font-size: 0.85rem;"
+                                             rendered="#{sub.status.name() == 'ACTIVE'}">
+                                <f:setPropertyActionListener target="#{subscriptionController.selectedSubscription}" value="#{sub}"/>
+                            </h:commandButton>
+                            <h:commandButton value="Reactivate" action="#{subscriptionController.reactivateSubscription}" 
+                                             styleClass="btn-success" style="padding: 5px 10px; font-size: 0.85rem;"
+                                             rendered="#{sub.status.name() != 'ACTIVE'}">
+                                <f:setPropertyActionListener target="#{subscriptionController.selectedSubscription}" value="#{sub}"/>
+                            </h:commandButton>
+                        </div>
+                    </h:column>
+                </h:dataTable>
+                
+                <h:panelGroup rendered="#{empty subscriptionController.subscriptions}">
+                    <div class="empty-state" style="text-align: center; padding: 40px;">
+                        <p style="color: #5F5E5A; margin-bottom: 15px;">You don't have any subscriptions yet.</p>
+                        <h:link outcome="/subscriptions/create" value="Add Your First Subscription" styleClass="btn-primary"/>
+                    </div>
+                </h:panelGroup>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>
+</html>

@@ -1,0 +1,157 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+
+<ui:composition template="/templates/layout.xhtml">
+    <ui:define name="title">Invoices - SubTrack</ui:define>
+    
+    <ui:define name="content">
+        <div class="page-header" style="margin-bottom: 30px;">
+            <h1 style="color: #1A1A1A;">Invoice Management</h1>
+            <p style="color: #5F5E5A;">View and process imported invoices from your email</p>
+        </div>
+
+        <h:panelGroup rendered="#{not emailController.connected}">
+            <div class="alert alert-warning">
+                <p style="font-weight: 600; margin-bottom: 10px;">Email Not Connected</p>
+                <p>Connect your email in the <h:link outcome="/profile" value="Profile page"/> to automatically import invoices.</p>
+            </div>
+        </h:panelGroup>
+
+        <h:panelGroup rendered="#{emailController.connected}">
+            <div class="stats-grid">
+                <div class="stat-card primary">
+                    <div class="stat-value">
+                        <h:outputText value="#{invoiceController.invoices.size()}"/>
+                    </div>
+                    <div class="stat-label">Total Invoices</div>
+                </div>
+                
+                <div class="stat-card warning">
+                    <div class="stat-value">
+                        <h:outputText value="#{invoiceController.pendingCount}"/>
+                    </div>
+                    <div class="stat-label">Pending Processing</div>
+                </div>
+                
+                <div class="stat-card success">
+                    <div class="stat-value">
+                        <h:outputText value="#{invoiceController.invoices.size() - invoiceController.pendingCount}"/>
+                    </div>
+                    <div class="stat-label">Processed</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <h2 class="card-title">All Invoices</h2>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <h:outputLabel for="showProcessed" value="Show Processed:" style="margin-right: 5px;"/>
+                        <h:selectBooleanCheckbox id="showProcessed" value="#{invoiceController.showProcessed}">
+                            <f:ajax render="@all"/>
+                        </h:selectBooleanCheckbox>
+                    </div>
+                </div>
+                
+                <h:dataTable value="#{invoiceController.filteredInvoices}" var="invoice" 
+                             styleClass="data-table"
+                             rendered="#{not empty invoiceController.filteredInvoices}">
+                    <h:column>
+                        <f:facet name="header">Date</f:facet>
+                        <h:outputText value="#{invoice.invoiceDate}">
+                            <f:convertDateTime type="date" dateStyle="medium"/>
+                        </h:outputText>
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Service</f:facet>
+                        <h:outputText value="#{invoice.serviceName}"/>
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Amount</f:facet>
+                        <h:outputText value="#{invoice.amount}">
+                            <f:convertNumber pattern="#,##0.00"/>
+                        </h:outputText>
+                        <h:outputText value=" #{invoice.currency}"/>
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Status</f:facet>
+                        <span class="badge #{invoice.isProcessed ? 'active' : 'paused'}">
+                            #{invoice.isProcessed ? 'Processed' : 'Pending'}
+                        </span>
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Actions</f:facet>
+                        <div style="display: flex; gap: 5px;">
+                            <h:commandButton value="View" 
+                                             onclick="PF('invoiceDetailDialog').show();"
+                                             styleClass="btn-secondary" style="padding: 5px 10px; font-size: 0.85rem;">
+                                <f:setPropertyActionListener target="#{invoiceController.selectedInvoice}" value="#{invoice}"/>
+                            </h:commandButton>
+                            <h:commandButton value="Process" 
+                                             action="#{invoiceController.processInvoice}" 
+                                             styleClass="btn-primary" style="padding: 5px 10px; font-size: 0.85rem;"
+                                             rendered="#{not invoice.isProcessed}">
+                                <f:setPropertyActionListener target="#{invoiceController.selectedInvoice}" value="#{invoice}"/>
+                            </h:commandButton>
+                            <h:commandButton value="Delete" 
+                                             action="#{invoiceController.deleteInvoice}" 
+                                             styleClass="btn-danger" style="padding: 5px 10px; font-size: 0.85rem;"
+                                             onclick="return confirm('Are you sure?');">
+                                <f:setPropertyActionListener target="#{invoiceController.selectedInvoice}" value="#{invoice}"/>
+                            </h:commandButton>
+                        </div>
+                    </h:column>
+                </h:dataTable>
+                
+                <h:panelGroup rendered="#{empty invoiceController.invoices}">
+                    <div class="empty-state" style="text-align: center; padding: 40px;">
+                        <p style="color: #5F5E5A; margin-bottom: 15px;">No invoices imported yet.</p>
+                        <p>Forward your invoices to your connected email address to import them automatically.</p>
+                    </div>
+                </h:panelGroup>
+            </div>
+        </h:panelGroup>
+
+        <!-- Invoice Detail Dialog -->
+        <p:dialog widgetVar="invoiceDetailDialog" header="Invoice Details" modal="true" width="600">
+            <h:panelGroup rendered="#{invoiceController.selectedInvoice != null}">
+                <dl class="dl-horizontal" style="display: grid; grid-template-columns: 120px 1fr; gap: 10px;">
+                    <dt style="color: #5F5E5A;">Service:</dt>
+                    <dd>#{invoiceController.selectedInvoice.serviceName}</dd>
+                    
+                    <dt style="color: #5F5E5A;">Amount:</dt>
+                    <dd>
+                        <h:outputText value="#{invoiceController.selectedInvoice.amount}">
+                            <f:convertNumber pattern="#,##0.00"/>
+                        </h:outputText>
+                        #{invoiceController.selectedInvoice.currency}
+                    </dd>
+                    
+                    <dt style="color: #5F5E5A;">Date:</dt>
+                    <dd>
+                        <h:outputText value="#{invoiceController.selectedInvoice.invoiceDate}">
+                            <f:convertDateTime type="date" dateStyle="medium"/>
+                        </h:outputText>
+                    </dd>
+                    
+                    <dt style="color: #5F5E5A;">Status:</dt>
+                    <dd>
+                        <span class="badge #{invoiceController.selectedInvoice.isProcessed ? 'active' : 'paused'}">
+                            #{invoiceController.selectedInvoice.isProcessed ? 'Processed' : 'Pending'}
+                        </span>
+                    </dd>
+                    
+                    <dt style="color: #5F5E5A;">Raw Content:</dt>
+                    <dd>
+                        <pre style="background: #f5f5f5; padding: 10px; max-height: 200px; overflow: auto; white-space: pre-wrap;">#{invoiceController.selectedInvoice.rawContent}</pre>
+                    </dd>
+                </dl>
+            </h:panelGroup>
+        </p:dialog>
+    </ui:define>
+</ui:composition>
+</html>

@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+<ui:composition template="/templates/admin-layout.xhtml">
+    <ui:define name="title">API Keys &amp; Configuration - SubTrack Admin</ui:define>
+
+    <ui:define name="content">
+        <div class="page-header" style="margin-bottom: 28px;">
+            <h1 style="color: #1A1A1A; font-size: 22px; font-weight: 700;">API Keys &amp; Configuration</h1>
+            <p style="color: #5F5E5A; font-size: 14px;">Configure external integration keys and URLs</p>
+        </div>
+
+        <h:form id="configForm">
+            <!-- Google Gemini AI -->
+            <div class="config-group">
+                <div class="config-group-title">
+                    <svg style="width: 16px; height: 16px; stroke: #BA7517; fill: none; stroke-width: 2; vertical-align: middle; margin-right: 6px;" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                    Google Gemini API
+                </div>
+                <div class="form-group">
+                    <label>API Key</label>
+                    <h:inputSecret value="#{adminConfigBean.geminiApiKey}" styleClass="form-control masked-field" redisplay="true"/>
+                </div>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <h:commandButton value="Test Connection" action="#{adminConfigBean.testGemini}" styleClass="btn-secondary" style="padding: 6px 14px; font-size: 13px;"/>
+                    <span class="status-indicator operational" style="display: none;"><span class="dot"></span> Connected</span>
+                </div>
+            </div>
+
+            <!-- Exchange Rate API -->
+            <div class="config-group">
+                <div class="config-group-title">
+                    <svg style="width: 16px; height: 16px; stroke: #185FA5; fill: none; stroke-width: 2; vertical-align: middle; margin-right: 6px;" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                    Exchange Rate API
+                </div>
+                <div class="form-group">
+                    <label>API Key</label>
+                    <h:inputSecret value="#{adminConfigBean.exchangeRateApiKey}" styleClass="form-control masked-field" redisplay="true"/>
+                </div>
+                <div class="form-group">
+                    <label>Endpoint URL</label>
+                    <h:inputText value="#{adminConfigBean.exchangeRateUrl}" styleClass="form-control" placeholder="https://api.exchangerate.host/latest"/>
+                </div>
+                <h:commandButton value="Test Connection" action="#{adminConfigBean.testExchangeRate}" styleClass="btn-secondary" style="padding: 6px 14px; font-size: 13px;"/>
+            </div>
+
+            <!-- n8n Orchestrator -->
+            <div class="config-group">
+                <div class="config-group-title">
+                    <svg style="width: 16px; height: 16px; stroke: #27500A; fill: none; stroke-width: 2; vertical-align: middle; margin-right: 6px;" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                    n8n Webhook
+                </div>
+                <div class="form-group">
+                    <label>Webhook URL</label>
+                    <h:inputText value="#{adminConfigBean.n8nWebhookUrl}" styleClass="form-control" placeholder="https://n8n.example.com/webhook/..."/>
+                </div>
+                <h:commandButton value="Test Webhook" action="#{adminConfigBean.testN8n}" styleClass="btn-secondary" style="padding: 6px 14px; font-size: 13px;"/>
+            </div>
+
+            <!-- Telegram -->
+            <div class="config-group">
+                <div class="config-group-title">
+                    <svg style="width: 16px; height: 16px; stroke: #185FA5; fill: none; stroke-width: 2; vertical-align: middle; margin-right: 6px;" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                    Telegram Bot
+                </div>
+                <div class="form-group">
+                    <label>Bot Token</label>
+                    <h:inputSecret value="#{adminConfigBean.telegramBotToken}" styleClass="form-control masked-field" redisplay="true"/>
+                </div>
+                <h:commandButton value="Test Bot" action="#{adminConfigBean.testTelegram}" styleClass="btn-secondary" style="padding: 6px 14px; font-size: 13px;"/>
+            </div>
+
+            <!-- WhatsApp -->
+            <div class="config-group">
+                <div class="config-group-title">
+                    <svg style="width: 16px; height: 16px; stroke: #27500A; fill: none; stroke-width: 2; vertical-align: middle; margin-right: 6px;" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                    WhatsApp Business API
+                </div>
+                <div class="form-group">
+                    <label>API Key</label>
+                    <h:inputSecret value="#{adminConfigBean.whatsappApiKey}" styleClass="form-control masked-field" redisplay="true"/>
+                </div>
+                <div class="form-group">
+                    <label>Endpoint URL</label>
+                    <h:inputText value="#{adminConfigBean.whatsappEndpoint}" styleClass="form-control" placeholder="https://graph.facebook.com/v17.0/..."/>
+                </div>
+                <h:commandButton value="Test Connection" action="#{adminConfigBean.testWhatsapp}" styleClass="btn-secondary" style="padding: 6px 14px; font-size: 13px;"/>
+            </div>
+
+            <!-- SMTP -->
+            <div class="config-group">
+                <div class="config-group-title">
+                    <svg style="width: 16px; height: 16px; stroke: #791F1F; fill: none; stroke-width: 2; vertical-align: middle; margin-right: 6px;" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                    SMTP Email Configuration
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div class="form-group">
+                        <label>SMTP Host</label>
+                        <h:inputText value="#{adminConfigBean.smtpHost}" styleClass="form-control" placeholder="smtp.gmail.com"/>
+                    </div>
+                    <div class="form-group">
+                        <label>Port</label>
+                        <h:inputText value="#{adminConfigBean.smtpPort}" styleClass="form-control" placeholder="587"/>
+                    </div>
+                    <div class="form-group">
+                        <label>Username</label>
+                        <h:inputText value="#{adminConfigBean.smtpUsername}" styleClass="form-control"/>
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <h:inputSecret value="#{adminConfigBean.smtpPassword}" styleClass="form-control masked-field" redisplay="true"/>
+                    </div>
+                </div>
+                <h:commandButton value="Send Test Email" action="#{adminConfigBean.testSmtp}" styleClass="btn-secondary" style="padding: 6px 14px; font-size: 13px;"/>
+            </div>
+
+            <div style="margin-top: 20px;">
+                <h:commandButton value="Save All Configuration" action="#{adminConfigBean.saveAll}" styleClass="btn-primary" style="padding: 12px 32px;"/>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>
+</html>

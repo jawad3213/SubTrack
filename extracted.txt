@@ -1,0 +1,315 @@
+Rapport de Projet
+Développement JEE / Architecture N-Tiers
+SubTrack
+Plateforme Intelligente de Gestion et
+d’Optimisation d’Abonnements SaaS
+Réalisé par :
+EL HAIL Jaouad
+KHOUKA HajarEncadré par :
+Mme. Belmokaddem Houda
+Année Universitaire : 2023 - 2024
+
+Table des matières
+1 Contexte, Problématique et Objectifs du Projet 2
+1.1 Le Contexte Fonctionnel . . . . . . . . . . . . . . . . . . . . . . . . . . . . 2
+1.2 La Problématique . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 2
+1.3 Les Objectifs du Projet . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 2
+2 Les Fonctionnalités Attendues 2
+2.1 1. Espace Client (Gestion & Optimisation CRUD) . . . . . . . . . . . . . . 2
+2.2 2. Automatisation (Zéro Saisie) . . . . . . . . . . . . . . . . . . . . . . . . 3
+2.3 3. Espace Administrateur (Back-Office) . . . . . . . . . . . . . . . . . . . . 3
+3 Les Acteurs et Utilisateurs du Système 3
+3.1 Acteurs Humains . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 3
+3.2 Acteurs Systèmes . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 4
+4 Aspect Technique et Architecture du Système 4
+4.1 Architecture N-Tiers (Jakarta EE) . . . . . . . . . . . . . . . . . . . . . . 4
+4.2 Écosystème d’Automatisation et d’Intelligence Artificielle . . . . . . . . . . 4
+5 Modélisation des Données (Schéma Relationnel) 5
+5.1 Description des Entités Principales . . . . . . . . . . . . . . . . . . . . . . 5
+6 Modélisation Fonctionnelle (Cas d’Utilisation) 6
+6.1 Description des Acteurs et Fonctionnalités Principales . . . . . . . . . . . . 6
+7 Modélisation Statique (Diagramme de Classes) 8
+7.1 Description des Packages et Classes Principales . . . . . . . . . . . . . . . 8
+8 Architecture Logicielle (Diagramme N-Tiers) 9
+8.1 Description des Couches et Responsabilités . . . . . . . . . . . . . . . . . . 9
+9 Interfaces Principales de l’Application 11
+9.1 Pilotage et Analyse des Données . . . . . . . . . . . . . . . . . . . . . . . . 11
+9.2 Gestion du Catalogue SaaS . . . . . . . . . . . . . . . . . . . . . . . . . . . 12
+9.3 Configuration des Notifications et Gestion Profil . . . . . . . . . . . . . . . 12
+1
+
+———————————————————
+1 Contexte, Problématique et Objectifs du Projet
+1.1 Le Contexte Fonctionnel
+L’applicationSubTrackest une plateforme unifiée conçue pour aider les particu-
+liers, les freelances et les entreprises (B2B) à centraliser, suivre et optimiser la gestion
+de leurs dépenses récurrentes en logiciels et services. Dans un monde où l’économie de
+l’abonnement est omniprésente,SubTrackagit comme un assistant financier intelligent,
+automatisant la collecte des factures et offrant une visibilité claire sur les engagements
+financiers continus.
+1.2 La Problématique
+Les utilisateurs et les entreprises perdent des centaines, voire des milliers de dirhams
+par an à cause d’abonnements oubliés, de renouvellements automatiques surprises, de
+hausses de prix silencieuses et de services redondants. Le suivi manuel via des tableurs est
+fastidieux,chronophageetsujetauxerreurshumaines.Deplus,lagestiondesabonnements
+internationaux implique des frais de conversion de devises qui complexifient le suivi du
+budget réel.
+1.3 Les Objectifs du Projet
+•Offrir une vue à 360 degrés de toutes les dépenses récurrentes via un tableau de
+bord analytique.
+•Réduire les dépenses en identifiant proactivement les outils inutilisés ou redondants.
+•Éliminer la saisie manuelle grâce à l’analyse intelligente des reçus par e-mail.
+•Faciliter la gestion financière et comptable grâce à la centralisation et l’export des
+données.
+2 Les Fonctionnalités Attendues
+2.1 1. Espace Client (Gestion & Optimisation CRUD)
+•Gestion des abonnements (CRUD) :Ajouter, modifier, suspendre ou résilier
+un abonnement avec gestion des fréquences (hebdomadaire, mensuelle, annuelle).
+•Enrichissement automatique :Récupération des logos des services et catégori-
+sation par tags personnalisés (ex : Loisirs, Travail, Cloud).
+2
+
+•Tableau de bord & Analyse :Affichage des coûts mensuels/annuels, prévisions
+budgétaires et suivi de l’historique pour détecter les hausses de prix.
+•Optimisation financière :
+◦Conversion automatique des devises étrangères en monnaie locale.
+◦Détection algorithmique des abonnements redondants.
+◦Centralisation des liens pour une résiliation en 1 clic.
+•Export comptable :Génération d’archives de justificatifs pour la comptabilité
+(cible B2B/Freelance).
+•Système d’Alertes :Notifications envoyées avant le prélèvement via Email, Tele-
+gram ou WhatsApp.
+2.2 2. Automatisation (Zéro Saisie)
+•Synchronisation Email :Connexion sécurisée aux boîtes mail pour détecter les
+nouvelles factures.
+•Extraction intelligente :Lecture automatique des reçus pour en extraire le nom
+du service, le montant et la date d’échéance afin de créer ou mettre à jour l’abon-
+nement sans intervention humaine.
+2.3 3. Espace Administrateur (Back-Office)
+•Gestion des utilisateurs :Administration des comptes clients.
+•Gestion du catalogue SaaS :Maintien d’une base de données globale des services
+connus.
+•Supervision :Suivi des logs systèmes et configuration globale.
+3 Les Acteurs et Utilisateurs du Système
+3.1 Acteurs Humains
+•Utilisateur B2C (Particuliers) :Cherche à suivre ses dépenses personnelles
+(VOD, musique, box) pour maîtriser son budget.
+•Utilisateur B2B & Freelances :A besoin de suivre ses licences logicielles pro-
+fessionnelles, d’éviter les doublons dans son équipe et d’exporter ses factures.
+•L’Administrateur :Gère le back-office deSubTrack, maintient le système et
+assure le support.
+3
+
+3.2 Acteurs Systèmes
+•API Taux de Change :Fournit les taux de conversion monétaire en temps réel.
+•Fournisseur Email :Transmet les reçus au système via des webhooks.
+4 Aspect Technique et Architecture du Système
+Pour répondre aux exigences de robustesse et d’évolutivité,SubTrackrepose sur une
+architecture N-Tiersstricte, basée sur l’écosystème Java/Jakarta EE, et intègre des
+micro-services externes pour l’intelligence artificielle.
+4.1 Architecture N-Tiers (Jakarta EE)
+Le système est divisé en couches indépendantes communicant entre elles :
+•CoucheClient(NavigateurWeb):L’interfaceutilisateurestrendueenHTML/CSS/JS.
+Elle communique avec le serveur via des requêtes et réponses HTTP.
+•Couche Présentation (JSF - JavaServer Faces) :Gère l’interface côté serveur
+à l’aide de pagesFacelets (.xhtml). Ces pages sont liées dynamiquement (Data Bin-
+ding) à des contrôleurs CDI appelésManaged Beans, qui interceptent les actions de
+l’utilisateur.
+•CoucheMétier(LogiqueApplicative):ComposéedeServices(ex:SubscriptionService).
+Elle contient toute la logique métier de l’application (calculs, vérifications, règles de
+gestion) et fait le pont entre les contrôleurs et la base de données.
+•Couche Persistance (Hibernate / JPA) :Assure la communication avec la base
+de données. Elle utilise le patron de conception DAO (Data Access Object) via des
+interfaces et leurs implémentations. Elle manipule desEntités JPA(@Entity) et
+génère les requêtes SQL/HQL grâce à l’EntityManager.
+•Base de Données Relationnelle :Stocke de manière persistante les tables du
+système (utilisateurs, abonnements, historique, etc.).
+4.2 Écosystème d’Automatisation et d’Intelligence Artificielle
+Enmargeducœurdel’applicationJakartaEE,lesystèmes’appuiesurunearchitecture
+événementielle pour l’automatisation :
+•n8n (Orchestrateur) :Agit comme un middleware d’automatisation. Il écoute les
+webhooks (nouveaux emails reçus) et orchestre le flux de données.
+•API Google Gemini (LLM) :Sollicité par l’orchestrateur n8n, ce modèle d’in-
+telligence artificielle est chargé d’analyser le texte brut des emails pour en extraire
+des données structurées (JSON) qui sont ensuite injectées dans la base de données
+de SubTrack.
+4
+
+5 Modélisation des Données (Schéma Relationnel)
+Afin de supporter les fonctionnalités de la plateformeSubTrack, la base de données
+relationnelle a été structurée autour d’entités clés garantissant l’intégrité, la traçabilité
+et l’optimisation des données. Le diagramme ci-dessous présente la structure des tables,
+leurs attributs, ainsi que les relations (Clés Primaires / Clés Étrangères) qui les unissent.
+Figure 1– Schéma Relationnel de la base de données SubTrack
+5.1 Description des Entités Principales
+L’architecture des données s’articule autour de plusieurs domaines fonctionnels :
+•Gestion des Utilisateurs :Le système sépare logiquement les utilisateurs finaux
+(CLIENT) des administrateurs du système (ADMINISTRATOR). La tableCLIENTgère
+5
+
+l’authentification et différencie les types de profils via l’énumérationAccountType
+(B2C, Freelance, B2B).
+•Le Cœur Métier (Abonnements) :La tableSUBSCRIPTIONest l’entité centrale
+du système. Un client peut posséder plusieurs abonnements (relation1 :N). Cette
+table stocke les détails essentiels tels que le prix de base, la devise d’origine, la
+fréquence de facturation et le statut de l’abonnement (Active, Paused, Cancelled).
+•Suivi et Historique :Afin de détecter les hausses de prix silencieuses, chaque
+abonnement est lié à la tablePAYMENT_HISTORY, qui trace l’historique chronologique
+des montants réellement prélevés.
+•Automatisation et IA :
+◦EMAIL_INTEGRATION: Stocke les jetons d’accès sécurisés (OAuth) pour per-
+mettre au système de scanner les boîtes mail des clients (relation0..1avec
+CLIENT).
+◦INVOICE: Conserve les données extraites par l’IA (Google Gemini) à partir des
+e-mails bruts, indiquant si la facture a bien été traitée (isAiProcessed).
+•Notifications et Alertes :La tableALERT_RULEpermet de définir de multiples
+règles de notification pour un même abonnement (ex : 3 jours avant via Email, 1
+jour avant via WhatsApp).
+•Optimisation Financière :La tableEXCHANGE_RATEagit comme un référentiel
+mis à jour régulièrement, permettant de convertir instantanément les devises étran-
+gères (originalCurrencyde l’abonnement) vers la monnaie locale (MAD) pour les
+tableaux de bord. Enfin, la tableCATEGORYpermet de regrouper les abonnements
+par thématiques pour l’analyse budgétaire.
+6 Modélisation Fonctionnelle (Cas d’Utilisation)
+Afin de définir le périmètre fonctionnel et les interactions des différents acteurs avec
+la plateformeSubTrack, un diagramme de cas d’utilisation a été élaboré. Le schéma ci-
+dessous présente les acteurs principaux (humains et systèmes externes), les fonctionnalités
+offertes par le système, ainsi que les dépendances spécifiques entre ces actions (inclusions
+et extensions).
+6.1 Description des Acteurs et Fonctionnalités Principales
+Le périmètre fonctionnel du système s’articule autour de plusieurs types d’interactions
+et d’acteurs clés :
+•Les Acteurs Humains :Le système sépare logiquement l’utilisateur final (Uti-
+lisateur B2C / B2B) de l’administrateur (Administrateur). L’utilisateur gère ses
+finances personnelles ou professionnelles, tandis que l’administrateur possède des
+6
+
+Figure 2– Diagramme de Cas d’Utilisation du système SubTrack
+privilèges étendus pour maintenir le système, gérer le catalogue SaaS et superviser
+les logs.
+•L’Espace Utilisateur (Gestion et Analyse) :L’utilisateur interagit avec le sys-
+tème pour gérer ses abonnements, configurer des alertes, connecter sa boîte mail
+et analyser ses dépenses via un tableau de bord. Toutes ces actions majeures né-
+cessitent obligatoirement une authentification préalable (modélisée par la relation
+«include»vers "S’authentifier").
+•Fonctionnalités Optionnelles (Extensions) :Lors de la gestion de ses abonne-
+ments, l’utilisateur a la possibilité d’enrichir ses données. Des actions optionnelles,
+telles que "Catégoriser un abonnement" ou "Récupérer le logo", viennent compléter
+le cas d’utilisation principal (modélisées par la relation«extend»).
+•L’EspaceAdministrateur(Back-Office):L’administrateurdisposedesonpropre
+accès sécurisé («include»vers "S’authentifier Back-office"). Ses cas d’utilisation
+spécifiques incluent la gestion des utilisateurs, la maintenance du catalogue SaaS
+global, ainsi que la configuration des clés API essentielles au système.
+•LesActeursSystèmesetl’Automatisation:Laplateformeinteragitdemanière
+autonome avec des systèmes externes pour automatiser les tâches :
+◦API Taux de Change: Sollicitée automatiquement («include») lors de la
+consultation du tableau de bord pour convertir les montants en devise locale.
+7
+
+◦Fournisseur Email & n8n: Lorsqu’un nouveau reçu est détecté par le fournis-
+seur email (via Webhook), l’orchestrateur n8n déclenche le cas "Automatiser
+la saisie".
+◦API Google Gemini: Ce processus d’automatisation inclut obligatoirement
+(«include») l’appel à l’IA Gemini pour extraire intelligemment les données
+financières de la facture.
+7 Modélisation Statique (Diagramme de Classes)
+Afin de concevoir l’architecture logicielle orientée objet de la plateformeSubTrack,
+un diagramme de classes UML a été élaboré. Le schéma ci-dessous présente l’organisation
+du code en packages logiques, les attributs et méthodes métiers des entités, ainsi que les
+relations (héritage, associations, multiplicités) qui les lient.
+Figure 3– Diagramme de Classes UML du système SubTrack
+7.1 Description des Packages et Classes Principales
+L’architecture applicative est découpée en trois domaines logiques (packages) :
+•Gestion des Utilisateurs & Sécurité :Ce module exploite le principe d’hé-
+ritage. Une classe abstraiteUsercentralise les attributs communs d’authentifica-
+tion et la méthodeauthenticate(). Elle est étendue par deux entités concrètes :
+Administrator(quipossèdelesméthodesmanageUsers()etmonitorSystemLogs())
+etClient.LeClientintègreuneméthodecléd’optimisation(detectRedundantSubscriptions())
+et peut configurer une instance d’EmailIntegrationpour synchroniser ses reçus.
+•Core Business (Abonnements) :La classeSubscriptionconstitue le noyau
+métier du système. UnClientpossède une ou plusieurs instances de cette classe.
+8
+
+Subscriptionencapsule non seulement les données, mais aussi la logique métier via
+des méthodes commecalculateMonthlyCost()etcheckPriceIncrease(). Elle
+est liée à la classeCategorypour le regroupement par thématiques, et génère des
+instances dePaymentHistorypour tracer l’évolution temporelle des facturations.
+•Optimisation&Automatisation(IA):Cepackageregroupelesservicesavancés
+gravitant autour des abonnements :
+◦Invoice:Modéliselafacturetraitée.ElleintègrelaméthodetriggerGeminiExtraction()
+qui indique l’interaction avec l’IA pour traiter lerawEmailContent.
+◦AlertRule:GèrelalogiquedenotificationvialaméthodeexecuteAlertWorkflow(),
+en s’appuyant sur l’énumérationAlertChannel(Email, Telegram, WhatsApp)
+pour définir le canal de communication.
+◦ExchangeRate: Entité gérant la conversion de devises. Elle possède une mé-
+thode asynchroneupdateRateAsync()garantissant que les calculs de coûts se
+font toujours sur des taux de change à jour.
+8 Architecture Logicielle (Diagramme N-Tiers)
+Afin de garantir une séparation claire des responsabilités et une maintenance évolutive
+delaplateformeVisionTech,unearchitecturedistribuéeencouches(N-Tiers)aétéadop-
+tée. Le schéma ci-dessous illustre le flux de données, depuis l’interaction de l’utilisateur
+sur le navigateur jusqu’à la persistance des données dans la base relationnelle.
+8.1 Description des Couches et Responsabilités
+L’écosystème technique repose sur l’intégration des frameworks Java EE (Jakarta EE),
+structuré en quatre niveaux principaux :
+•Navigateur Web (Client) :Représente le point d’entrée pour l’utilisateur fi-
+nal. L’interface est composée de technologies standards (HTML/CSS/JS) qui commu-
+niquent avec le serveur via des protocolesHTTP (Requêtes / Réponses).
+•Couche Présentation (JSF) :Cette couche gère l’affichage et l’interaction utili-
+sateur. Elle se compose de :
+◦Pages Facelets (.xhtml) :Les vues définies en XML qui génèrent le rendu
+final.
+◦Managed Beans (Contrôleurs CDI) :Ils assurent leBindingde données
+et déclenchent les actions métier en réponse aux interactions sur la vue.
+•Couche Métier (Logique Application) :C’est le cœur de l’application où sont
+centraliséeslesrèglesdegestion.ElleexposedesServices(ex:SubscriptionService)
+qui traitent les demandes provenant de la couche présentation. Cette isolation per-
+met de réutiliser la logique sans dépendre de l’interface graphique.
+9
+
+Figure 4– Architecture N-Tiers de la plateforme VisionTech (JSF + Hibernate)
+10
+
+•Couche Persistance (Hibernate / JPA) :Ce module assure la traduction entre
+le monde objet et le monde relationnel (ORM).
+◦Interfaces et Implémentations DAO :Le patternData Access Objectest
+utilisé pour isoler les méthodes CRUD.
+◦Entités JPA (@Entity) :Classes Java annotées qui représentent les données
+métier.
+◦EntityManager :Gère les transactions et traduit les opérations en requêtes
+SQL / HQLvers la base de données.
+•Base de Données Relationnelle :Le stockage physique des données (tables
+users,subscriptions, etc.) qui garantit l’intégrité et la persistance des informa-
+tions de la plateforme.
+9 Interfaces Principales de l’Application
+Cette section illustre la réalisation concrète de l’applicationSubTrack. L’interface a
+été conçue pour être "Responsive" et intuitive, permettant une prise en main immédiate
+par l’utilisateur.
+9.1 Pilotage et Analyse des Données
+Les deux interfaces ci-dessous constituent le noyau décisionnel pour l’utilisateur. Elles
+permettent de transformer des données brutes en informations visuelles exploitables.
+(a) Tableau de Bord Global
+ (b) Visualisation Analytique
+Figure 5– Le Dashboard (Figure 5a) offre une vue d’ensemble, tandis que la page
+d’Analyse (Figure 5b) détaille les dépenses par catégorie.
+11
+
+9.2 Gestion du Catalogue SaaS
+Le catalogue centralise l’ensemble des services disponibles sur le marché, permettant
+au client d’ajouter un service en quelques secondes grâce à des modèles pré-configurés.
+Figure 6– Interface du Catalogue SaaS : Recherche et sélection de services.
+9.3 Configuration des Notifications et Gestion Profil
+Afin d’éviter les surprises bancaires, l’utilisateur dispose d’un module d’alertes per-
+sonnalisées et d’une page de gestion de ses informations.
+•Automatisation :Toutes ces interfaces sont reliées dynamiquement à la base de
+données via les Managed Beans (JSF).
+•Expérience Utilisateur :Les graphiques (Analyse) sont générés dynamiquement
+en fonction de l’historique de paiement stocké.
+12
+
+(a) Centre de Notifications
+ (b) Interface de Profil / Gestion
+Figure 7– Configuration des alertes (Figure 7a) et page principale de gestion (Figure
+7b).
+13
+

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+<h:head>
+    <title>Sign in - SubTrack</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <h:outputStylesheet name="css/auth.css"/>
+</h:head>
+<h:body>
+    <div class="auth-wrapper">
+        <div class="auth-card">
+            
+            <div class="logo-block">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    </svg>
+                </div>
+                <span class="brand-name">SubTrack</span>
+            </div>
+            
+            <div class="auth-header" style="margin-bottom: 1.5rem;">
+                <h1 class="page-title">Welcome back</h1>
+                <p class="page-subtitle">Sign in to account</p>
+            </div>
+            
+            <h:form id="loginForm" prependId="false" styleClass="auth-form">
+                
+                <div class="form-group">
+                    <h:outputLabel for="email" value="Email address" styleClass="form-label" />
+                    <h:inputText id="email" 
+                                 value="#{authController.email}" 
+                                 required="true"
+                                 requiredMessage="Email is required"
+                                 validatorMessage="Invalid email format"
+                                 styleClass="form-input"
+                                 html5:placeholder="name@company.com" 
+                                 xmlns:html5="http://xmlns.jcp.org/jsf/passthrough">
+                        <f:validateRegex pattern="^[^@\s]+@[^@\s]+\.[^@\s]+$" />
+                    </h:inputText>
+                    <h:message for="email" styleClass="field-error"/>
+                </div>
+                
+                <div class="form-group">
+                    <h:outputLabel for="password" value="Password" styleClass="form-label" />
+                    <div style="position: relative;">
+                        <h:inputSecret id="password" 
+                                       value="#{authController.password}" 
+                                       required="true"
+                                       requiredMessage="Password is required"
+                                       styleClass="form-input password-input"
+                                       html5:placeholder="Enter your password"
+                                       xmlns:html5="http://xmlns.jcp.org/jsf/passthrough" />
+                        <button type="button" class="password-toggle" onclick="togglePassword()">
+                            <svg viewBox="0 0 24 24" id="eye-icon">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                        </button>
+                    </div>
+                    <h:message for="password" styleClass="field-error"/>
+                </div>
+                
+                <div class="forgot-wrapper">
+                    <a href="#" class="forgot-link">Forgot password?</a>
+                </div>
+                
+                <h:messages globalOnly="true" styleClass="msg-error"/>
+                
+                <h:commandButton value="Sign in" 
+                                 action="#{authController.login}" 
+                                 styleClass="btn-primary"/>
+                                 
+                <div class="auth-footer">
+                    No account? <h:link outcome="register" value="Create one" styleClass="auth-link"/>
+                </div>
+            </h:form>
+        </div>
+    </div>
+    
+    <script>
+        function togglePassword() {
+            var pwdField = document.getElementById('password');
+            if (pwdField.type === 'password') {
+                pwdField.type = 'text';
+            } else {
+                pwdField.type = 'password';
+            }
+        }
+    </script>
+</h:body>
+</html>

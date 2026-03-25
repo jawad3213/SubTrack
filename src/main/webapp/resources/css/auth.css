@@ -1,0 +1,313 @@
+:root {
+  --blue-50:  #E6F1FB;
+  --blue-100: #B5D4F4;
+  --blue-200: #85B7EB;
+  --blue-400: #378ADD;
+  --blue-600: #185FA5;   /* primary */
+  --blue-800: #0C447C;   /* hover   */
+  --blue-900: #042C53;   /* darkest */
+
+  --bg-page:      #F1EFE8;
+  --bg-card:      #FFFFFF;
+  --bg-input:     #F5F5F3;
+
+  --text-primary:   #1A1A1A;
+  --text-secondary: #5F5E5A;
+  --text-hint:      #B4B2A9;
+
+  --border-default: rgba(0,0,0,0.15);
+  --border-hover:   rgba(0,0,0,0.30);
+  --border-focus:   #185FA5;
+
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+}
+
+body {
+    font-family: system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: var(--bg-page);
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+}
+
+.auth-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-page);
+}
+
+.auth-card {
+    width: 420px;
+    max-width: calc(100vw - 2rem);
+    background: var(--bg-card);
+    border: 0.5px solid var(--border-default);
+    border-radius: var(--radius-lg);
+    padding: 2.5rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+}
+
+.auth-header {
+    margin-bottom: 1.5rem;
+}
+
+.logo-block {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 1.5rem;
+}
+
+.logo-icon {
+    width: 32px;
+    height: 32px;
+    background: var(--blue-600);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logo-icon svg {
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: white;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.brand-name {
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.page-title {
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin: 0 0 4px 0;
+}
+
+.page-subtitle {
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group {
+    margin-bottom: 12px;
+    position: relative;
+}
+
+.form-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+}
+
+.form-input {
+    height: 40px;
+    width: 100%;
+    background: var(--bg-input);
+    border: 0.5px solid var(--border-default);
+    border-radius: var(--radius-md);
+    padding: 0 14px;
+    font-size: 14.5px;
+    color: var(--text-primary);
+    font-family: inherit;
+    box-sizing: border-box;
+    transition: all 150ms ease;
+}
+
+.form-input::placeholder {
+    color: var(--text-hint);
+    opacity: 1;
+}
+
+.form-input:hover {
+    border: 0.5px solid var(--border-hover);
+}
+
+.form-input:focus {
+    border: 0.5px solid var(--border-focus);
+    background: var(--bg-card);
+    box-shadow: 0 0 0 3px rgba(24, 95, 165, 0.15);
+    outline: none;
+}
+
+/* password specific */
+.password-input {
+    padding-right: 32px;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-hint);
+}
+
+.password-toggle:hover {
+    color: var(--text-secondary);
+}
+
+.password-toggle svg {
+    width: 14px;
+    height: 14px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* links and buttons */
+.forgot-wrapper {
+    text-align: right;
+    margin-bottom: 0px; 
+    margin-top: -6px; /* pull up below field */
+}
+
+.forgot-link {
+    font-size: 11px;
+    color: var(--blue-600);
+    text-decoration: none;
+}
+
+.forgot-link:hover {
+    text-decoration: underline;
+}
+
+.btn-primary {
+    height: 42px;
+    width: 100%;
+    background: var(--blue-600);
+    color: #FFFFFF;
+    font-size: 14.5px;
+    font-weight: 500;
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 150ms ease, transform 100ms ease;
+    margin-top: 4px;
+}
+
+.btn-primary:hover {
+    background: var(--blue-800);
+}
+
+.btn-primary:active {
+    transform: scale(0.98);
+}
+
+.auth-footer {
+    text-align: center;
+    margin-top: 1rem;
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.auth-link {
+    color: var(--blue-600);
+    font-weight: 500;
+    text-decoration: none;
+    margin-left: 4px;
+}
+
+.auth-link:hover {
+    text-decoration: underline;
+}
+
+/* validation */
+.msg-error {
+    display: block;
+    background: #FCEBEB;
+    color: #791F1F;
+    border: 0.5px solid #E24B4A;
+    border-radius: var(--radius-md);
+    padding: 10px 14px;
+    font-size: 13px;
+    margin-top: 12px;
+    margin-bottom: 8px;
+}
+
+.msg-success {
+    display: block;
+    background: #EAF3DE;
+    color: #27500A;
+    border: 0.5px solid #639922;
+    border-radius: var(--radius-md);
+    padding: 10px 14px;
+    font-size: 13px;
+    margin-top: 12px;
+    margin-bottom: 8px;
+}
+
+.field-error {
+    font-size: 11px;
+    color: #791F1F;
+    font-weight: 400;
+}
+/* segmented controls */
+.segmented-control {
+    display: flex;
+    gap: 6px;
+    width: 100%;
+    margin-bottom: 12px;
+}
+
+.segment-btn {
+    flex: 1;
+    height: 38px;
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    font-weight: 500;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background: transparent;
+    border: 1px solid var(--border-hover);
+    color: var(--text-secondary);
+    transition: all 150ms ease;
+    user-select: none;
+    box-sizing: border-box;
+}
+
+.segment-btn:hover {
+    border: 1px solid var(--blue-400);
+    color: var(--text-primary);
+}
+
+.segment-btn.active {
+    background: var(--blue-50);
+    border: 1px solid var(--blue-600);
+    color: var(--blue-800);
+}

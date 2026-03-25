@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<faces-config xmlns="https://jakarta.ee/xml/ns/jakartaee"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-facesconfig_4_0.xsd"
+              version="4.0">
+    
+    <!-- Navigation Rules -->
+    <!-- Login navigation is handled by AuthController return values:
+         - Admin users: returns "/admin/dashboard?faces-redirect=true"
+         - Regular users: returns "dashboard?faces-redirect=true"
+         No blanket navigation-rule needed here. -->
+    
+    <!-- Register navigation is also handled by AuthController.register() return value. -->
+    
+    <navigation-rule>
+        <from-view-id>/dashboard.xhtml</from-view-id>
+        <navigation-case>
+            <from-action>#{authController.logout}</from-action>
+            <to-view-id>/login.xhtml</to-view-id>
+            <redirect/>
+        </navigation-case>
+        <navigation-case>
+            <from-outcome>subscriptions</from-outcome>
+            <to-view-id>/subscriptions/list.xhtml</to-view-id>
+            <redirect/>
+        </navigation-case>
+    </navigation-rule>
+    
+    <navigation-rule>
+        <from-view-id>/subscriptions/*.xhtml</from-view-id>
+        <navigation-case>
+            <from-action>#{subscriptionController.save}</from-action>
+            <to-view-id>/dashboard.xhtml</to-view-id>
+            <redirect/>
+        </navigation-case>
+        <navigation-case>
+            <from-outcome>cancel</from-outcome>
+            <to-view-id>/dashboard.xhtml</to-view-id>
+            <redirect/>
+        </navigation-case>
+        <navigation-case>
+            <from-outcome>detail</from-outcome>
+            <to-view-id>/subscriptions/detail.xhtml</to-view-id>
+            <redirect/>
+        </navigation-case>
+    </navigation-rule>
+    
+    <navigation-rule>
+        <from-view-id>/settings.xhtml</from-view-id>
+        <navigation-case>
+            <from-action>#{settingsController.deleteAccount}</from-action>
+            <to-view-id>/login.xhtml</to-view-id>
+            <redirect/>
+        </navigation-case>
+    </navigation-rule>
+    
+    <!-- Converters -->
+    <converter>
+        <converter-id>categoryConverter</converter-id>
+        <converter-class>com.subtrack.converter.CategoryConverter</converter-class>
+    </converter>
+    
+    <converter>
+        <converter-id>subscriptionConverter</converter-id>
+        <converter-class>com.subtrack.converter.SubscriptionConverter</converter-class>
+    </converter>
+    
+    <!-- Validators -->
+    <validator>
+        <validator-id>emailValidator</validator-id>
+        <validator-class>com.subtrack.validator.EmailValidator</validator-class>
+    </validator>
+    
+    <validator>
+        <validator-id>passwordValidator</validator-id>
+        <validator-class>com.subtrack.validator.PasswordValidator</validator-class>
+    </validator>
+    
+    <!-- Enum Converters -->
+    <converter>
+        <converter-for-class>com.subtrack.enums.Frequency</converter-for-class>
+        <converter-class>jakarta.faces.convert.EnumConverter</converter-class>
+    </converter>
+    
+    <converter>
+        <converter-for-class>com.subtrack.enums.SubscriptionStatus</converter-for-class>
+        <converter-class>jakarta.faces.convert.EnumConverter</converter-class>
+    </converter>
+    
+    <converter>
+        <converter-for-class>com.subtrack.enums.AlertChannel</converter-for-class>
+        <converter-class>jakarta.faces.convert.EnumConverter</converter-class>
+    </converter>
+    
+    <converter>
+        <converter-for-class>com.subtrack.enums.AccountType</converter-for-class>
+        <converter-class>jakarta.faces.convert.EnumConverter</converter-class>
+    </converter>
+    
+    <!-- Application Configuration -->
+    <application>
+        <message-bundle>messages</message-bundle>
+        <locale-config>
+            <default-locale>en</default-locale>
+            <supported-locale>fr</supported-locale>
+        </locale-config>
+        <exception-handler-factory>
+            com.subtrack.exception.GlobalExceptionHandlerFactory
+        </exception-handler-factory>
+    </application>
+    
+</faces-config>

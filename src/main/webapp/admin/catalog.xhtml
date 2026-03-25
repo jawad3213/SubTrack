@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+<ui:composition template="/templates/admin-layout.xhtml">
+    <ui:define name="title">SaaS Catalog - SubTrack Admin</ui:define>
+
+    <ui:define name="content">
+        <div class="page-header" style="margin-bottom: 28px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h1 style="color: #1A1A1A; font-size: 22px; font-weight: 700;">SaaS Catalog</h1>
+                <p style="color: #5F5E5A; font-size: 14px;">Manage the global catalog of SaaS services</p>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 24px;">
+            <!-- Add New Service Form -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Add New Service</h2>
+                </div>
+                <h:form>
+                    <div class="form-group">
+                        <label>Service Name</label>
+                        <h:inputText value="#{adminCatalogBean.serviceName}" styleClass="form-control" placeholder="e.g. Netflix"/>
+                    </div>
+                    <div class="form-group">
+                        <label>Logo URL</label>
+                        <h:inputText value="#{adminCatalogBean.serviceLogoUrl}" styleClass="form-control" placeholder="https://..."/>
+                    </div>
+                    <div class="form-group">
+                        <label>Category</label>
+                        <h:selectOneMenu value="#{adminCatalogBean.serviceCategory}" styleClass="form-control">
+                            <f:selectItem itemLabel="— Select —" itemValue=""/>
+                            <f:selectItems value="#{adminCatalogBean.categories}" var="cat" itemLabel="#{cat}" itemValue="#{cat}"/>
+                        </h:selectOneMenu>
+                    </div>
+                    <div class="form-group">
+                        <label>Default Price</label>
+                        <h:inputText value="#{adminCatalogBean.servicePrice}" styleClass="form-control" placeholder="9.99"/>
+                    </div>
+                    <div class="form-group">
+                        <label>Currency</label>
+                        <h:selectOneMenu value="#{adminCatalogBean.serviceCurrency}" styleClass="form-control">
+                            <f:selectItem itemLabel="MAD" itemValue="MAD"/>
+                            <f:selectItem itemLabel="USD" itemValue="USD"/>
+                            <f:selectItem itemLabel="EUR" itemValue="EUR"/>
+                            <f:selectItem itemLabel="GBP" itemValue="GBP"/>
+                        </h:selectOneMenu>
+                    </div>
+                    <div class="form-group">
+                        <label>Cancel URL</label>
+                        <h:inputText value="#{adminCatalogBean.cancelUrl}" styleClass="form-control" placeholder="https://cancel.example.com"/>
+                    </div>
+                    <h:commandButton value="Add to Catalog" action="#{adminCatalogBean.addService}" styleClass="btn-primary" style="width: 100%; margin-top: 8px;"/>
+                </h:form>
+            </div>
+
+            <!-- Catalog Table -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Current Catalog</h2>
+                </div>
+                <h:form>
+                    <h:dataTable value="#{adminCatalogBean.catalogServices}" var="service" styleClass="data-table"
+                                 rendered="#{not empty adminCatalogBean.catalogServices}">
+                        <h:column>
+                            <f:facet name="header">Service</f:facet>
+                            #{service.name}
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">Category</f:facet>
+                            #{service.category}
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">Default Price</f:facet>
+                            <h:outputText value="#{service.defaultPrice}"><f:convertNumber pattern="#,##0.00"/></h:outputText>
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">Actions</f:facet>
+                            <div style="display: flex; gap: 5px;">
+                                <h:commandButton value="Delete" action="#{adminCatalogBean.deleteService}" styleClass="btn-danger" style="padding: 4px 10px; font-size: 12px;"
+                                                 onclick="return confirm('Delete this service from the catalog?');">
+                                    <f:setPropertyActionListener target="#{adminCatalogBean.selectedService}" value="#{service}"/>
+                                </h:commandButton>
+                            </div>
+                        </h:column>
+                    </h:dataTable>
+                    <h:panelGroup rendered="#{empty adminCatalogBean.catalogServices}">
+                        <div class="empty-state"><p>Catalog is empty. Add a service to get started.</p></div>
+                    </h:panelGroup>
+                </h:form>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>
+</html>

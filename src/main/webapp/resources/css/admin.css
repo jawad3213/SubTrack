@@ -1,0 +1,341 @@
+/* SubTrack Admin Panel — Dedicated Styles */
+
+/* Admin sidebar section labels */
+.sidebar-section-label {
+    display: block;
+    padding: 20px 15px 6px 15px;
+    font-size: 10px;
+    font-weight: 600;
+    color: rgba(181, 212, 244, 0.45);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    list-style: none;
+}
+
+/* Admin sidebar accent color */
+.admin-sidebar .sidebar-logo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Admin KPI Grid */
+.admin-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    margin-bottom: 28px;
+}
+
+.admin-kpi-card {
+    background: #FFFFFF;
+    border: 0.5px solid rgba(0,0,0,0.12);
+    border-radius: 12px;
+    padding: 22px 24px;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    transition: box-shadow 150ms ease;
+}
+
+.admin-kpi-card:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+}
+
+.admin-kpi-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.admin-kpi-icon svg {
+    width: 20px;
+    height: 20px;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
+}
+
+.admin-kpi-icon.blue   { background: #E6F1FB; }
+.admin-kpi-icon.blue svg { stroke: #185FA5; }
+.admin-kpi-icon.green  { background: #EAF3DE; }
+.admin-kpi-icon.green svg { stroke: #27500A; }
+.admin-kpi-icon.amber  { background: #FAEEDA; }
+.admin-kpi-icon.amber svg { stroke: #BA7517; }
+.admin-kpi-icon.red    { background: #FCEBEB; }
+.admin-kpi-icon.red svg { stroke: #791F1F; }
+
+.admin-kpi-body {
+    flex: 1;
+}
+
+.admin-kpi-value {
+    font-size: 26px;
+    font-weight: 700;
+    color: #1A1A1A;
+    line-height: 1.1;
+}
+
+.admin-kpi-label {
+    font-size: 12px;
+    color: #5F5E5A;
+    margin-top: 4px;
+    font-weight: 500;
+}
+
+/* Activity Feed */
+.activity-feed {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.activity-feed li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 0.5px solid rgba(0,0,0,0.08);
+}
+
+.activity-feed li:last-child {
+    border-bottom: none;
+}
+
+.activity-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-top: 6px;
+    flex-shrink: 0;
+}
+
+.activity-dot.user    { background: #185FA5; }
+.activity-dot.sub     { background: #27500A; }
+.activity-dot.invoice { background: #BA7517; }
+.activity-dot.alert   { background: #791F1F; }
+
+.activity-text {
+    font-size: 13px;
+    color: #1A1A1A;
+    flex: 1;
+}
+
+.activity-time {
+    font-size: 11px;
+    color: #5F5E5A;
+    white-space: nowrap;
+}
+
+/* System Status Badges */
+.status-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.status-indicator.operational {
+    background: #EAF3DE;
+    color: #27500A;
+}
+
+.status-indicator.unreachable {
+    background: #FCEBEB;
+    color: #791F1F;
+}
+
+.status-indicator .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+}
+
+.status-indicator.operational .dot { background: #639922; }
+.status-indicator.unreachable .dot { background: #E24B4A; }
+
+/* Admin panel sections */
+.admin-section {
+    margin-bottom: 28px;
+}
+
+.admin-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.admin-section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1A1A1A;
+}
+
+/* System status grid */
+.system-status-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+}
+
+.system-status-card {
+    background: #FFFFFF;
+    border: 0.5px solid rgba(0,0,0,0.12);
+    border-radius: 10px;
+    padding: 16px;
+}
+
+.system-status-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1A1A1A;
+    margin-bottom: 6px;
+}
+
+.system-status-detail {
+    font-size: 11px;
+    color: #5F5E5A;
+    margin-top: 6px;
+}
+
+/* Filter bar */
+.admin-filter-bar {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+    padding: 14px 18px;
+    background: #F5F5F3;
+    border-radius: 10px;
+    border: 0.5px solid rgba(0,0,0,0.08);
+}
+
+.admin-filter-bar input,
+.admin-filter-bar select {
+    height: 34px;
+    padding: 0 12px;
+    background: #FFFFFF;
+    border: 0.5px solid rgba(0,0,0,0.15);
+    border-radius: 8px;
+    font-size: 13px;
+    color: #1A1A1A;
+    transition: all 150ms ease;
+}
+
+.admin-filter-bar input:focus,
+.admin-filter-bar select:focus {
+    outline: none;
+    border-color: #185FA5;
+    box-shadow: 0 0 0 3px rgba(24, 95, 165, 0.15);
+}
+
+.admin-filter-bar input[type="text"] {
+    min-width: 220px;
+}
+
+/* Quick action buttons row */
+.admin-quick-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* Avatar circle */
+.avatar-initials {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #E6F1FB;
+    color: #185FA5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+/* Masked field (for API keys) */
+.masked-field {
+    font-family: 'Courier New', monospace;
+    letter-spacing: 0.05em;
+}
+
+/* Config section */
+.config-group {
+    background: #FFFFFF;
+    border: 0.5px solid rgba(0,0,0,0.12);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 16px;
+}
+
+.config-group-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1A1A1A;
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 0.5px solid rgba(0,0,0,0.08);
+}
+
+/* Log level badges */
+.log-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.log-badge.info  { background: #E6F1FB; color: #185FA5; }
+.log-badge.warn  { background: #FAEEDA; color: #633806; }
+.log-badge.error { background: #FCEBEB; color: #791F1F; }
+
+/* Processing status badges */
+.process-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.process-badge.processed { background: #EAF3DE; color: #27500A; }
+.process-badge.failed    { background: #FCEBEB; color: #791F1F; }
+.process-badge.pending   { background: #FAEEDA; color: #633806; }
+
+/* Two column layout */
+.admin-two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+}
+
+@media (max-width: 900px) {
+    .admin-two-col {
+        grid-template-columns: 1fr;
+    }
+    .admin-kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .admin-kpi-grid {
+        grid-template-columns: 1fr;
+    }
+}
