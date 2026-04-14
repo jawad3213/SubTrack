@@ -31,6 +31,7 @@
     </welcome-file-list>
     
     <!-- Session Configuration -->
+    <!-- Note: Set <secure>true</secure> before deploying to production -->
     <session-config>
         <session-timeout>30</session-timeout>
         <cookie-config>
@@ -46,6 +47,7 @@
     </context-param>
     
     <!-- Project Stage (Development/Production) -->
+    <!-- Note: Switch to Production before deploying to production -->
     <context-param>
         <param-name>jakarta.faces.PROJECT_STAGE</param-name>
         <param-value>Development</param-value>

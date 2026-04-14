@@ -87,18 +87,24 @@
                 <div class="system-status-grid" style="grid-template-columns: 1fr;">
                     <div class="system-status-card">
                         <div class="system-status-name">Exchange Rate API</div>
-                        <span class="status-indicator operational"><span class="dot"></span> Operational</span>
-                        <div class="system-status-detail">Last updated: —</div>
+                        <span class="status-indicator #{adminDashboardBean.exchangeRateConfigured ? 'operational' : 'unreachable'}">
+                            <span class="dot"></span> #{adminDashboardBean.exchangeRateConfigured ? 'Operational' : 'Not configured'}
+                        </span>
+                        <div class="system-status-detail">Last updated: #{adminDashboardBean.exchangeRateConfigured ? 'Auto-refresh every 6h' : 'Not configured'}</div>
                     </div>
                     <div class="system-status-card">
                         <div class="system-status-name">n8n Orchestrator</div>
-                        <span class="status-indicator operational"><span class="dot"></span> Operational</span>
-                        <div class="system-status-detail">Last webhook: —</div>
+                        <span class="status-indicator #{adminDashboardBean.n8nWebhookConfigured ? 'operational' : 'unreachable'}">
+                            <span class="dot"></span> #{adminDashboardBean.n8nWebhookConfigured ? 'Operational' : 'Not configured'}
+                        </span>
+                        <div class="system-status-detail">Last webhook: #{adminDashboardBean.n8nWebhookConfigured ? 'Ready to receive' : 'Not configured'}</div>
                     </div>
                     <div class="system-status-card">
                         <div class="system-status-name">Google Gemini API</div>
-                        <span class="status-indicator unreachable"><span class="dot"></span> Not configured</span>
-                        <div class="system-status-detail">Last invoice processed: —</div>
+                        <span class="status-indicator #{adminDashboardBean.geminiConfigured ? 'operational' : 'unreachable'}">
+                            <span class="dot"></span> #{adminDashboardBean.geminiConfigured ? 'Operational' : 'Not configured'}
+                        </span>
+                        <div class="system-status-detail">Last invoice processed: #{adminDashboardBean.geminiConfigured ? 'Ready' : 'Not configured'}</div>
                     </div>
                 </div>
             </div>

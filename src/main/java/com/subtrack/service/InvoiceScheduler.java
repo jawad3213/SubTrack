@@ -17,9 +17,18 @@ public class InvoiceScheduler {
         List<Invoice> unprocessed = invoiceService.getUnprocessedInvoices();
         for (Invoice invoice : unprocessed) {
             try {
-                invoiceService.processInvoice(invoice.getId());
+                if (invoice.getRawContent() != null && !invoice.getRawContent().isBlank()) {
+                    invoiceService.parseInvoiceEmail(invoice);
+                    
+                    if (invoice.getIsProcessed() && invoice.getServiceName() != null 
+                        && invoice.getAmount() != null && invoice.getAmount().compareTo(java.math.BigDecimal.ZERO) > 0) {
+                        invoiceService.createSubscriptionFromInvoice(invoice);
+                    }
+                } else {
+                    invoiceService.processInvoice(invoice.getId());
+                }
             } catch (Exception e) {
-                System.err.println("Failed to process invoice: " + invoice.getId());
+                System.err.println("Failed to process invoice: " + invoice.getId() + " - " + e.getMessage());
             }
         }
     }

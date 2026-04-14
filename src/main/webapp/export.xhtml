@@ -45,7 +45,7 @@
                             </h:selectOneMenu>
                         </div>
                         
-                        <h:commandButton value="Export Subscriptions" styleClass="btn-primary" style="width: 100%;"/>
+                        <h:commandButton value="Export Subscriptions" action="#{exportBean.exportSubscriptionsCsv}" styleClass="btn-primary" style="width: 100%;"/>
                     </h:form>
                 </div>
             </div>
@@ -82,7 +82,7 @@
                             </h:selectOneMenu>
                         </div>
                         
-                        <h:commandButton value="Export Payments" styleClass="btn-primary" style="width: 100%;"/>
+                        <h:commandButton value="Export Payments" action="#{exportBean.exportPaymentsCsv}" styleClass="btn-primary" style="width: 100%;"/>
                     </h:form>
                 </div>
             </div>
@@ -114,7 +114,7 @@
                     </p>
                 </div>
                 
-                <h:commandButton value="Request Full Backup" styleClass="btn-secondary"/>
+                <h:commandButton value="Request Full Backup" action="#{exportBean.requestFullBackup}" styleClass="btn-secondary"/>
             </h:form>
         </div>
 

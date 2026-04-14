@@ -4,6 +4,7 @@
              xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_1.xsd"
              version="3.1">
     
+    <!-- Development persistence unit - uses validate to catch entity-schema mismatches -->
     <persistence-unit name="subtrackPU" transaction-type="JTA">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
         <jta-data-source>java:global/SubtrackDS</jta-data-source>
@@ -23,23 +24,22 @@
         <class>com.subtrack.entity.NotificationLog</class>
         
         <properties>
-            <!-- JDBC Configuration moved to DataSourceDefinition -->
-            
-            <!-- Hibernate Configuration -->
+            <!-- Hibernate Configuration - Development Mode -->
             <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect"/>
-            <property name="hibernate.hbm2ddl.auto" value="none"/>
+            <!-- validate ensures entities match schema (won't create/update) -->
+            <property name="hibernate.hbm2ddl.auto" value="validate"/>
             <property name="hibernate.show_sql" value="true"/>
             <property name="hibernate.format_sql" value="true"/>
             <property name="hibernate.use_sql_comments" value="true"/>
             
             <!-- Connection Pool -->
-            <property name="hibernate.connection.pool_size" value="10"/>
+            <property name="hibernate.connection.pool_size" value="5"/>
             
-            <!-- Second Level Cache disabled for EE compatibility -->
+            <!-- Second Level Cache disabled -->
             <property name="hibernate.cache.use_second_level_cache" value="false"/>
             
-            <!-- Statistics -->
-            <property name="hibernate.generate_statistics" value="false"/>
+            <!-- Statistics for performance tuning -->
+            <property name="hibernate.generate_statistics" value="true"/>
         </properties>
     </persistence-unit>
     

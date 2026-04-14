@@ -32,6 +32,7 @@ public class DatabaseInitializer implements ServletContextListener {
         javax.naming.InitialContext ctx = new javax.naming.InitialContext();
         javax.sql.DataSource ds = (javax.sql.DataSource) ctx.lookup("java:global/SubtrackDS");
         try (java.sql.Connection conn = ds.getConnection()) {
+            initSystemConfig(conn);
             initCategories(conn);
             initUsers(conn);
         }
@@ -62,6 +63,39 @@ public class DatabaseInitializer implements ServletContextListener {
                         ins.executeUpdate();
                         System.out.println(">>> Created category: " + cat[0]);
                     }
+                }
+            }
+        }
+    }
+
+    private void initSystemConfig(java.sql.Connection conn) throws Exception {
+        try (java.sql.Statement stmt = conn.createStatement()) {
+            stmt.execute("CREATE TABLE IF NOT EXISTS system_config (" +
+                         "config_key VARCHAR(100) PRIMARY KEY, " +
+                         "config_value VARCHAR(1000), " +
+                         "updated_at TIMESTAMP)");
+            System.out.println(">>> Initialized system_config table");
+        }
+
+        String clientId = System.getenv("GOOGLE_CLIENT_ID") != null ? System.getenv("GOOGLE_CLIENT_ID") : "YOUR_GOOGLE_CLIENT_ID";
+        String clientSecret = System.getenv("GOOGLE_CLIENT_SECRET") != null ? System.getenv("GOOGLE_CLIENT_SECRET") : "YOUR_GOOGLE_CLIENT_SECRET";
+        
+        setConfigIfNotExists(conn, "GOOGLE_OAUTH_CLIENT_ID", clientId);
+        setConfigIfNotExists(conn, "GOOGLE_OAUTH_CLIENT_SECRET", clientSecret);
+    }
+
+    private void setConfigIfNotExists(java.sql.Connection conn, String key, String value) throws Exception {
+        try (java.sql.PreparedStatement check = conn.prepareStatement(
+                "SELECT config_value FROM system_config WHERE config_key = ?")) {
+            check.setString(1, key);
+            java.sql.ResultSet rs = check.executeQuery();
+            if (!rs.next()) {
+                try (java.sql.PreparedStatement ins = conn.prepareStatement(
+                        "INSERT INTO system_config (config_key, config_value, updated_at) VALUES (?, ?, NOW())")) {
+                    ins.setString(1, key);
+                    ins.setString(2, value);
+                    ins.executeUpdate();
+                    System.out.println(">>> Set system config: " + key);
                 }
             }
         }

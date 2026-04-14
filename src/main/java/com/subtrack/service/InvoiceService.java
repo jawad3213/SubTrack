@@ -25,6 +25,9 @@ public class InvoiceService {
     @Inject
     private SubscriptionService subscriptionService;
 
+    @Inject
+    private GeminiService geminiService;
+
     public List<Invoice> findAll() {
         return invoiceDAO.findAll();
     }
@@ -102,7 +105,33 @@ public class InvoiceService {
         return invoiceDAO.findUnprocessedInvoices();
     }
     
+    @Transactional
     public void parseInvoiceEmail(Invoice invoice) {
-        
+        if (invoice == null || invoice.getRawContent() == null || invoice.getRawContent().isBlank()) {
+            System.err.println(">>> InvoiceService: Cannot parse invoice - no raw content.");
+            return;
+        }
+
+        GeminiService.InvoiceParseResult result = geminiService.extractInvoiceData(invoice.getRawContent());
+
+        if (result.isSuccess()) {
+            if (result.getServiceName() != null) {
+                invoice.setServiceName(result.getServiceName());
+            }
+            if (result.getAmount() != null) {
+                invoice.setAmount(result.getAmount());
+            }
+            if (result.getCurrency() != null) {
+                invoice.setCurrency(result.getCurrency());
+            }
+            if (result.getInvoiceDate() != null) {
+                invoice.setInvoiceDate(result.getInvoiceDate());
+            }
+            invoice.setIsProcessed(true);
+            invoiceDAO.update(invoice);
+            System.out.println(">>> InvoiceService: Successfully parsed invoice - " + invoice.getServiceName() + " | " + invoice.getAmount() + " " + invoice.getCurrency());
+        } else {
+            System.err.println(">>> InvoiceService: AI parsing failed - " + result.getErrorMessage());
+        }
     }
 }

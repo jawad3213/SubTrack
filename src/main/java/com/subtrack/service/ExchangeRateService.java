@@ -1,8 +1,10 @@
 package com.subtrack.service;
 
 import com.subtrack.dao.ExchangeRateDAO;
+import com.subtrack.dao.PaymentHistoryDAO;
 import com.subtrack.entity.Category;
 import com.subtrack.entity.ExchangeRate;
+import com.subtrack.entity.PaymentHistory;
 import com.subtrack.entity.Subscription;
 import com.subtrack.enums.SubscriptionStatus;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -29,6 +31,9 @@ public class ExchangeRateService {
     
     @Inject
     private CategoryService categoryService;
+    
+    @Inject
+    private PaymentHistoryDAO paymentHistoryDAO;
 
     public List<ExchangeRate> findAll() {
         return exchangeRateDAO.findAll();
@@ -97,17 +102,28 @@ public class ExchangeRateService {
         java.util.List<MonthlySpending> trend = new java.util.ArrayList<>();
         LocalDate now = LocalDate.now();
         
+        List<Subscription> subscriptions = subscriptionService.findByClientId(clientId);
+        
         for (int i = months - 1; i >= 0; i--) {
             LocalDate monthDate = now.minusMonths(i);
             String monthName = monthDate.getMonth().getDisplayName(java.time.format.TextStyle.SHORT, java.util.Locale.ENGLISH);
             
-            // For a real app, this would query PaymentHistory for that month
-            // Here we use a simpler approach for the demo: total current monthly cost
-            BigDecimal monthlyCost = subscriptionService.calculateMonthlyCost(clientId);
+            LocalDate startOfMonth = monthDate.withDayOfMonth(1);
+            LocalDate endOfMonth = monthDate.withDayOfMonth(monthDate.lengthOfMonth());
             
-            // Add some variation for mock trend
-            if (i == 1) monthlyCost = monthlyCost.multiply(new BigDecimal("0.9"));
-            if (i == 2) monthlyCost = monthlyCost.multiply(new BigDecimal("0.85"));
+            BigDecimal monthlyCost = BigDecimal.ZERO;
+            
+            for (Subscription sub : subscriptions) {
+                List<PaymentHistory> payments = paymentHistoryDAO.findBySubscriptionIdAndDateRange(
+                    sub.getId(), startOfMonth, endOfMonth);
+                for (PaymentHistory payment : payments) {
+                    monthlyCost = monthlyCost.add(payment.getAmount());
+                }
+            }
+            
+            if (monthlyCost.compareTo(BigDecimal.ZERO) == 0) {
+                monthlyCost = subscriptionService.calculateMonthlyCost(clientId);
+            }
             
             trend.add(new MonthlySpending(monthName, monthlyCost));
         }
