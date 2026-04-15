@@ -77,8 +77,13 @@ public class DatabaseInitializer implements ServletContextListener {
             System.out.println(">>> Initialized system_config table");
         }
 
-        String clientId = System.getenv("GOOGLE_CLIENT_ID") != null ? System.getenv("GOOGLE_CLIENT_ID") : "YOUR_GOOGLE_CLIENT_ID";
-        String clientSecret = System.getenv("GOOGLE_CLIENT_SECRET") != null ? System.getenv("GOOGLE_CLIENT_SECRET") : "YOUR_GOOGLE_CLIENT_SECRET";
+        // Read OAuth credentials from environment variables (never hardcode secrets!)
+        String clientId = System.getenv("GOOGLE_OAUTH_CLIENT_ID") != null
+                ? System.getenv("GOOGLE_OAUTH_CLIENT_ID")
+                : "YOUR_GOOGLE_OAUTH_CLIENT_ID";
+        String clientSecret = System.getenv("GOOGLE_OAUTH_CLIENT_SECRET") != null
+                ? System.getenv("GOOGLE_OAUTH_CLIENT_SECRET")
+                : "YOUR_GOOGLE_OAUTH_CLIENT_SECRET";
         
         setConfigIfNotExists(conn, "GOOGLE_OAUTH_CLIENT_ID", clientId);
         setConfigIfNotExists(conn, "GOOGLE_OAUTH_CLIENT_SECRET", clientSecret);
@@ -96,6 +101,17 @@ public class DatabaseInitializer implements ServletContextListener {
                     ins.setString(2, value);
                     ins.executeUpdate();
                     System.out.println(">>> Set system config: " + key);
+                }
+            } else {
+                String existingValue = rs.getString(1);
+                if (existingValue.startsWith("YOUR_") || existingValue.isEmpty()) {
+                    try (java.sql.PreparedStatement upd = conn.prepareStatement(
+                            "UPDATE system_config SET config_value = ?, updated_at = NOW() WHERE config_key = ?")) {
+                        upd.setString(1, value);
+                        upd.setString(2, key);
+                        upd.executeUpdate();
+                        System.out.println(">>> Updated placeholder config: " + key);
+                    }
                 }
             }
         }

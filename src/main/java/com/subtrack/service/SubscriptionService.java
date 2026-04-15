@@ -46,7 +46,6 @@ public class SubscriptionService {
     @Transactional
     public void create(Subscription subscription) {
         subscriptionDAO.create(subscription);
-        recordPayment(subscription);
     }
 
     @Transactional

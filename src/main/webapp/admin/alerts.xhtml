@@ -50,7 +50,7 @@
                     </h:column>
                     <h:column>
                         <f:facet name="header">Fired At</f:facet>
-                        <h:outputText value="#{log.firedAt}"><f:convertDateTime type="both" dateStyle="medium" timeStyle="short"/></h:outputText>
+                        <h:outputText value="#{log.firedAt}"><f:convertDateTime type="localDateTime" pattern="yyyy-MM-dd HH:mm:ss"/></h:outputText>
                     </h:column>
                     <h:column>
                         <f:facet name="header">Delivery</f:facet>

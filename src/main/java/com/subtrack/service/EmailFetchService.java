@@ -18,6 +18,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import jakarta.json.Json;
+import jakarta.json.JsonArray;
+import jakarta.json.JsonObject;
+import jakarta.json.JsonReader;
+import java.io.StringReader;
 
 @ApplicationScoped
 public class EmailFetchService {
@@ -109,43 +114,45 @@ public class EmailFetchService {
     }
     
     private List<String> parseEmailIdsFromResponse(String json) {
-        java.util.List<String> ids = new java.util.ArrayList<>();
-        int idx = 0;
-        while ((idx = json.indexOf("\"id\"", idx)) != -1) {
-            int colon = json.indexOf(":", idx);
-            int quote1 = json.indexOf("\"", colon);
-            int quote2 = json.indexOf("\"", quote1 + 1);
-            if (colon > 0 && quote1 > 0 && quote2 > 0) {
-                ids.add(json.substring(quote1 + 1, quote2));
+        List<String> ids = new java.util.ArrayList<>();
+        try (JsonReader reader = Json.createReader(new StringReader(json))) {
+            JsonObject obj = reader.readObject();
+            if (obj.containsKey("messages")) {
+                JsonArray messages = obj.getJsonArray("messages");
+                for (int i = 0; i < messages.size(); i++) {
+                    ids.add(messages.getJsonObject(i).getString("id"));
+                }
             }
-            idx = quote2;
+        } catch (Exception e) {
+            System.err.println("Failed to parse Gmail message IDs: " + e.getMessage());
         }
         return ids;
     }
     
     private String extractEmailBody(String json) {
-        String snippet = extractJsonField(json, "snippet");
-        if (snippet != null) {
-            return snippet;
+        try (JsonReader reader = Json.createReader(new StringReader(json))) {
+            JsonObject obj = reader.readObject();
+            
+            String snippet = obj.getString("snippet", null);
+            if (snippet != null && !snippet.isBlank()) {
+                return snippet;
+            }
+            
+            if (obj.containsKey("payload")) {
+                JsonObject payload = obj.getJsonObject("payload");
+                if (payload.containsKey("body")) {
+                    JsonObject body = payload.getJsonObject("body");
+                    if (body.containsKey("data")) {
+                        String encoded = body.getString("data");
+                        // Replace URL-safe base64 characters
+                        String base64 = encoded.replace("-", "+").replace("_", "/");
+                        return new String(java.util.Base64.getDecoder().decode(base64), StandardCharsets.UTF_8);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Failed to extract email body: " + e.getMessage());
         }
-        
-        int payloadIdx = json.indexOf("\"payload\"");
-        if (payloadIdx == -1) return null;
-        
-        int bodyIdx = json.indexOf("\"body\"", payloadIdx);
-        if (bodyIdx == -1) return null;
-        
-        int dataIdx = json.indexOf("\"data\"", bodyIdx);
-        if (dataIdx == -1) return null;
-        
-        int colon = json.indexOf(":", dataIdx);
-        int quote1 = json.indexOf("\"", colon);
-        int quote2 = json.indexOf("\"", quote1 + 1);
-        if (quote1 > 0 && quote2 > 0) {
-            String encoded = json.substring(quote1 + 1, quote2);
-            return new String(java.util.Base64.getDecoder().decode(encoded), StandardCharsets.UTF_8);
-        }
-        
         return null;
     }
     

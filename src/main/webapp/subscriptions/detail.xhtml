@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
@@ -62,14 +62,14 @@
                             <dt style="color: #5F5E5A;">Start Date:</dt>
                             <dd>
                                 <h:outputText value="#{subscriptionController.selectedSubscription.startDate}">
-                                    <f:convertDateTime type="date" dateStyle="medium"/>
+                                    <f:convertDateTime type="localDate" pattern="yyyy-MM-dd"/>
                                 </h:outputText>
                             </dd>
                             
                             <dt style="color: #5F5E5A;">Next Billing:</dt>
                             <dd>
                                 <h:outputText value="#{subscriptionController.selectedSubscription.nextBillingDate}">
-                                    <f:convertDateTime type="date" dateStyle="medium"/>
+                                    <f:convertDateTime type="localDate" pattern="yyyy-MM-dd"/>
                                 </h:outputText>
                             </dd>
                         </dl>
@@ -160,7 +160,7 @@
                     <h:column>
                         <f:facet name="header">Date</f:facet>
                         <h:outputText value="#{payment.paymentDate}">
-                            <f:convertDateTime type="date" dateStyle="medium"/>
+                            <f:convertDateTime type="localDate" pattern="yyyy-MM-dd"/>
                         </h:outputText>
                     </h:column>
                     <h:column>

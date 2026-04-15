@@ -49,6 +49,8 @@ public class AdminConfigBean implements Serializable {
     private String smtpPort = "587";
     private String smtpUsername = "";
     private String smtpPassword = "";
+    private String googleClientId = "";
+    private String googleClientSecret = "";
 
     @PostConstruct
     public void init() {
@@ -63,6 +65,8 @@ public class AdminConfigBean implements Serializable {
         smtpPort = configDAO.getValue("SMTP_PORT", "587");
         smtpUsername = configDAO.getValue("SMTP_USER", "");
         smtpPassword = configDAO.getValue("SMTP_PASS", "");
+        googleClientId = configDAO.getValue("GOOGLE_OAUTH_CLIENT_ID", "");
+        googleClientSecret = configDAO.getValue("GOOGLE_OAUTH_CLIENT_SECRET", "");
     }
 
     public void testGemini() {
@@ -278,6 +282,8 @@ public class AdminConfigBean implements Serializable {
         configDAO.setValue("SMTP_PORT", smtpPort);
         configDAO.setValue("SMTP_USER", smtpUsername);
         configDAO.setValue("SMTP_PASS", smtpPassword);
+        configDAO.setValue("GOOGLE_OAUTH_CLIENT_ID", googleClientId);
+        configDAO.setValue("GOOGLE_OAUTH_CLIENT_SECRET", googleClientSecret);
         
         jakarta.faces.context.FacesContext.getCurrentInstance().addMessage(null,
             new jakarta.faces.application.FacesMessage(jakarta.faces.application.FacesMessage.SEVERITY_INFO, "Success", "Configuration saved successfully"));
@@ -306,4 +312,8 @@ public class AdminConfigBean implements Serializable {
     public void setSmtpUsername(String s) { this.smtpUsername = s; }
     public String getSmtpPassword() { return smtpPassword; }
     public void setSmtpPassword(String s) { this.smtpPassword = s; }
+    public String getGoogleClientId() { return googleClientId; }
+    public void setGoogleClientId(String s) { this.googleClientId = s; }
+    public String getGoogleClientSecret() { return googleClientSecret; }
+    public void setGoogleClientSecret(String s) { this.googleClientSecret = s; }
 }

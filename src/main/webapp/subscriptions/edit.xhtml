@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
@@ -29,6 +29,7 @@
                     <h:outputLabel for="description" value="Description" styleClass="form-label"/>
                     <h:inputTextarea id="description" value="#{subscriptionController.description}" 
                                      styleClass="form-control" rows="2"/>
+                    <h:message for="description" styleClass="error-message"/>
                 </div>
                 
                 <div class="form-group">
@@ -53,6 +54,7 @@
                         <f:selectItem itemLabel="AUD" itemValue="AUD"/>
                         <f:selectItem itemLabel="MAD" itemValue="MAD"/>
                     </h:selectOneMenu>
+                    <h:message for="currency" styleClass="error-message"/>
                 </div>
                 
                 <div class="form-group">
@@ -62,6 +64,7 @@
                         <f:selectItems value="#{subscriptionController.frequencies}" var="freq"
                                        itemLabel="#{freq.displayName}" itemValue="#{freq}"/>
                     </h:selectOneMenu>
+                    <h:message for="frequency" styleClass="error-message"/>
                 </div>
                 
                 <div class="form-group">
@@ -73,6 +76,7 @@
                         <f:selectItems value="#{subscriptionController.categories}" var="cat"
                                        itemLabel="#{cat.name}" itemValue="#{cat}"/>
                     </h:selectOneMenu>
+                    <h:message for="category" styleClass="error-message"/>
                 </div>
                 
                 <div class="form-group">
@@ -85,12 +89,14 @@
                     <h:outputLabel for="logoUrl" value="Logo URL" styleClass="form-label"/>
                     <h:inputText id="logoUrl" value="#{subscriptionController.logoUrl}" 
                                  styleClass="form-control"/>
+                    <h:message for="logoUrl" styleClass="error-message"/>
                 </div>
                 
                 <div class="form-group">
                     <h:outputLabel for="notes" value="Notes" styleClass="form-label"/>
                     <h:inputTextarea id="notes" value="#{subscriptionController.notes}" 
                                      styleClass="form-control" rows="3"/>
+                    <h:message for="notes" styleClass="error-message"/>
                 </div>
                 
                 <div class="form-actions" style="display: flex; gap: 10px; margin-top: 20px;">

@@ -8,6 +8,7 @@ import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.SessionScoped;
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
+import jakarta.faces.context.ExternalContext;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import java.io.BufferedReader;
@@ -19,6 +20,10 @@ import java.nio.charset.StandardCharsets;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Optional;
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
+import jakarta.json.JsonReader;
+import java.io.StringReader;
 
 @Named
 @SessionScoped
@@ -62,30 +67,37 @@ public class EmailController implements Serializable {
             String clientId = systemConfigDAO.getValue("GOOGLE_OAUTH_CLIENT_ID", "");
             String clientSecret = systemConfigDAO.getValue("GOOGLE_OAUTH_CLIENT_SECRET", "");
             
+            FacesContext ctx = FacesContext.getCurrentInstance();
+            
             if (clientId.isBlank() || clientSecret.isBlank()) {
-                FacesContext.getCurrentInstance().addMessage(null,
+                ctx.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "OAuth not configured. Contact admin."));
                 return null;
             }
             
             oauthState = java.util.UUID.randomUUID().toString();
             
-            FacesContext ctx = FacesContext.getCurrentInstance();
-            String baseUrl = ctx.getExternalContext().getRequestContextPath();
-            String redirectUri = baseUrl + "/oauth/callback.xhtml";
+            ExternalContext ec = ctx.getExternalContext();
+            String baseUrl = ec.getRequestScheme() + "://" + ec.getRequestServerName() 
+                + (ec.getRequestServerPort() != 80 && ec.getRequestServerPort() != 443 
+                   ? ":" + ec.getRequestServerPort() : "")
+                + ec.getRequestContextPath();
+            String redirectUri = baseUrl + "/oauth/callback";
             
             String authUrl = "https://accounts.google.com/o/oauth2/v2auth?"
                 + "client_id=" + clientId
                 + "&redirect_uri=" + java.net.URLEncoder.encode(redirectUri, "UTF-8")
                 + "&response_type=code"
-                + "&scope=" + java.net.URLEncoder.encode("https://www.googleapis.com/auth/gmail.readonly", "UTF-8")
+                + "&scope=" + java.net.URLEncoder.encode("https://www.googleapis.com/auth/gmail.readonly email openid", "UTF-8")
                 + "&state=" + oauthState
                 + "&access_type=offline"
                 + "&prompt=consent";
             
-            ctx.getExternalContext().redirect(authUrl);
+            ec.redirect(authUrl);
+            ctx.responseComplete();
             return null;
         } catch (Exception e) {
+            e.printStackTrace();
             FacesContext.getCurrentInstance().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Failed to initiate OAuth: " + e.getMessage()));
             return null;
@@ -103,9 +115,12 @@ public class EmailController implements Serializable {
             String clientId = systemConfigDAO.getValue("GOOGLE_OAUTH_CLIENT_ID", "");
             String clientSecret = systemConfigDAO.getValue("GOOGLE_OAUTH_CLIENT_SECRET", "");
             
-            FacesContext ctx = FacesContext.getCurrentInstance();
-            String baseUrl = ctx.getExternalContext().getRequestContextPath();
-            String redirectUri = baseUrl + "/oauth/callback.xhtml";
+            ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
+            String baseUrl = ec.getRequestScheme() + "://" + ec.getRequestServerName() 
+                + (ec.getRequestServerPort() != 80 && ec.getRequestServerPort() != 443 
+                   ? ":" + ec.getRequestServerPort() : "")
+                + ec.getRequestContextPath();
+            String redirectUri = baseUrl + "/oauth/callback";
             
             URL url = new URL("https://oauth2.googleapis.com/token");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -134,14 +149,27 @@ public class EmailController implements Serializable {
                 }
                 
                 String json = response.toString();
-                String accessToken = extractJsonField(json, "access_token");
-                String refreshToken = extractJsonField(json, "refresh_token");
-                Integer expiresIn = parseInt(extractJsonField(json, "expires_in"));
+                JsonObject jsonObject;
+                try (JsonReader reader = Json.createReader(new StringReader(json))) {
+                    jsonObject = reader.readObject();
+                }
                 
+                String accessToken = jsonObject.getString("access_token", null);
+                String refreshToken = jsonObject.getString("refresh_token", null);
+                int expiresIn = jsonObject.getInt("expires_in", 3600);
+                
+                // Fetch user email address
+                String email = fetchUserEmail(accessToken);
+                if (email == null) {
+                    FacesContext.getCurrentInstance().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Failed to retrieve email address from Google"));
+                    return null;
+                }
+
                 Client user = userContext.getCurrentUser();
                 if (user != null) {
-                    LocalDateTime expiresAt = LocalDateTime.now().plusSeconds(expiresIn != null ? expiresIn : 3600);
-                    emailIntegrationService.connectEmail(user, emailAddress, accessToken, refreshToken, expiresAt);
+                    LocalDateTime expiresAt = LocalDateTime.now().plusSeconds(expiresIn);
+                    emailIntegrationService.connectEmail(user, email, accessToken, refreshToken, expiresAt);
                 }
                 
                 FacesContext.getCurrentInstance().addMessage(null,
@@ -154,12 +182,40 @@ public class EmailController implements Serializable {
             loadEmailIntegration();
             return "/settings.xhtml?faces-redirect=true";
         } catch (Exception e) {
+            e.printStackTrace();
             FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", e.getMessage()));
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "OAuth error: " + e.getMessage()));
             return null;
         }
     }
     
+    private String fetchUserEmail(String accessToken) {
+        try {
+            URL url = new URL("https://www.googleapis.com/oauth2/v3/userinfo");
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            conn.setRequestProperty("Authorization", "Bearer " + accessToken);
+            
+            if (conn.getResponseCode() == 200) {
+                StringBuilder response = new StringBuilder();
+                try (BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8))) {
+                    String line;
+                    while ((line = br.readLine()) != null) {
+                        response.append(line);
+                    }
+                }
+                
+                try (JsonReader reader = Json.createReader(new StringReader(response.toString()))) {
+                    JsonObject jsonObject = reader.readObject();
+                    return jsonObject.getString("email", null);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Failed to fetch user email: " + e.getMessage());
+        }
+        return null;
+    }
+
     private String extractJsonField(String json, String field) {
         int idx = json.indexOf("\"" + field + "\"");
         if (idx == -1) return null;

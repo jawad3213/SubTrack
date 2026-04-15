@@ -32,7 +32,7 @@
                     </h:column>
                     <h:column>
                         <f:facet name="header">Last Updated</f:facet>
-                        <h:outputText value="#{rate.lastUpdated}"><f:convertDateTime type="both" dateStyle="medium" timeStyle="short"/></h:outputText>
+                        <h:outputText value="#{rate.lastUpdated}"><f:convertDateTime type="localDateTime" pattern="yyyy-MM-dd HH:mm:ss"/></h:outputText>
                     </h:column>
                     <h:column>
                         <f:facet name="header">Freshness</f:facet>

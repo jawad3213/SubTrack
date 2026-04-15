@@ -7,8 +7,12 @@ import jakarta.faces.context.FacesContext;
 import jakarta.faces.convert.Converter;
 import jakarta.faces.convert.FacesConverter;
 import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.enterprise.context.RequestScoped;
 import java.util.UUID;
 
+@Named
+@RequestScoped
 @FacesConverter(value = "categoryConverter", managed = true)
 public class CategoryConverter implements Converter<Category> {
 

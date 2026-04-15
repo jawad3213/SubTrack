@@ -1,6 +1,7 @@
 package com.subtrack.controller;
 
 import com.subtrack.entity.Category;
+import com.subtrack.entity.Client;
 import com.subtrack.entity.Subscription;
 import com.subtrack.enums.Frequency;
 import com.subtrack.enums.SubscriptionStatus;
@@ -78,6 +79,13 @@ public class SubscriptionController implements Serializable {
                 return null;
             }
             
+            Client client = userContext.getCurrentUser();
+            if (client == null) {
+                FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "User session expired"));
+                return null;
+            }
+            
             Subscription subscription = new Subscription();
             subscription.setName(name);
             subscription.setDescription(description);
@@ -90,7 +98,7 @@ public class SubscriptionController implements Serializable {
             subscription.setCancelLink(cancelLink);
             subscription.setNotes(notes);
             subscription.setStatus(SubscriptionStatus.ACTIVE);
-            subscription.setClient(userContext.getCurrentUser());
+            subscription.setClient(client);
             
             subscriptionService.create(subscription);
             
@@ -101,8 +109,9 @@ public class SubscriptionController implements Serializable {
             loadSubscriptions();
             return "list?faces-redirect=true";
         } catch (Exception e) {
+            e.printStackTrace();
             FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", e.getMessage()));
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Failed to create subscription: " + e.getMessage()));
             return null;
         }
     }

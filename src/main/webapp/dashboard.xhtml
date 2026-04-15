@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
@@ -19,8 +19,8 @@
             <div class="stat-card primary">
                 <div class="stat-value">
                     <h:outputText value="#{dashboardController.totalMonthlyCost}">
-                        <f:convertNumber type="currency" currencyCode="MAD"/>
-                    </h:outputText>
+                        <f:convertNumber pattern="#,##0.00"/>
+                    </h:outputText> MAD
                 </div>
                 <div class="stat-label">Monthly Cost</div>
             </div>
@@ -28,8 +28,8 @@
             <div class="stat-card success">
                 <div class="stat-value">
                     <h:outputText value="#{dashboardController.totalAnnualCost}">
-                        <f:convertNumber type="currency" currencyCode="MAD"/>
-                    </h:outputText>
+                        <f:convertNumber pattern="#,##0.00"/>
+                    </h:outputText> MAD
                 </div>
                 <div class="stat-label">Annual Cost</div>
             </div>
@@ -62,9 +62,9 @@
                 <h:column>
                     <f:facet name="header">Price</f:facet>
                     <h:outputText value="#{sub.price}">
-                        <f:convertNumber type="currency" currencyCode="#{sub.originalCurrency}"/>
+                        <f:convertNumber pattern="#,##0.00"/>
                     </h:outputText>
-                    <h:outputText value=" / #{sub.frequency.displayName}"/>
+                    <h:outputText value=" #{sub.originalCurrency} / #{sub.frequency.displayName}"/>
                 </h:column>
                 <h:column>
                     <f:facet name="header">Status</f:facet>
@@ -75,7 +75,7 @@
                 <h:column>
                     <f:facet name="header">Next Billing</f:facet>
                     <h:outputText value="#{sub.nextBillingDate}">
-                        <f:convertDateTime type="date" dateStyle="medium"/>
+                        <f:convertDateTime type="localDate" pattern="yyyy-MM-dd"/>
                     </h:outputText>
                 </h:column>
                 <h:column>

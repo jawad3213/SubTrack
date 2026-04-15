@@ -64,6 +64,10 @@ replay_pid*
 .env.*
 !.env.example
 
+# === API Test Files (contain secrets) ===
+TestGemini.java
+TestGemini.class
+
 # === WildFly / JBoss ===
 standalone/data/
 standalone/log/

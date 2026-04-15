@@ -40,7 +40,7 @@
                     <h:column>
                         <f:facet name="header">Timestamp</f:facet>
                         <span style="font-size: 12px; color: #5F5E5A; white-space: nowrap;">
-                            <h:outputText value="#{log.timestamp}"><f:convertDateTime type="both" dateStyle="short" timeStyle="medium"/></h:outputText>
+                            <h:outputText value="#{log.timestamp}"><f:convertDateTime type="localDateTime" pattern="yyyy-MM-dd HH:mm:ss"/></h:outputText>
                         </span>
                     </h:column>
                     <h:column>

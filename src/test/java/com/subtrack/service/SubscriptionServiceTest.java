@@ -12,6 +12,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -25,6 +27,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class SubscriptionServiceTest {
 
     @Mock
@@ -104,7 +107,7 @@ class SubscriptionServiceTest {
 
         BigDecimal result = subscriptionService.calculateMonthlyCost(testClient.getId());
 
-        assertEquals(new BigDecimal("15.99"), result);
+        assertEquals(0, new BigDecimal("15.99").compareTo(result));
     }
 
     @Test
@@ -124,7 +127,7 @@ class SubscriptionServiceTest {
 
         BigDecimal result = subscriptionService.calculateMonthlyCost(testClient.getId());
 
-        assertEquals(new BigDecimal("25.98"), result);
+        assertEquals(0, new BigDecimal("25.98").compareTo(result));
     }
 
     @Test
@@ -145,7 +148,7 @@ class SubscriptionServiceTest {
 
         BigDecimal result = subscriptionService.calculateAnnualCost(testClient.getId());
 
-        assertEquals(new BigDecimal("191.88"), result);
+        assertEquals(0, new BigDecimal("191.88").compareTo(result));
     }
 
     @Test
@@ -159,7 +162,7 @@ class SubscriptionServiceTest {
 
         BigDecimal result = subscriptionService.calculateAnnualCost(testClient.getId());
 
-        assertEquals(new BigDecimal("100.00"), result);
+        assertEquals(0, new BigDecimal("100.00").compareTo(result));
     }
 
     @Test

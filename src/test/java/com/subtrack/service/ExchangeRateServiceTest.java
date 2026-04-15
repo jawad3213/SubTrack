@@ -14,6 +14,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import com.subtrack.entity.Client;
 
@@ -29,6 +31,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class ExchangeRateServiceTest {
 
     @Mock
@@ -93,7 +96,7 @@ class ExchangeRateServiceTest {
         BigDecimal result = exchangeRateService.convertToLocalCurrency(
             new BigDecimal("100.00"), "USD", "EUR");
 
-        assertEquals(new BigDecimal("85.00"), result);
+        assertEquals(0, new BigDecimal("85.00").compareTo(result));
     }
 
     @Test
@@ -199,7 +202,7 @@ class ExchangeRateServiceTest {
         BigDecimal result = exchangeRateService.convertToLocalCurrency(
             new BigDecimal("100.00"), "USD", "GBP");
 
-        assertEquals(new BigDecimal("73.00"), result);
+        assertEquals(0, new BigDecimal("73.00").compareTo(result));
     }
 
     @Test

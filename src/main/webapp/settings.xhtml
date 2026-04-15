@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
@@ -23,6 +23,9 @@
             </li>
             <li>
                 <a href="#" onclick="showTab('notifications',this);return false;">Notifications</a>
+            </li>
+            <li>
+                <a href="#" onclick="showTab('email',this);return false;">Email Integration</a>
             </li>
             <li>
                 <a href="#" onclick="showTab('danger',this);return false;">Danger Zone</a>
@@ -155,6 +158,58 @@
                         <h:commandButton value="Save Preferences" action="#{settingsController.updateNotificationPreferences}" 
                                          styleClass="btn-primary"/>
                     </h:form>
+                </div>
+            </div>
+            
+            <!-- Email Integration Tab -->
+            <div class="tab-pane" id="email">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Email Integration</h2>
+                    </div>
+                    
+                    <p style="color: #5F5E5A; margin-bottom: 20px;">
+                        Connect your email to automatically import invoices from your inbox.
+                        SubTrack uses OAuth to securely connect to your Gmail account.
+                    </p>
+                    
+                    <h:form>
+                        <div class="form-group">
+                            <h:panelGroup rendered="#{emailController.connected}">
+                                <div style="background: #E8F5E9; border: 1px solid #4CAF50; border-radius: 4px; padding: 15px; margin-bottom: 20px;">
+                                    <p style="color: #2E7D32; font-weight: 600; margin: 0;">
+                                        ✓ Connected
+                                    </p>
+                                    <p style="color: #5F5E5A; margin: 5px 0 0 0;">
+                                        Connected email: #{emailController.emailIntegration.emailAddress}
+                                    </p>
+                                </div>
+                                <h:commandButton value="Disconnect Email" action="#{emailController.disconnectEmail}" 
+                                                 styleClass="btn-danger"/>
+                            </h:panelGroup>
+                            
+                            <h:panelGroup rendered="#{not emailController.connected}">
+                                <p style="color: #999; margin-bottom: 15px;">
+                                    Click the button below to connect your Gmail account. 
+                                    You'll be redirected to Google to authorize access.
+                                </p>
+                                <h:commandButton value="Connect Gmail" action="#{emailController.connectEmail}" 
+                                                 styleClass="btn-primary"/>
+                            </h:panelGroup>
+                        </div>
+                    </h:form>
+                    
+                    <hr style="margin: 20px 0;"/>
+                    
+                    <div style="background: #FFF3E0; border: 1px solid #FF9800; border-radius: 4px; padding: 15px;">
+                        <p style="color: #E65100; font-weight: 600; margin: 0 0 5px 0;">How it works</p>
+                        <ul style="color: #5F5E5A; margin: 0; padding-left: 20px;">
+                            <li>SubTrack uses read-only access to your Gmail account</li>
+                            <li>We only scan emails for subscription/invoice information</li>
+                            <li>Your credentials are never stored - only OAuth tokens</li>
+                            <li>You can disconnect anytime from your settings</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
             
