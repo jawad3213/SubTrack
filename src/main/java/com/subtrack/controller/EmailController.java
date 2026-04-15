@@ -44,6 +44,8 @@ public class EmailController implements Serializable {
     private String emailAddress;
     private boolean isConnected;
     private String oauthState;
+    private String oauthCode;
+    private String oauthStateParam;
 
     @PostConstruct
     public void init() {
@@ -84,7 +86,7 @@ public class EmailController implements Serializable {
                 + ec.getRequestContextPath();
             String redirectUri = baseUrl + "/oauth/callback";
             
-            String authUrl = "https://accounts.google.com/o/oauth2/v2auth?"
+            String authUrl = "https://accounts.google.com/o/oauth2/v2/auth?"
                 + "client_id=" + clientId
                 + "&redirect_uri=" + java.net.URLEncoder.encode(redirectUri, "UTF-8")
                 + "&response_type=code"
@@ -102,6 +104,10 @@ public class EmailController implements Serializable {
                 new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Failed to initiate OAuth: " + e.getMessage()));
             return null;
         }
+    }
+    
+    public String handleOAuthCallbackAction() {
+        return handleOAuthCallback(oauthCode, oauthStateParam);
     }
     
     public String handleOAuthCallback(String code, String state) {
@@ -124,6 +130,8 @@ public class EmailController implements Serializable {
             
             URL url = new URL("https://oauth2.googleapis.com/token");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setConnectTimeout(15000);
+            conn.setReadTimeout(15000);
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
             conn.setDoOutput(true);
@@ -293,5 +301,21 @@ public class EmailController implements Serializable {
     
     public String getOauthState() {
         return oauthState;
+    }
+
+    public String getOauthCode() {
+        return oauthCode;
+    }
+
+    public void setOauthCode(String oauthCode) {
+        this.oauthCode = oauthCode;
+    }
+
+    public String getOauthStateParam() {
+        return oauthStateParam;
+    }
+
+    public void setOauthStateParam(String oauthStateParam) {
+        this.oauthStateParam = oauthStateParam;
     }
 }

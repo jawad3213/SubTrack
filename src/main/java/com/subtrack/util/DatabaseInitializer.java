@@ -20,7 +20,8 @@ public class DatabaseInitializer implements ServletContextListener {
         // The application itself uses the JTA persistence unit (subtrackPU).
         try {
             // Attempt initialization via JTA EntityManager from JNDI
-            initViaJndi();
+            // Attempt initialization via JTA EntityManager from JNDI
+            initViaJndi(sce);
             System.out.println(">>> DatabaseInitializer: initialization completed successfully");
         } catch (Exception e) {
             System.err.println(">>> DatabaseInitializer: initialization FAILED - " + e.getMessage());
@@ -28,11 +29,11 @@ public class DatabaseInitializer implements ServletContextListener {
         }
     }
 
-    private void initViaJndi() throws Exception {
+    private void initViaJndi(ServletContextEvent sce) throws Exception {
         javax.naming.InitialContext ctx = new javax.naming.InitialContext();
         javax.sql.DataSource ds = (javax.sql.DataSource) ctx.lookup("java:global/SubtrackDS");
         try (java.sql.Connection conn = ds.getConnection()) {
-            initSystemConfig(conn);
+            initSystemConfig(conn, sce);
             initCategories(conn);
             initUsers(conn);
         }
@@ -68,7 +69,7 @@ public class DatabaseInitializer implements ServletContextListener {
         }
     }
 
-    private void initSystemConfig(java.sql.Connection conn) throws Exception {
+    private void initSystemConfig(java.sql.Connection conn, ServletContextEvent sce) throws Exception {
         try (java.sql.Statement stmt = conn.createStatement()) {
             stmt.execute("CREATE TABLE IF NOT EXISTS system_config (" +
                          "config_key VARCHAR(100) PRIMARY KEY, " +
@@ -77,13 +78,29 @@ public class DatabaseInitializer implements ServletContextListener {
             System.out.println(">>> Initialized system_config table");
         }
 
-        // Read OAuth credentials from environment variables (never hardcode secrets!)
-        String clientId = System.getenv("GOOGLE_OAUTH_CLIENT_ID") != null
-                ? System.getenv("GOOGLE_OAUTH_CLIENT_ID")
-                : "YOUR_GOOGLE_OAUTH_CLIENT_ID";
-        String clientSecret = System.getenv("GOOGLE_OAUTH_CLIENT_SECRET") != null
-                ? System.getenv("GOOGLE_OAUTH_CLIENT_SECRET")
-                : "YOUR_GOOGLE_OAUTH_CLIENT_SECRET";
+        // Helper to get config from env or .env file
+        java.util.Properties dotEnv = new java.util.Properties();
+        java.io.File envFile = new java.io.File(sce.getServletContext().getRealPath("/"), "../../.env"); 
+        // Note: in a standard Maven/WildFly layout, the .env is usually 2 levels up from the deployment root during mvn wildfly:run
+        if (!envFile.exists()) {
+            envFile = new java.io.File(".env"); // Fallback for various run modes
+        }
+
+        if (envFile.exists()) {
+            try (java.io.FileInputStream fis = new java.io.FileInputStream(envFile)) {
+                dotEnv.load(fis);
+            } catch (java.io.IOException e) {
+                System.err.println(">>> Failed to load .env file: " + e.getMessage());
+            }
+        }
+
+        String clientId = System.getenv("GOOGLE_OAUTH_CLIENT_ID");
+        if (clientId == null) clientId = dotEnv.getProperty("GOOGLE_OAUTH_CLIENT_ID");
+        if (clientId == null) clientId = "YOUR_GOOGLE_OAUTH_CLIENT_ID";
+
+        String clientSecret = System.getenv("GOOGLE_OAUTH_CLIENT_SECRET");
+        if (clientSecret == null) clientSecret = dotEnv.getProperty("GOOGLE_OAUTH_CLIENT_SECRET");
+        if (clientSecret == null) clientSecret = "YOUR_GOOGLE_OAUTH_CLIENT_SECRET";
         
         setConfigIfNotExists(conn, "GOOGLE_OAUTH_CLIENT_ID", clientId);
         setConfigIfNotExists(conn, "GOOGLE_OAUTH_CLIENT_SECRET", clientSecret);
