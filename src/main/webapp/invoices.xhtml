@@ -10,9 +10,16 @@
     <ui:define name="title">Invoices - SubTrack</ui:define>
     
     <ui:define name="content">
-        <div class="page-header" style="margin-bottom: 30px;">
-            <h1 style="color: #1A1A1A;">Invoice Management</h1>
-            <p style="color: #5F5E5A;">View and process imported invoices from your email</p>
+        <div class="page-header" style="margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h1 style="color: #1A1A1A;">Invoice Management</h1>
+                <p style="color: #5F5E5A;">View and process imported invoices from your email</p>
+            </div>
+            <h:form rendered="#{emailController.connected}">
+                <h:commandLink action="#{emailController.syncEmails}" styleClass="btn-primary" style="text-decoration: none;">
+                    <i class="pi pi-sync" style="margin-right: 5px;"></i> Sync from Gmail
+                </h:commandLink>
+            </h:form>
         </div>
 
         <h:panelGroup rendered="#{not emailController.connected}">

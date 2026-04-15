@@ -4,6 +4,7 @@ import com.subtrack.dao.SystemConfigDAO;
 import com.subtrack.entity.Client;
 import com.subtrack.entity.EmailIntegration;
 import com.subtrack.service.EmailIntegrationService;
+import com.subtrack.service.EmailFetchService;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.SessionScoped;
 import jakarta.faces.application.FacesMessage;
@@ -36,6 +37,9 @@ public class EmailController implements Serializable {
     
     @Inject
     private UserContext userContext;
+    
+    @Inject
+    private EmailFetchService emailFetchService;
     
     @Inject
     private SystemConfigDAO systemConfigDAO;
@@ -273,6 +277,20 @@ public class EmailController implements Serializable {
             return emailIntegrationService.isTokenValid(userContext.getClientId());
         }
         return false;
+    }
+
+    public String syncEmails() {
+        if (userContext.getClientId() != null) {
+            try {
+                emailFetchService.fetchEmailsForClient(userContext.getClientId());
+                FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Success", "Emails synced and processed by AI"));
+            } catch (Exception e) {
+                FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Failed to sync emails: " + e.getMessage()));
+            }
+        }
+        return null;
     }
 
     public EmailIntegration getEmailIntegration() {

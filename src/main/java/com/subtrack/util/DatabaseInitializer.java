@@ -101,12 +101,19 @@ public class DatabaseInitializer implements ServletContextListener {
         String clientSecret = System.getenv("GOOGLE_OAUTH_CLIENT_SECRET");
         if (clientSecret == null) clientSecret = dotEnv.getProperty("GOOGLE_OAUTH_CLIENT_SECRET");
         if (clientSecret == null) clientSecret = "YOUR_GOOGLE_OAUTH_CLIENT_SECRET";
+
+        String geminiKey = System.getenv("GEMINI_API_KEY");
+        if (geminiKey == null) geminiKey = dotEnv.getProperty("GEMINI_API_KEY");
+        if (geminiKey == null) geminiKey = "YOUR_GEMINI_API_KEY";
         
-        setConfigIfNotExists(conn, "GOOGLE_OAUTH_CLIENT_ID", clientId);
-        setConfigIfNotExists(conn, "GOOGLE_OAUTH_CLIENT_SECRET", clientSecret);
+        syncConfig(conn, "GOOGLE_OAUTH_CLIENT_ID", clientId);
+        syncConfig(conn, "GOOGLE_OAUTH_CLIENT_SECRET", clientSecret);
+        syncConfig(conn, "GEMINI_API_KEY", geminiKey);
     }
 
-    private void setConfigIfNotExists(java.sql.Connection conn, String key, String value) throws Exception {
+    private void syncConfig(java.sql.Connection conn, String key, String value) throws Exception {
+        if (value == null || value.isEmpty() || value.startsWith("YOUR_")) return;
+
         try (java.sql.PreparedStatement check = conn.prepareStatement(
                 "SELECT config_value FROM system_config WHERE config_key = ?")) {
             check.setString(1, key);
@@ -121,13 +128,13 @@ public class DatabaseInitializer implements ServletContextListener {
                 }
             } else {
                 String existingValue = rs.getString(1);
-                if (existingValue.startsWith("YOUR_") || existingValue.isEmpty()) {
+                if (!value.equals(existingValue)) {
                     try (java.sql.PreparedStatement upd = conn.prepareStatement(
                             "UPDATE system_config SET config_value = ?, updated_at = NOW() WHERE config_key = ?")) {
                         upd.setString(1, value);
                         upd.setString(2, key);
                         upd.executeUpdate();
-                        System.out.println(">>> Updated placeholder config: " + key);
+                        System.out.println(">>> Synchronized config from environment: " + key);
                     }
                 }
             }

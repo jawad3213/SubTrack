@@ -41,7 +41,7 @@ public class EmailIntegrationDAOImpl implements EmailIntegrationDAO {
     @Override
     public Optional<EmailIntegration> findByClientId(UUID clientId) {
         TypedQuery<EmailIntegration> query = em.createQuery(
-            "SELECT e FROM EmailIntegration e WHERE e.client.id = :clientId", EmailIntegration.class);
+            "SELECT e FROM EmailIntegration e JOIN FETCH e.client WHERE e.client.id = :clientId", EmailIntegration.class);
         query.setParameter("clientId", clientId);
         List<EmailIntegration> results = query.getResultList();
         return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
