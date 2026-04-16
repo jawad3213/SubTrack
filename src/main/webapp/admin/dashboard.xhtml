@@ -17,33 +17,20 @@
         <div class="admin-kpi-grid">
             <div class="admin-kpi-card">
                 <div class="admin-kpi-icon blue">
+                    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                </div>
+                <div class="admin-kpi-body">
+                    <div class="admin-kpi-value">#{adminDashboardBean.totalCatalogServices}</div>
+                    <div class="admin-kpi-label">Total SaaS Services</div>
+                </div>
+            </div>
+            <div class="admin-kpi-card">
+                <div class="admin-kpi-icon amber">
                     <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
                 </div>
                 <div class="admin-kpi-body">
                     <div class="admin-kpi-value">#{adminDashboardBean.totalUsers}</div>
                     <div class="admin-kpi-label">Total Registered Users</div>
-                </div>
-            </div>
-            <div class="admin-kpi-card">
-                <div class="admin-kpi-icon green">
-                    <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
-                </div>
-                <div class="admin-kpi-body">
-                    <div class="admin-kpi-value">#{adminDashboardBean.totalActiveSubscriptions}</div>
-                    <div class="admin-kpi-label">Active Subscriptions</div>
-                </div>
-            </div>
-            <div class="admin-kpi-card">
-                <div class="admin-kpi-icon amber">
-                    <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                </div>
-                <div class="admin-kpi-body">
-                    <div class="admin-kpi-value">
-                        <h:outputText value="#{adminDashboardBean.monthlyRecurringRevenue}">
-                            <f:convertNumber pattern="#,##0.00"/>
-                        </h:outputText> MAD
-                    </div>
-                    <div class="admin-kpi-label">Monthly Recurring Revenue</div>
                 </div>
             </div>
             <div class="admin-kpi-card">
@@ -117,7 +104,6 @@
             </div>
             <div class="admin-quick-actions">
                 <h:link outcome="/admin/catalog" value="+ Add SaaS Service" styleClass="btn-primary"/>
-                <h:link outcome="/admin/logs" value="View System Logs" styleClass="btn-secondary"/>
                 <h:link outcome="/admin/users" value="Export User Data" styleClass="btn-secondary"/>
             </div>
         </div>

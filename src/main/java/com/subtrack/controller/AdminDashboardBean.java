@@ -4,6 +4,7 @@ import com.subtrack.service.ClientService;
 import com.subtrack.service.SubscriptionService;
 import com.subtrack.service.AlertService;
 import com.subtrack.service.InvoiceService;
+import com.subtrack.service.SaaSCatalogService;
 import com.subtrack.dao.SystemConfigDAO;
 import com.subtrack.entity.Client;
 import com.subtrack.entity.Subscription;
@@ -43,7 +44,11 @@ public class AdminDashboardBean implements Serializable {
     @Inject
     private UserContext userContext;
 
+    @Inject
+    private SaaSCatalogService saasCatalogService;
+
     private long totalUsers;
+    private long totalCatalogServices;
     private long totalActiveSubscriptions;
     private double monthlyRecurringRevenue;
     private long newUsersThisMonth;
@@ -61,6 +66,8 @@ public class AdminDashboardBean implements Serializable {
             try {
                 List<Client> allUsers = clientService.findAll();
                 totalUsers = allUsers != null ? allUsers.size() : 0;
+                
+                totalCatalogServices = saasCatalogService.getAllServices().size();
 
                 totalActiveSubscriptions = 0;
                 monthlyRecurringRevenue = 0.0;
@@ -153,6 +160,7 @@ public class AdminDashboardBean implements Serializable {
 
     // Getters
     public long getTotalUsers() { return totalUsers; }
+    public long getTotalCatalogServices() { return totalCatalogServices; }
     public long getTotalActiveSubscriptions() { return totalActiveSubscriptions; }
     public double getMonthlyRecurringRevenue() { return monthlyRecurringRevenue; }
     public long getNewUsersThisMonth() { return newUsersThisMonth; }

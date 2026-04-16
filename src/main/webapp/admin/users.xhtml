@@ -77,9 +77,7 @@
                     <h:column>
                         <f:facet name="header">Actions</f:facet>
                         <div style="display: flex; gap: 6px; flex-wrap: wrap;">
-                            <h:link outcome="/admin/user-detail" value="View" styleClass="btn-secondary" style="padding: 4px 12px; font-size: 12px; height: 28px;">
-                                <f:param name="id" value="#{user.id}"/>
-                            </h:link>
+
                             <h:commandButton value="Suspend" action="#{adminUserBean.suspendUser}" 
                                              styleClass="btn-danger" style="padding: 4px 12px; font-size: 12px; height: 28px;"
                                              rendered="#{user.isActive and user.role.name() != 'ADMIN'}">

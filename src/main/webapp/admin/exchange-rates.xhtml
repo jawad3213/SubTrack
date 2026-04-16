@@ -11,7 +11,7 @@
         <div class="page-header" style="margin-bottom: 28px; display: flex; justify-content: space-between; align-items: center;">
             <div>
                 <h1 style="color: #1A1A1A; font-size: 22px; font-weight: 700;">Exchange Rate Management</h1>
-                <p style="color: #5F5E5A; font-size: 14px;">Current exchange rates stored in the EXCHANGE_RATE table</p>
+                <p style="color: #5F5E5A; font-size: 14px;">Live exchange rates stored in the database (Base: USD). Click "Refresh All Rates" to pull from API.</p>
             </div>
             <h:form>
                 <h:commandButton value="Refresh All Rates" action="#{adminExchangeRateBean.refreshAllRates}" styleClass="btn-primary"/>
@@ -27,7 +27,7 @@
                         <span style="font-weight: 600; font-size: 15px; color: #1A1A1A;">#{rate.currencyCode}</span>
                     </h:column>
                     <h:column>
-                        <f:facet name="header">Rate to MAD</f:facet>
+                        <f:facet name="header">Rate (per 1 USD)</f:facet>
                         <h:outputText value="#{rate.rateToMad}"><f:convertNumber pattern="#,##0.0000"/></h:outputText>
                     </h:column>
                     <h:column>
@@ -40,16 +40,11 @@
                             <span class="dot"></span> #{rate.fresh ? 'Fresh' : 'Stale'}
                         </span>
                     </h:column>
-                    <h:column>
-                        <f:facet name="header">Actions</f:facet>
-                        <h:commandButton value="Edit" styleClass="btn-secondary" style="padding: 4px 10px; font-size: 12px;">
-                            <f:setPropertyActionListener target="#{adminExchangeRateBean.selectedRate}" value="#{rate}"/>
-                        </h:commandButton>
-                    </h:column>
+
                 </h:dataTable>
 
                 <h:panelGroup rendered="#{empty adminExchangeRateBean.exchangeRates}">
-                    <div class="empty-state"><p>No exchange rates stored. Click "Refresh All Rates" to fetch them.</p></div>
+                    <div class="empty-state"><p>No exchange rates stored yet. Configure the API URL in Admin → Configuration, then click "Refresh All Rates".</p></div>
                 </h:panelGroup>
             </h:form>
         </div>

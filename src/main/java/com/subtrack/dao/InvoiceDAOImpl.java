@@ -49,7 +49,7 @@ public class InvoiceDAOImpl implements InvoiceDAO {
     @Override
     public List<Invoice> findByClientId(UUID clientId) {
         TypedQuery<Invoice> query = em.createQuery(
-            "SELECT i FROM Invoice i WHERE i.client.id = :clientId ORDER BY i.createdAt DESC", 
+            "SELECT i FROM Invoice i JOIN FETCH i.client WHERE i.client.id = :clientId ORDER BY i.createdAt DESC", 
             Invoice.class);
         query.setParameter("clientId", clientId);
         return query.getResultList();

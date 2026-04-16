@@ -270,6 +270,36 @@ public class AdminConfigBean implements Serializable {
         }
     }
 
+    public void testGoogleOAuth() {
+        try {
+            configDAO.setValue("GOOGLE_OAUTH_CLIENT_ID", googleClientId);
+            configDAO.setValue("GOOGLE_OAUTH_CLIENT_SECRET", googleClientSecret);
+            
+            if (googleClientId == null || googleClientId.isBlank() || googleClientSecret == null || googleClientSecret.isBlank()) {
+                FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Google Client ID or Secret is missing."));
+                return;
+            }
+            
+            // Simple test: reach Google's discovery document
+            URL url = new URL("https://accounts.google.com/.well-known/openid-configuration");
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            conn.setConnectTimeout(5000);
+            
+            if (conn.getResponseCode() == 200) {
+                FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Success", "Google Auth endpoints reachable. Configuration saved and ready for OAuth flow."));
+            } else {
+                FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Could not reach Google Auth endpoints."));
+            }
+        } catch (Exception e) {
+            FacesContext.getCurrentInstance().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "OAuth test error: " + e.getMessage()));
+        }
+    }
+
     public void saveAll() {
         configDAO.setValue("GEMINI_API_KEY", geminiApiKey);
         configDAO.setValue("EXCHANGE_RATE_API_KEY", exchangeRateApiKey);

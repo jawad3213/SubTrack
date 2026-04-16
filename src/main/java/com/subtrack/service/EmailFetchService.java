@@ -39,19 +39,20 @@ public class EmailFetchService {
     private static final String GMAIL_API = "https://gmail.googleapis.com/gmail/v1/users/me/messages";
     private static final String GMAIL_GET_API = "https://gmail.googleapis.com/gmail/v1/users/me/messages/";
     
-    public void fetchEmailsForClient(UUID clientId) {
+    public int fetchEmailsForClient(UUID clientId) {
         System.out.println(">>> EmailFetchService: Starting sync for client " + clientId);
+        int totalProcessed = 0;
         
         Optional<EmailIntegration> integrationOpt = emailIntegrationService.findByClientId(clientId);
         if (integrationOpt.isEmpty()) {
             System.err.println(">>> EmailFetchService: No email integration found for client " + clientId);
-            return;
+            return 0;
         }
         
         EmailIntegration integration = integrationOpt.get();
         if (!integration.getIsActive()) {
             System.err.println(">>> EmailFetchService: Email integration is not active");
-            return;
+            return 0;
         }
         
         String accessToken = integration.getAccessToken();
@@ -61,26 +62,25 @@ public class EmailFetchService {
             System.out.println(">>> EmailFetchService: Token expired, attempting refresh...");
             accessToken = refreshAccessToken(integration);
             if (accessToken == null) {
-                System.err.println(">>> EmailFetchService: Token refresh failed. User needs to reconnect.");
-                throw new RuntimeException("Gmail token expired. Please reconnect your email in Settings.");
+                System.err.println(">>> EmailFetchService: Access token is null and refresh failed");
+                return 0;
             }
         }
         
+        Client client = integration.getClient();
+        
         try {
-            List<String> unreadIds = fetchUnreadEmailIds(accessToken);
-            System.out.println(">>> EmailFetchService: Found " + unreadIds.size() + " unread invoice emails");
+            List<String> emailIds = fetchInvoiceEmailIds(accessToken);
+            System.out.println(">>> EmailFetchService: Found " + emailIds.size() + " potential invoice emails in the last 30 days");
             
-            if (unreadIds.isEmpty()) {
-                System.out.println(">>> EmailFetchService: No matching emails found. Make sure you have unread emails with invoice/receipt/billing/subscription in the subject.");
-                return;
+            if (emailIds.isEmpty()) {
+                System.out.println(">>> EmailFetchService: No matching emails found.");
+                return 0;
             }
             
-            EmailIntegration integration = integrationOpt.get();
-            Client client = integration.getClient();
             System.out.println(">>> EmailFetchService: Syncing for " + client.getEmail());
 
-            int processed = 0;
-            for (String emailId : unreadIds) {
+            for (String emailId : emailIds) {
                 try {
                     System.out.println(">>> EmailFetchService: Fetching email ID: " + emailId);
                     String emailContent = fetchEmailContent(accessToken, emailId);
@@ -90,29 +90,25 @@ public class EmailFetchService {
                         continue;
                     }
                     
-                    System.out.println(">>> EmailFetchService: Email content preview: " + 
-                        emailContent.substring(0, Math.min(200, emailContent.length())));
-                    
                     if (looksLikeInvoice(emailContent)) {
                         System.out.println(">>> EmailFetchService: Email looks like an invoice, creating record...");
                         createInvoiceRecord(client, emailContent, emailId);
-                        processed++;
+                        totalProcessed++;
                         
                         // Small delay to respect Gemini 1.5-flash free-tier (15 RPM)
                         try { Thread.sleep(3500); } catch (InterruptedException e) { Thread.currentThread().interrupt(); }
                     } else {
-                        System.out.println(">>> EmailFetchService: Email does NOT look like an invoice, skipping.");
+                        System.out.println(">>> EmailFetchService: Email " + emailId + " does NOT look like an invoice, skipping.");
                     }
                 } catch (Exception e) {
                     System.err.println(">>> EmailFetchService: Error processing email " + emailId + ": " + e.getMessage());
-                    e.printStackTrace();
                 }
             }
-            System.out.println(">>> EmailFetchService: Sync complete. Processed " + processed + " invoices.");
+            System.out.println(">>> EmailFetchService: Sync complete. Imported " + totalProcessed + " invoices.");
+            return totalProcessed;
         } catch (Exception e) {
             System.err.println(">>> EmailFetchService: Failed to fetch emails: " + e.getMessage());
-            e.printStackTrace();
-            throw new RuntimeException("Failed to fetch emails: " + e.getMessage());
+            return 0;
         }
     }
     
@@ -186,9 +182,10 @@ public class EmailFetchService {
         return null;
     }
     
-    private List<String> fetchUnreadEmailIds(String accessToken) throws Exception {
-        // Use OR logic: {subject:invoice subject:receipt subject:billing} uses Gmail's OR grouping
-        String query = "is:unread {subject:invoice subject:receipt subject:billing subject:subscription subject:payment}";
+    private List<String> fetchInvoiceEmailIds(String accessToken) throws Exception {
+        // Use OR logic: {subject:invoice subject:receipt subject:billing} 
+        // We look for emails in the last 30 days, read or unread.
+        String query = "newer_than:30d {subject:invoice subject:receipt subject:billing subject:subscription subject:payment subject:order subject:confirmation}";
         String encodedQuery = java.net.URLEncoder.encode(query, "UTF-8");
         
         URL url = new URL(GMAIL_API + "?q=" + encodedQuery + "&maxResults=20");

@@ -93,7 +93,7 @@ public class AuthController implements Serializable {
         userContext.invalidate();
         loggedInUser = null;
         loggedIn = false;
-        return "login?faces-redirect=true";
+        return "/login?faces-redirect=true";
     }
 
     public boolean isLoggedIn() {

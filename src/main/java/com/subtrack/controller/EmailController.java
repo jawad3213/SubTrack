@@ -44,6 +44,9 @@ public class EmailController implements Serializable {
     @Inject
     private SystemConfigDAO systemConfigDAO;
 
+    @Inject
+    private InvoiceController invoiceController;
+
     private EmailIntegration emailIntegration;
     private String emailAddress;
     private boolean isConnected;
@@ -282,9 +285,20 @@ public class EmailController implements Serializable {
     public String syncEmails() {
         if (userContext.getClientId() != null) {
             try {
-                emailFetchService.fetchEmailsForClient(userContext.getClientId());
-                FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Success", "Emails synced and processed by AI"));
+                int count = emailFetchService.fetchEmailsForClient(userContext.getClientId());
+                
+                // CRITICAL: Reload invoices so the UI table updates immediately
+                invoiceController.loadInvoices();
+                
+                if (count > 0) {
+                    FacesContext.getCurrentInstance().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO, "Success", 
+                        "Successfully imported and processed " + count + " new invoices."));
+                } else {
+                    FacesContext.getCurrentInstance().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO, "Sync Complete", 
+                        "No new invoice emails found in the last 30 days."));
+                }
             } catch (Exception e) {
                 FacesContext.getCurrentInstance().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Failed to sync emails: " + e.getMessage()));

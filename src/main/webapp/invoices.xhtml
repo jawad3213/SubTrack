@@ -16,9 +16,12 @@
                 <p style="color: #5F5E5A;">View and process imported invoices from your email</p>
             </div>
             <h:form rendered="#{emailController.connected}">
-                <h:commandLink action="#{emailController.syncEmails}" styleClass="btn-primary" style="text-decoration: none;">
-                    <i class="pi pi-sync" style="margin-right: 5px;"></i> Sync from Gmail
-                </h:commandLink>
+                <p:commandButton value="Sync from Gmail" icon="pi pi-sync"
+                                 action="#{emailController.syncEmails}" 
+                                 update=":invoiceForm :globalMessages"
+                                 styleClass="ui-button-raised"
+                                 style="font-size: 0.9rem;"
+                                 onclick="PrimeFaces.monitorDownload(null, null);" />
             </h:form>
         </div>
 
@@ -53,111 +56,153 @@
                 </div>
             </div>
 
-            <div class="card">
-                <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-                    <h2 class="card-title">All Invoices</h2>
-                    <div style="display: flex; gap: 10px; align-items: center;">
-                        <h:outputLabel for="showProcessed" value="Show Processed:" style="margin-right: 5px;"/>
-                        <h:selectBooleanCheckbox id="showProcessed" value="#{invoiceController.showProcessed}">
-                            <f:ajax render="@all"/>
-                        </h:selectBooleanCheckbox>
-                    </div>
-                </div>
-                
-                <h:dataTable value="#{invoiceController.filteredInvoices}" var="invoice" 
-                             styleClass="data-table"
-                             rendered="#{not empty invoiceController.filteredInvoices}">
-                    <h:column>
-                        <f:facet name="header">Date</f:facet>
-                        <h:outputText value="#{invoice.invoiceDate}">
-                            <f:convertDateTime type="localDate" pattern="yyyy-MM-dd"/>
-                        </h:outputText>
-                    </h:column>
-                    <h:column>
-                        <f:facet name="header">Service</f:facet>
-                        <h:outputText value="#{invoice.serviceName}"/>
-                    </h:column>
-                    <h:column>
-                        <f:facet name="header">Amount</f:facet>
-                        <h:outputText value="#{invoice.amount}">
-                            <f:convertNumber pattern="#,##0.00"/>
-                        </h:outputText>
-                        <h:outputText value=" #{invoice.currency}"/>
-                    </h:column>
-                    <h:column>
-                        <f:facet name="header">Status</f:facet>
-                        <span class="badge #{invoice.isProcessed ? 'active' : 'paused'}">
-                            #{invoice.isProcessed ? 'Processed' : 'Pending'}
-                        </span>
-                    </h:column>
-                    <h:column>
-                        <f:facet name="header">Actions</f:facet>
-                        <div style="display: flex; gap: 5px;">
-                            <h:commandButton value="View" 
-                                             onclick="PF('invoiceDetailDialog').show();"
-                                             styleClass="btn-secondary" style="padding: 5px 10px; font-size: 0.85rem;">
-                                <f:setPropertyActionListener target="#{invoiceController.selectedInvoice}" value="#{invoice}"/>
-                            </h:commandButton>
-                            <h:commandButton value="Process" 
-                                             action="#{invoiceController.processInvoice}" 
-                                             styleClass="btn-primary" style="padding: 5px 10px; font-size: 0.85rem;"
-                                             rendered="#{not invoice.isProcessed}">
-                                <f:setPropertyActionListener target="#{invoiceController.selectedInvoice}" value="#{invoice}"/>
-                            </h:commandButton>
-                            <h:commandButton value="Delete" 
-                                             action="#{invoiceController.deleteInvoice}" 
-                                             styleClass="btn-danger" style="padding: 5px 10px; font-size: 0.85rem;"
-                                             onclick="return confirm('Are you sure?');">
-                                <f:setPropertyActionListener target="#{invoiceController.selectedInvoice}" value="#{invoice}"/>
-                            </h:commandButton>
+            <h:form id="invoiceForm">
+                <div class="card">
+                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                        <h2 class="card-title">All Invoices</h2>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <p:selectOneButton value="#{invoiceController.statusFilter}" unselectable="false">
+                                <f:selectItem itemLabel="All" itemValue="ALL"/>
+                                <f:selectItem itemLabel="Pending" itemValue="PENDING"/>
+                                <f:selectItem itemLabel="Linked &amp; Done" itemValue="PROCESSED"/>
+                                <p:ajax update="@form :globalMessages" />
+                            </p:selectOneButton>
                         </div>
-                    </h:column>
-                </h:dataTable>
-                
-                <h:panelGroup rendered="#{empty invoiceController.invoices}">
-                    <div class="empty-state" style="text-align: center; padding: 40px;">
-                        <p style="color: #5F5E5A; margin-bottom: 15px;">No invoices imported yet.</p>
-                        <p>Forward your invoices to your connected email address to import them automatically.</p>
                     </div>
-                </h:panelGroup>
-            </div>
+                    
+                    <p:dataTable id="invoiceTable" value="#{invoiceController.filteredInvoices}" var="invoice" 
+                                 reflow="true" styleClass="data-table"
+                                 emptyMessage="No invoices found matching the selected filter.">
+                        <p:column headerText="Date">
+                            <h:outputText value="#{invoice.invoiceDate}">
+                                <f:convertDateTime type="localDate" pattern="yyyy-MM-dd"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Service">
+                            <h:outputText value="#{invoice.serviceName}"/>
+                        </p:column>
+                        <p:column headerText="Amount">
+                            <h:outputText value="#{invoice.amount}">
+                                <f:convertNumber pattern="#,##0.00"/>
+                            </h:outputText>
+                            <h:outputText value=" #{invoice.currency}"/>
+                        </p:column>
+                        <p:column headerText="Status" style="width: 160px; text-align: center;">
+                            <h:panelGroup rendered="#{not invoice.isProcessed}">
+                                <span style="background: #FFF4E5; color: #B95000; padding: 4px 12px; border-radius: 6px; font-weight: 600; font-size: 0.75rem; display: inline-flex; align-items: center; border: 1px solid #FFD8A8;">
+                                    <i class="pi pi-clock" style="font-size: 0.7rem; margin-right: 5px;"></i> PENDING REVIEW
+                                </span>
+                            </h:panelGroup>
+                            <h:panelGroup rendered="#{invoice.isProcessed}">
+                                <span style="background: #E6F9F1; color: #00875A; padding: 4px 12px; border-radius: 6px; font-weight: 600; font-size: 0.75rem; display: inline-flex; align-items: center; border: 1px solid #B2F2D8;">
+                                    <i class="pi pi-check-circle" style="font-size: 0.7rem; margin-right: 5px;"></i> LINKED &amp; DONE
+                                </span>
+                            </h:panelGroup>
+                        </p:column>
+                        <p:column headerText="Actions">
+                            <div style="display: flex; gap: 5px;">
+                                <p:commandButton value="View" icon="pi pi-eye"
+                                                 process="@this"
+                                                 update=":invoiceDetailForm:invoiceDetailContent"
+                                                 oncomplete="PF('invoiceDetailDialog').show();"
+                                                 styleClass="ui-button-secondary ui-button-flat" style="font-size: 0.85rem;">
+                                    <f:setPropertyActionListener target="#{invoiceController.selectedInvoice}" value="#{invoice}"/>
+                                </p:commandButton>
+                                
+                                <p:commandButton value="Process" icon="pi pi-check"
+                                                 action="#{invoiceController.processInvoice}" 
+                                                 update="@form :globalMessages"
+                                                 styleClass="ui-button-success" style="font-size: 0.85rem;"
+                                                 rendered="#{not invoice.isProcessed}">
+                                    <f:setPropertyActionListener target="#{invoiceController.selectedInvoice}" value="#{invoice}"/>
+                                </p:commandButton>
+                                
+                                <p:commandButton value="Delete" icon="pi pi-trash"
+                                                 action="#{invoiceController.deleteInvoice}" 
+                                                 update="@form :globalMessages"
+                                                 styleClass="ui-button-danger ui-button-flat" style="font-size: 0.85rem;">
+                                    <p:confirm header="Confirmation" message="Are you sure you want to delete this invoice?" icon="pi pi-exclamation-triangle"/>
+                                    <f:setPropertyActionListener target="#{invoiceController.selectedInvoice}" value="#{invoice}"/>
+                                </p:commandButton>
+                            </div>
+                        </p:column>
+                    </p:dataTable>
+                    
+                    <h:panelGroup rendered="#{empty invoiceController.invoices}">
+                        <div class="empty-state" style="text-align: center; padding: 40px;">
+                            <p style="color: #5F5E5A; margin-bottom: 15px;">No invoices imported yet.</p>
+                            <p>Forward your invoices to your connected email address to import them automatically.</p>
+                        </div>
+                    </h:panelGroup>
+                </div>
+
+                <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                    <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no ui-button-flat"/>
+                    <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" />
+                </p:confirmDialog>
+            </h:form>
         </h:panelGroup>
 
         <!-- Invoice Detail Dialog -->
-        <p:dialog widgetVar="invoiceDetailDialog" header="Invoice Details" modal="true" width="600">
-            <h:panelGroup rendered="#{invoiceController.selectedInvoice != null}">
-                <dl class="dl-horizontal" style="display: grid; grid-template-columns: 120px 1fr; gap: 10px;">
-                    <dt style="color: #5F5E5A;">Service:</dt>
-                    <dd>#{invoiceController.selectedInvoice.serviceName}</dd>
-                    
-                    <dt style="color: #5F5E5A;">Amount:</dt>
-                    <dd>
-                        <h:outputText value="#{invoiceController.selectedInvoice.amount}">
-                            <f:convertNumber pattern="#,##0.00"/>
-                        </h:outputText>
-                        #{invoiceController.selectedInvoice.currency}
-                    </dd>
-                    
-                    <dt style="color: #5F5E5A;">Date:</dt>
-                    <dd>
-                        <h:outputText value="#{invoiceController.selectedInvoice.invoiceDate}">
-                            <f:convertDateTime type="localDate" pattern="yyyy-MM-dd"/>
-                        </h:outputText>
-                    </dd>
-                    
-                    <dt style="color: #5F5E5A;">Status:</dt>
-                    <dd>
-                        <span class="badge #{invoiceController.selectedInvoice.isProcessed ? 'active' : 'paused'}">
-                            #{invoiceController.selectedInvoice.isProcessed ? 'Processed' : 'Pending'}
-                        </span>
-                    </dd>
-                    
-                    <dt style="color: #5F5E5A;">Raw Content:</dt>
-                    <dd>
-                        <pre style="background: #f5f5f5; padding: 10px; max-height: 200px; overflow: auto; white-space: pre-wrap;">#{invoiceController.selectedInvoice.rawContent}</pre>
-                    </dd>
-                </dl>
-            </h:panelGroup>
+        <p:dialog widgetVar="invoiceDetailDialog" header="Invoice Details" modal="true" 
+                  width="700" showEffect="fade" hideEffect="fade" responsive="true">
+            <h:form id="invoiceDetailForm">
+                <h:panelGroup id="invoiceDetailContent">
+                    <h:panelGroup rendered="#{invoiceController.selectedInvoice != null}">
+                        <div style="padding: 10px;">
+                            <div style="border-bottom: 2px solid #6366F1; padding-bottom: 10px; margin-bottom: 20px;">
+                                <h3 style="margin: 0; color: #111827; display: flex; align-items: center; gap: 10px;">
+                                    <i class="pi pi-file-pdf" style="color: #6366F1; font-size: 1.5rem;"></i>
+                                    Invoice Information
+                                </h3>
+                                <p style="margin: 5px 0 0 0; color: #6B7280; font-size: 0.875rem;">Modify invoice metadata or update status manually.</p>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 20px;">
+                                <div class="field-container">
+                                    <h:outputLabel value="Service Name" style="display: block; font-weight: 600; margin-bottom: 5px; color: #374151;" />
+                                    <p:inputText value="#{invoiceController.selectedInvoice.serviceName}" style="width: 100%;" />
+                                </div>
+                                <div class="field-container">
+                                    <h:outputLabel value="Invoice Date" style="display: block; font-weight: 600; margin-bottom: 5px; color: #374151;" />
+                                    <p:datePicker value="#{invoiceController.selectedInvoice.invoiceDate}" pattern="yyyy-MM-dd" style="width: 100%;" />
+                                </div>
+                                <div class="field-container">
+                                    <h:outputLabel value="Amount" style="display: block; font-weight: 600; margin-bottom: 5px; color: #374151;" />
+                                    <div style="display: flex; gap: 10px;">
+                                        <p:inputNumber value="#{invoiceController.selectedInvoice.amount}" decimalPlaces="2" style="width: 100%;" />
+                                        <p:inputText value="#{invoiceController.selectedInvoice.currency}" placeholder="USD" style="width: 80px;" maxlength="3" />
+                                    </div>
+                                </div>
+                                <div class="field-container">
+                                    <h:outputLabel value="Status" style="display: block; font-weight: 600; margin-bottom: 5px; color: #374151;" />
+                                    <p:selectBooleanButton value="#{invoiceController.selectedInvoice.isProcessed}" 
+                                                          onLabel="LINKED &amp; DONE" offLabel="PENDING REVIEW"
+                                                          onIcon="pi pi-check-circle" offIcon="pi pi-clock"
+                                                          style="width: 100%; height: 38px; font-weight: 600;"
+                                                          styleClass="#{invoiceController.selectedInvoice.isProcessed ? 'ui-button-success' : 'ui-button-warning'}" />
+                                </div>
+                            </div>
+                            
+                            <div style="margin-top: 20px;">
+                                <h:outputLabel value="Raw Email Content" style="display: block; font-weight: 600; margin-bottom: 10px; color: #374151;" />
+                                <div style="background: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 8px; padding: 15px;">
+                                    <pre style="margin: 0; white-space: pre-wrap; font-family: 'Consolas', 'Monaco', monospace; font-size: 0.85rem; color: #4B5563; max-height: 200px; overflow-y: auto;">#{invoiceController.selectedInvoice.rawContent}</pre>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 30px; border-top: 1px solid #f3f4f6; padding-top: 20px;">
+                                <p:commandButton value="Cancel" onclick="PF('invoiceDetailDialog').hide();" 
+                                                 type="button" styleClass="ui-button-flat ui-button-secondary" />
+                                <p:commandButton value="Save Changes" action="#{invoiceController.updateInvoice}"
+                                                 update=":invoiceForm :globalMessages"
+                                                 oncomplete="if (!args.validationFailed) PF('invoiceDetailDialog').hide();"
+                                                 icon="pi pi-save" styleClass="ui-button-raised" />
+                            </div>
+                        </div>
+                    </h:panelGroup>
+                </h:panelGroup>
+            </h:form>
         </p:dialog>
     </ui:define>
 </ui:composition>

@@ -28,7 +28,7 @@ public class GeminiService {
     private static final Logger LOGGER = Logger.getLogger(GeminiService.class.getName());
     private static final AppLogger APP_LOGGER = AppLogger.getLogger(GeminiService.class);
     private static final String GEMINI_API_URL = 
-        "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
 
     @Inject
     private SystemConfigDAO configDAO;
@@ -156,7 +156,15 @@ public class GeminiService {
                 "- If you cannot determine a field, use UNKNOWN\n\n" +
                 "Here is the text to parse:\n\n" + rawContent;
 
-        String response = sendPrompt(prompt);
+        String response;
+        try {
+            response = sendPrompt(prompt);
+        } catch (Exception e) {
+            result.setSuccess(false);
+            result.setErrorMessage("Gemini API call failed: " + e.getMessage());
+            LOGGER.log(Level.WARNING, "GeminiService: API call failed during invoice parsing", e);
+            return result;
+        }
 
         if (response == null || response.isBlank()) {
             result.setSuccess(false);

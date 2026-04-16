@@ -44,6 +44,7 @@
                     <label>Client Secret</label>
                     <h:inputSecret value="#{adminConfigBean.googleClientSecret}" styleClass="form-control masked-field" redisplay="true"/>
                 </div>
+                <h:commandButton value="Test OAuth Configuration" action="#{adminConfigBean.testGoogleOAuth}" styleClass="btn-secondary" style="padding: 6px 14px; font-size: 13px;"/>
             </div>
 
             <!-- Exchange Rate API -->

@@ -40,6 +40,7 @@ public class SubscriptionController implements Serializable {
     private Subscription newSubscription;
     private List<Category> categories;
     private String searchTerm;
+    private String editId;
     
     private String name;
     private String description;
@@ -163,7 +164,7 @@ public class SubscriptionController implements Serializable {
                 new FacesMessage(FacesMessage.SEVERITY_INFO, "Success", "Subscription deleted successfully"));
             
             loadSubscriptions();
-            return null;
+            return "/subscriptions/list?faces-redirect=true";
         } catch (Exception e) {
             FacesContext.getCurrentInstance().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", e.getMessage()));
@@ -237,7 +238,7 @@ public class SubscriptionController implements Serializable {
         }
     }
     
-    public void prepareEdit(Subscription subscription) {
+    public String prepareEdit(Subscription subscription) {
         selectedSubscription = subscription;
         name = subscription.getName();
         description = subscription.getDescription();
@@ -248,6 +249,31 @@ public class SubscriptionController implements Serializable {
         logoUrl = subscription.getLogoUrl();
         cancelLink = subscription.getCancelLink();
         notes = subscription.getNotes();
+        return "/subscriptions/edit?faces-redirect=true";
+    }
+    
+    public void loadForEdit() {
+        if (editId != null && !editId.trim().isEmpty()) {
+            try {
+                UUID uuid = UUID.fromString(editId);
+                if (selectedSubscription == null || !uuid.equals(selectedSubscription.getId())) {
+                    subscriptionService.findById(uuid).ifPresent(sub -> {
+                        selectedSubscription = sub;
+                        name = sub.getName();
+                        description = sub.getDescription();
+                        price = sub.getPrice();
+                        originalCurrency = sub.getOriginalCurrency();
+                        frequency = sub.getFrequency();
+                        category = sub.getCategory();
+                        logoUrl = sub.getLogoUrl();
+                        cancelLink = sub.getCancelLink();
+                        notes = sub.getNotes();
+                    });
+                }
+            } catch (IllegalArgumentException e) {
+                // Invalid UUID string, ignore and don't load anything
+            }
+        }
     }
     
     public void prepareNew() {
@@ -330,6 +356,14 @@ public class SubscriptionController implements Serializable {
 
     public void setSearchTerm(String searchTerm) {
         this.searchTerm = searchTerm;
+    }
+
+    public String getEditId() {
+        return editId;
+    }
+
+    public void setEditId(String editId) {
+        this.editId = editId;
     }
 
     public String getName() {
