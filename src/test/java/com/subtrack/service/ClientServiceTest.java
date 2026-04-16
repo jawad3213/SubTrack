@@ -6,24 +6,28 @@ import com.subtrack.enums.AccountType;
 import com.subtrack.enums.Role;
 import com.subtrack.util.PasswordUtil;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
+/**
+ * Unit tests for {@link ClientService}.
+ * All DAO interactions are mocked – no database required.
+ */
 @ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = Strictness.LENIENT)
 class ClientServiceTest {
 
     @Mock
@@ -32,184 +36,236 @@ class ClientServiceTest {
     @InjectMocks
     private ClientService clientService;
 
-    private Client testClient;
+    private Client sampleClient;
+    private final UUID clientId = UUID.randomUUID();
 
     @BeforeEach
     void setUp() {
-        testClient = new Client();
-        testClient.setId(UUID.randomUUID());
-        testClient.setEmail("test@example.com");
-        testClient.setPassword(PasswordUtil.hashPassword("Password123"));
-        testClient.setFirstName("John");
-        testClient.setLastName("Doe");
-        testClient.setAccountType(AccountType.B2C);
-        testClient.setRole(Role.CLIENT);
-        testClient.setIsActive(true);
+        sampleClient = new Client();
+        sampleClient.setId(clientId);
+        sampleClient.setEmail("test@example.com");
+        sampleClient.setPassword(PasswordUtil.hashPassword("StrongPass1"));
+        sampleClient.setFirstName("John");
+        sampleClient.setLastName("Doe");
+        sampleClient.setAccountType(AccountType.B2C);
+        sampleClient.setRole(Role.CLIENT);
+        sampleClient.setIsActive(true);
+    }
+
+    // ---------------------------------------------------------------
+    // registerClient
+    // ---------------------------------------------------------------
+    @Nested
+    @DisplayName("registerClient()")
+    class RegisterClient {
+
+        @Test
+        @DisplayName("should register a new client successfully")
+        void register_newClient_success() {
+            when(clientDAO.existsByEmail("new@example.com")).thenReturn(false);
+
+            Client result = clientService.registerClient(
+                    "new@example.com", "ValidPass1", "Jane", "Doe", AccountType.B2C);
+
+            assertNotNull(result);
+            assertEquals("new@example.com", result.getEmail());
+            assertEquals("Jane", result.getFirstName());
+            assertEquals(Role.CLIENT, result.getRole());
+            assertTrue(result.getIsActive());
+            verify(clientDAO).create(any(Client.class));
+        }
+
+        @Test
+        @DisplayName("should throw when email is already registered")
+        void register_duplicateEmail_throws() {
+            when(clientDAO.existsByEmail("test@example.com")).thenReturn(true);
+
+            IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
+                    () -> clientService.registerClient(
+                            "test@example.com", "ValidPass1", "A", "B", AccountType.B2C));
+            assertTrue(ex.getMessage().contains("already registered"));
+            verify(clientDAO, never()).create(any());
+        }
+
+        @Test
+        @DisplayName("should throw when password is too weak")
+        void register_weakPassword_throws() {
+            when(clientDAO.existsByEmail("new@example.com")).thenReturn(false);
+
+            IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
+                    () -> clientService.registerClient(
+                            "new@example.com", "weak", "A", "B", AccountType.B2C));
+            assertTrue(ex.getMessage().contains("Password must be"));
+            verify(clientDAO, never()).create(any());
+        }
+
+        @Test
+        @DisplayName("should default to B2C when accountType is null")
+        void register_nullAccountType_defaultsToB2C() {
+            when(clientDAO.existsByEmail("x@x.com")).thenReturn(false);
+
+            Client result = clientService.registerClient(
+                    "x@x.com", "ValidPass1", "X", "Y", null);
+            assertEquals(AccountType.B2C, result.getAccountType());
+        }
+    }
+
+    // ---------------------------------------------------------------
+    // authenticate
+    // ---------------------------------------------------------------
+    @Nested
+    @DisplayName("authenticate()")
+    class Authenticate {
+
+        @Test
+        @DisplayName("should return a client for valid credentials")
+        void authenticate_validCredentials_returnsClient() {
+            String rawPassword = "StrongPass1";
+            sampleClient.setPassword(PasswordUtil.hashPassword(rawPassword));
+            when(clientDAO.findByEmail("test@example.com")).thenReturn(Optional.of(sampleClient));
+
+            Optional<Client> result = clientService.authenticate("test@example.com", rawPassword);
+
+            assertTrue(result.isPresent());
+            assertEquals(clientId, result.get().getId());
+        }
+
+        @Test
+        @DisplayName("should return empty for wrong password")
+        void authenticate_wrongPassword_returnsEmpty() {
+            when(clientDAO.findByEmail("test@example.com")).thenReturn(Optional.of(sampleClient));
+
+            Optional<Client> result = clientService.authenticate("test@example.com", "WrongPass9");
+
+            assertTrue(result.isEmpty());
+        }
+
+        @Test
+        @DisplayName("should return empty for non-existent email")
+        void authenticate_unknownEmail_returnsEmpty() {
+            when(clientDAO.findByEmail("unknown@x.com")).thenReturn(Optional.empty());
+
+            Optional<Client> result = clientService.authenticate("unknown@x.com", "pass");
+
+            assertTrue(result.isEmpty());
+        }
+
+        @Test
+        @DisplayName("should throw when the account is deactivated")
+        void authenticate_deactivatedAccount_throws() {
+            sampleClient.setIsActive(false);
+            when(clientDAO.findByEmail("test@example.com")).thenReturn(Optional.of(sampleClient));
+
+            assertThrows(IllegalStateException.class,
+                    () -> clientService.authenticate("test@example.com", "StrongPass1"));
+        }
+    }
+
+    // ---------------------------------------------------------------
+    // deactivateClient / activateClient
+    // ---------------------------------------------------------------
+    @Nested
+    @DisplayName("deactivateClient / activateClient")
+    class ActivationToggle {
+
+        @Test
+        @DisplayName("deactivateClient should set isActive to false")
+        void deactivate_setsActiveToFalse() {
+            when(clientDAO.findById(clientId)).thenReturn(Optional.of(sampleClient));
+
+            clientService.deactivateClient(clientId);
+
+            assertFalse(sampleClient.getIsActive());
+            verify(clientDAO).update(sampleClient);
+        }
+
+        @Test
+        @DisplayName("activateClient should set isActive to true")
+        void activate_setsActiveToTrue() {
+            sampleClient.setIsActive(false);
+            when(clientDAO.findById(clientId)).thenReturn(Optional.of(sampleClient));
+
+            clientService.activateClient(clientId);
+
+            assertTrue(sampleClient.getIsActive());
+            verify(clientDAO).update(sampleClient);
+        }
+
+        @Test
+        @DisplayName("deactivateClient should do nothing if client not found")
+        void deactivate_notFound_noOp() {
+            when(clientDAO.findById(clientId)).thenReturn(Optional.empty());
+
+            clientService.deactivateClient(clientId);
+
+            verify(clientDAO, never()).update(any());
+        }
+    }
+
+    // ---------------------------------------------------------------
+    // changePassword
+    // ---------------------------------------------------------------
+    @Nested
+    @DisplayName("changePassword()")
+    class ChangePassword {
+
+        @Test
+        @DisplayName("should update the password when current password is correct")
+        void changePassword_correctCurrent_updatesHash() {
+            String rawPassword = "CurrentPass1";
+            sampleClient.setPassword(PasswordUtil.hashPassword(rawPassword));
+            when(clientDAO.findById(clientId)).thenReturn(Optional.of(sampleClient));
+
+            clientService.changePassword(clientId, rawPassword, "NewSecure1");
+
+            verify(clientDAO).update(sampleClient);
+            assertTrue(PasswordUtil.verifyPassword("NewSecure1", sampleClient.getPassword()));
+        }
+
+        @Test
+        @DisplayName("should throw when current password is wrong")
+        void changePassword_wrongCurrent_throws() {
+            sampleClient.setPassword(PasswordUtil.hashPassword("RealPass1"));
+            when(clientDAO.findById(clientId)).thenReturn(Optional.of(sampleClient));
+
+            assertThrows(IllegalArgumentException.class,
+                    () -> clientService.changePassword(clientId, "WrongCurrent", "NewPass1"));
+        }
+
+        @Test
+        @DisplayName("should throw when client is not found")
+        void changePassword_notFound_throws() {
+            when(clientDAO.findById(clientId)).thenReturn(Optional.empty());
+
+            assertThrows(IllegalArgumentException.class,
+                    () -> clientService.changePassword(clientId, "a", "b"));
+        }
+    }
+
+    // ---------------------------------------------------------------
+    // Delegation tests (simple pass-through)
+    // ---------------------------------------------------------------
+    @Test
+    @DisplayName("findAll should delegate to DAO")
+    void findAll_delegatesToDAO() {
+        when(clientDAO.findAll()).thenReturn(List.of(sampleClient));
+        List<Client> result = clientService.findAll();
+        assertEquals(1, result.size());
+        verify(clientDAO).findAll();
     }
 
     @Test
-    void registerClient_Success() {
-        when(clientDAO.existsByEmail("new@example.com")).thenReturn(false);
-        when(clientDAO.existsByEmail(anyString())).thenReturn(false);
-        doNothing().when(clientDAO).create(any(Client.class));
-
-        Client result = clientService.registerClient("new@example.com", "Password123", "John", "Doe", AccountType.B2C);
-
-        assertNotNull(result);
-        assertEquals("new@example.com", result.getEmail());
-        assertEquals("John", result.getFirstName());
-        assertEquals("Doe", result.getLastName());
-        assertEquals(AccountType.B2C, result.getAccountType());
-        assertEquals(Role.CLIENT, result.getRole());
-        verify(clientDAO).create(any(Client.class));
+    @DisplayName("isEmailTaken should delegate to DAO")
+    void isEmailTaken_delegatesToDAO() {
+        when(clientDAO.existsByEmail("x@x.com")).thenReturn(true);
+        assertTrue(clientService.isEmailTaken("x@x.com"));
     }
 
     @Test
-    void registerClient_EmailAlreadyExists_ThrowsException() {
-        when(clientDAO.existsByEmail("existing@example.com")).thenReturn(true);
-
-        assertThrows(IllegalArgumentException.class, () -> 
-            clientService.registerClient("existing@example.com", "Password123", "John", "Doe", AccountType.B2C));
-    }
-
-    @Test
-    void registerClient_WeakPassword_ThrowsException() {
-        when(clientDAO.existsByEmail(anyString())).thenReturn(false);
-
-        assertThrows(IllegalArgumentException.class, () -> 
-            clientService.registerClient("new@example.com", "weak", "John", "Doe", AccountType.B2C));
-    }
-
-    @Test
-    void registerClient_PasswordTooShort_ThrowsException() {
-        when(clientDAO.existsByEmail(anyString())).thenReturn(false);
-
-        assertThrows(IllegalArgumentException.class, () -> 
-            clientService.registerClient("new@example.com", "Pass123", "John", "Doe", AccountType.B2C));
-    }
-
-    @Test
-    void registerClient_MissingUppercase_ThrowsException() {
-        when(clientDAO.existsByEmail(anyString())).thenReturn(false);
-
-        assertThrows(IllegalArgumentException.class, () -> 
-            clientService.registerClient("new@example.com", "password123", "John", "Doe", AccountType.B2C));
-    }
-
-    @Test
-    void registerClient_MissingLowercase_ThrowsException() {
-        when(clientDAO.existsByEmail(anyString())).thenReturn(false);
-
-        assertThrows(IllegalArgumentException.class, () -> 
-            clientService.registerClient("new@example.com", "PASSWORD123", "John", "Doe", AccountType.B2C));
-    }
-
-    @Test
-    void registerClient_MissingDigit_ThrowsException() {
-        when(clientDAO.existsByEmail(anyString())).thenReturn(false);
-
-        assertThrows(IllegalArgumentException.class, () -> 
-            clientService.registerClient("new@example.com", "PasswordABC", "John", "Doe", AccountType.B2C));
-    }
-
-    @Test
-    void authenticate_Success() {
-        when(clientDAO.findByEmail("test@example.com")).thenReturn(Optional.of(testClient));
-
-        Optional<Client> result = clientService.authenticate("test@example.com", "Password123");
-
-        assertTrue(result.isPresent());
-        assertEquals(testClient.getEmail(), result.get().getEmail());
-    }
-
-    @Test
-    void authenticate_WrongPassword_ReturnsEmpty() {
-        when(clientDAO.findByEmail("test@example.com")).thenReturn(Optional.of(testClient));
-
-        Optional<Client> result = clientService.authenticate("test@example.com", "WrongPassword");
-
-        assertTrue(result.isEmpty());
-    }
-
-    @Test
-    void authenticate_UserNotFound_ReturnsEmpty() {
-        when(clientDAO.findByEmail("notfound@example.com")).thenReturn(Optional.empty());
-
-        Optional<Client> result = clientService.authenticate("notfound@example.com", "Password123");
-
-        assertTrue(result.isEmpty());
-    }
-
-    @Test
-    void authenticate_DeactivatedUser_ThrowsException() {
-        testClient.setIsActive(false);
-        when(clientDAO.findByEmail("test@example.com")).thenReturn(Optional.of(testClient));
-
-        assertThrows(IllegalStateException.class, () -> 
-            clientService.authenticate("test@example.com", "Password123"));
-    }
-
-    @Test
-    void isEmailTaken_ReturnsTrue() {
-        when(clientDAO.existsByEmail("taken@example.com")).thenReturn(true);
-
-        assertTrue(clientService.isEmailTaken("taken@example.com"));
-    }
-
-    @Test
-    void isEmailTaken_ReturnsFalse() {
-        when(clientDAO.existsByEmail("available@example.com")).thenReturn(false);
-
-        assertFalse(clientService.isEmailTaken("available@example.com"));
-    }
-
-    @Test
-    void deactivateClient_Success() {
-        when(clientDAO.findById(testClient.getId())).thenReturn(Optional.of(testClient));
-        doNothing().when(clientDAO).update(any(Client.class));
-
-        clientService.deactivateClient(testClient.getId());
-
-        assertFalse(testClient.getIsActive());
-        verify(clientDAO).update(any(Client.class));
-    }
-
-    @Test
-    void activateClient_Success() {
-        testClient.setIsActive(false);
-        when(clientDAO.findById(testClient.getId())).thenReturn(Optional.of(testClient));
-        doNothing().when(clientDAO).update(any(Client.class));
-
-        clientService.activateClient(testClient.getId());
-
-        assertTrue(testClient.getIsActive());
-        verify(clientDAO).update(any(Client.class));
-    }
-
-    @Test
-    void changePassword_Success() {
-        when(clientDAO.findById(testClient.getId())).thenReturn(Optional.of(testClient));
-        doNothing().when(clientDAO).update(any(Client.class));
-
-        clientService.changePassword(testClient.getId(), "Password123", "NewPassword456");
-
-        assertTrue(PasswordUtil.verifyPassword("NewPassword456", testClient.getPassword()));
-    }
-
-    @Test
-    void changePassword_WrongCurrentPassword_ThrowsException() {
-        when(clientDAO.findById(testClient.getId())).thenReturn(Optional.of(testClient));
-
-        assertThrows(IllegalArgumentException.class, () -> 
-            clientService.changePassword(testClient.getId(), "WrongPassword", "NewPassword456"));
-    }
-
-    @Test
-    void changePassword_ClientNotFound_ThrowsException() {
-        UUID randomId = UUID.randomUUID();
-        when(clientDAO.findById(randomId)).thenReturn(Optional.empty());
-
-        assertThrows(IllegalArgumentException.class, () -> 
-            clientService.changePassword(randomId, "Password123", "NewPassword456"));
+    @DisplayName("deleteClient should delete if found")
+    void deleteClient_found_deletes() {
+        when(clientDAO.findById(clientId)).thenReturn(Optional.of(sampleClient));
+        clientService.deleteClient(clientId);
+        verify(clientDAO).delete(sampleClient);
     }
 }

@@ -154,8 +154,6 @@ class InvoiceServiceTest {
 
     @Test
     void createSubscriptionFromInvoice_Success() {
-        when(invoiceDAO.findById(testInvoice.getId())).thenReturn(Optional.of(testInvoice));
-        doNothing().when(invoiceDAO).update(any(Invoice.class));
         doNothing().when(subscriptionService).create(any(Subscription.class));
 
         Subscription result = invoiceService.createSubscriptionFromInvoice(testInvoice);
@@ -173,8 +171,7 @@ class InvoiceServiceTest {
         testInvoice.setCurrency("EUR");
         testInvoice.setInvoiceDate(LocalDate.of(2024, 1, 15));
         
-        when(invoiceDAO.findById(testInvoice.getId())).thenReturn(Optional.of(testInvoice));
-        doNothing().when(invoiceDAO).update(any(Invoice.class));
+        
         doNothing().when(subscriptionService).create(any(Subscription.class));
 
         Subscription result = invoiceService.createSubscriptionFromInvoice(testInvoice);

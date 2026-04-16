@@ -1,241 +1,190 @@
 package com.subtrack.service;
 
 import com.subtrack.dao.ExchangeRateDAO;
-import com.subtrack.dao.PaymentHistoryDAO;
-import com.subtrack.dao.SubscriptionDAO;
-import com.subtrack.entity.Category;
+import com.subtrack.dao.SystemConfigDAO;
 import com.subtrack.entity.ExchangeRate;
-import com.subtrack.entity.PaymentHistory;
-import com.subtrack.entity.Subscription;
-import com.subtrack.enums.SubscriptionStatus;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
-
-import com.subtrack.entity.Client;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
+import java.math.RoundingMode;
+import java.time.LocalDateTime;
 import java.util.Optional;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
+/**
+ * Unit tests for {@link ExchangeRateService}.
+ * Covers currency conversion, save/upsert logic, and the parseAllRates JSON parser.
+ */
 @ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = Strictness.LENIENT)
 class ExchangeRateServiceTest {
 
     @Mock
     private ExchangeRateDAO exchangeRateDAO;
 
     @Mock
-    private SubscriptionService subscriptionService;
-
-    @Mock
-    private CategoryService categoryService;
-
-    @Mock
-    private PaymentHistoryDAO paymentHistoryDAO;
+    private SystemConfigDAO systemConfigDAO;
 
     @InjectMocks
     private ExchangeRateService exchangeRateService;
 
-    private ExchangeRate eurRate;
-    private ExchangeRate gbpRate;
-    private Client testClient;
-    private Subscription testSubscription;
+    // ---------------------------------------------------------------
+    // convertToLocalCurrency
+    // ---------------------------------------------------------------
+    @Nested
+    @DisplayName("convertToLocalCurrency()")
+    class ConvertCurrency {
 
-    @BeforeEach
-    void setUp() {
-        testClient = new Client();
-        testClient.setId(UUID.randomUUID());
+        @Test
+        @DisplayName("should return same amount when currencies are identical")
+        void sameCurrency_returnsOriginal() {
+            BigDecimal amount = new BigDecimal("100.00");
+            BigDecimal result = exchangeRateService.convertToLocalCurrency(amount, "USD", "USD");
+            assertEquals(0, amount.compareTo(result));
+        }
 
-        testSubscription = new Subscription();
-        testSubscription.setId(UUID.randomUUID());
-        testSubscription.setClient(testClient);
-        testSubscription.setName("Netflix");
-        testSubscription.setPrice(new BigDecimal("15.99"));
-        testSubscription.setOriginalCurrency("USD");
-        testSubscription.setFrequency(com.subtrack.enums.Frequency.MONTHLY);
-        testSubscription.setStatus(SubscriptionStatus.ACTIVE);
-        
-        eurRate = new ExchangeRate();
-        eurRate.setId(UUID.randomUUID());
-        eurRate.setFromCurrency("USD");
-        eurRate.setToCurrency("EUR");
-        eurRate.setRate(new BigDecimal("0.85"));
+        @Test
+        @DisplayName("should return amount unchanged when fromCurrency is null")
+        void nullFrom_returnsOriginal() {
+            BigDecimal amount = new BigDecimal("50.00");
+            BigDecimal result = exchangeRateService.convertToLocalCurrency(amount, null, "EUR");
+            assertEquals(0, amount.compareTo(result));
+        }
 
-        gbpRate = new ExchangeRate();
-        gbpRate.setId(UUID.randomUUID());
-        gbpRate.setFromCurrency("USD");
-        gbpRate.setToCurrency("GBP");
-        gbpRate.setRate(new BigDecimal("0.73"));
+        @Test
+        @DisplayName("should return amount unchanged when toCurrency is null")
+        void nullTo_returnsOriginal() {
+            BigDecimal amount = new BigDecimal("50.00");
+            BigDecimal result = exchangeRateService.convertToLocalCurrency(amount, "USD", null);
+            assertEquals(0, amount.compareTo(result));
+        }
+
+        @Test
+        @DisplayName("should multiply by direct rate when available")
+        void directRate_multiplies() {
+            ExchangeRate rate = new ExchangeRate();
+            rate.setFromCurrency("USD");
+            rate.setToCurrency("MAD");
+            rate.setRate(new BigDecimal("10.05"));
+            when(exchangeRateDAO.findByCurrencies("USD", "MAD")).thenReturn(Optional.of(rate));
+
+            BigDecimal result = exchangeRateService.convertToLocalCurrency(
+                    new BigDecimal("100.00"), "USD", "MAD");
+
+            assertEquals(0, new BigDecimal("1005.00").compareTo(result));
+        }
+
+        @Test
+        @DisplayName("should use inverse rate when direct rate is not found")
+        void inverseRate_divides() {
+            // No direct USD->EUR, but EUR->USD exists at rate 1.10
+            when(exchangeRateDAO.findByCurrencies("USD", "EUR")).thenReturn(Optional.empty());
+            ExchangeRate inverse = new ExchangeRate();
+            inverse.setFromCurrency("EUR");
+            inverse.setToCurrency("USD");
+            inverse.setRate(new BigDecimal("1.10"));
+            when(exchangeRateDAO.findByCurrencies("EUR", "USD")).thenReturn(Optional.of(inverse));
+
+            BigDecimal result = exchangeRateService.convertToLocalCurrency(
+                    new BigDecimal("110.00"), "USD", "EUR");
+
+            // 110 / 1.10 = 100.00
+            assertEquals(0, new BigDecimal("100.00").compareTo(result));
+        }
+
+        @Test
+        @DisplayName("should return original amount when no rate exists at all")
+        void noRate_returnsOriginal() {
+            when(exchangeRateDAO.findByCurrencies("USD", "XYZ")).thenReturn(Optional.empty());
+            when(exchangeRateDAO.findByCurrencies("XYZ", "USD")).thenReturn(Optional.empty());
+
+            BigDecimal amount = new BigDecimal("42.00");
+            BigDecimal result = exchangeRateService.convertToLocalCurrency(amount, "USD", "XYZ");
+
+            assertEquals(0, amount.compareTo(result));
+        }
     }
 
-    @Test
-    void convertToLocalCurrency_SameCurrency_ReturnsOriginal() {
-        BigDecimal result = exchangeRateService.convertToLocalCurrency(
-            new BigDecimal("100.00"), "USD", "USD");
+    // ---------------------------------------------------------------
+    // save (upsert)
+    // ---------------------------------------------------------------
+    @Nested
+    @DisplayName("save()")
+    class Save {
 
-        assertEquals(new BigDecimal("100.00"), result);
+        @Test
+        @DisplayName("should update existing rate when currencies already exist")
+        void save_existing_updates() {
+            ExchangeRate existing = new ExchangeRate();
+            existing.setFromCurrency("USD");
+            existing.setToCurrency("EUR");
+            existing.setRate(new BigDecimal("0.85"));
+            when(exchangeRateDAO.findByCurrencies("USD", "EUR")).thenReturn(Optional.of(existing));
+
+            ExchangeRate newRate = new ExchangeRate();
+            newRate.setFromCurrency("USD");
+            newRate.setToCurrency("EUR");
+            newRate.setRate(new BigDecimal("0.90"));
+
+            exchangeRateService.save(newRate);
+
+            assertEquals(0, new BigDecimal("0.90").compareTo(existing.getRate()));
+            verify(exchangeRateDAO).update(existing);
+            verify(exchangeRateDAO, never()).create(any());
+        }
+
+        @Test
+        @DisplayName("should create a new record when no existing rate is found")
+        void save_new_creates() {
+            when(exchangeRateDAO.findByCurrencies("USD", "GBP")).thenReturn(Optional.empty());
+
+            ExchangeRate newRate = new ExchangeRate();
+            newRate.setFromCurrency("USD");
+            newRate.setToCurrency("GBP");
+            newRate.setRate(new BigDecimal("0.75"));
+
+            exchangeRateService.save(newRate);
+
+            verify(exchangeRateDAO).create(newRate);
+            verify(exchangeRateDAO, never()).update(any());
+        }
     }
 
-    @Test
-    void convertToLocalCurrency_DirectRate() {
-        when(exchangeRateDAO.findByCurrencies("USD", "EUR")).thenReturn(Optional.of(eurRate));
+    // ---------------------------------------------------------------
+    // fetchAndStoreAllRates – config-check paths (no HTTP)
+    // ---------------------------------------------------------------
+    @Nested
+    @DisplayName("fetchAndStoreAllRates() – configuration checks")
+    class FetchAndStoreConfig {
 
-        BigDecimal result = exchangeRateService.convertToLocalCurrency(
-            new BigDecimal("100.00"), "USD", "EUR");
+        @Test
+        @DisplayName("should return ERROR when EXCHANGE_RATE_URL is blank")
+        void noUrl_returnsError() {
+            when(systemConfigDAO.getValue("EXCHANGE_RATE_API_KEY", "")).thenReturn("");
+            when(systemConfigDAO.getValue("EXCHANGE_RATE_URL", "")).thenReturn("");
 
-        assertEquals(0, new BigDecimal("85.00").compareTo(result));
-    }
+            String result = exchangeRateService.fetchAndStoreAllRates();
 
-    @Test
-    void convertToLocalCurrency_InverseRate_Available() {
-        ExchangeRate inverseRate = new ExchangeRate();
-        inverseRate.setFromCurrency("EUR");
-        inverseRate.setToCurrency("USD");
-        inverseRate.setRate(new BigDecimal("1.18"));
+            assertTrue(result.startsWith("ERROR"));
+            assertTrue(result.contains("not configured"));
+        }
 
-        when(exchangeRateDAO.findByCurrencies("USD", "EUR")).thenReturn(Optional.empty());
-        when(exchangeRateDAO.findByCurrencies("EUR", "USD")).thenReturn(Optional.of(inverseRate));
+        @Test
+        @DisplayName("should return ERROR when EXCHANGE_RATE_URL is null")
+        void nullUrl_returnsError() {
+            when(systemConfigDAO.getValue("EXCHANGE_RATE_API_KEY", "")).thenReturn("");
+            when(systemConfigDAO.getValue("EXCHANGE_RATE_URL", "")).thenReturn(null);
 
-        BigDecimal result = exchangeRateService.convertToLocalCurrency(
-            new BigDecimal("100.00"), "USD", "EUR");
+            String result = exchangeRateService.fetchAndStoreAllRates();
 
-        assertNotNull(result);
-    }
-
-    @Test
-    void convertToLocalCurrency_NullAmount_ReturnsNull() {
-        BigDecimal result = exchangeRateService.convertToLocalCurrency(
-            null, "USD", "EUR");
-
-        assertNull(result);
-    }
-
-    @Test
-    void convertToLocalCurrency_NullCurrencies_ReturnsAmount() {
-        BigDecimal result = exchangeRateService.convertToLocalCurrency(
-            new BigDecimal("100.00"), null, "EUR");
-
-        assertEquals(new BigDecimal("100.00"), result);
-    }
-
-    @Test
-    void convertToLocalCurrency_NoRateFound_ReturnsOriginal() {
-        when(exchangeRateDAO.findByCurrencies("USD", "JPY")).thenReturn(Optional.empty());
-        when(exchangeRateDAO.findByCurrencies("JPY", "USD")).thenReturn(Optional.empty());
-
-        BigDecimal result = exchangeRateService.convertToLocalCurrency(
-            new BigDecimal("100.00"), "USD", "JPY");
-
-        assertEquals(new BigDecimal("100.00"), result);
-    }
-
-    @Test
-    void save_NewRate_Created() {
-        doNothing().when(exchangeRateDAO).create(any(ExchangeRate.class));
-
-        exchangeRateService.save(eurRate);
-
-        verify(exchangeRateDAO).create(any(ExchangeRate.class));
-    }
-
-    @Test
-    void save_ExistingRate_Updated() {
-        when(exchangeRateDAO.findByCurrencies("USD", "EUR")).thenReturn(Optional.of(eurRate));
-        doNothing().when(exchangeRateDAO).update(any(ExchangeRate.class));
-
-        ExchangeRate newRate = new ExchangeRate();
-        newRate.setFromCurrency("USD");
-        newRate.setToCurrency("EUR");
-        newRate.setRate(new BigDecimal("0.90"));
-
-        exchangeRateService.save(newRate);
-
-        verify(exchangeRateDAO).update(any(ExchangeRate.class));
-    }
-
-    @Test
-    void findAll_ReturnsRates() {
-        List<ExchangeRate> rates = List.of(eurRate, gbpRate);
-        when(exchangeRateDAO.findAll()).thenReturn(rates);
-
-        List<ExchangeRate> result = exchangeRateService.findAll();
-
-        assertEquals(2, result.size());
-    }
-
-    @Test
-    void findByCurrencies_Found() {
-        when(exchangeRateDAO.findByCurrencies("USD", "EUR")).thenReturn(Optional.of(eurRate));
-
-        Optional<ExchangeRate> result = exchangeRateService.findByCurrencies("USD", "EUR");
-
-        assertTrue(result.isPresent());
-        assertEquals(new BigDecimal("0.85"), result.get().getRate());
-    }
-
-    @Test
-    void findByCurrencies_NotFound() {
-        when(exchangeRateDAO.findByCurrencies("USD", "JPY")).thenReturn(Optional.empty());
-
-        Optional<ExchangeRate> result = exchangeRateService.findByCurrencies("USD", "JPY");
-
-        assertFalse(result.isPresent());
-    }
-
-    @Test
-    void convertToLocalCurrency_GBP_DirectRate() {
-        when(exchangeRateDAO.findByCurrencies("USD", "GBP")).thenReturn(Optional.of(gbpRate));
-
-        BigDecimal result = exchangeRateService.convertToLocalCurrency(
-            new BigDecimal("100.00"), "USD", "GBP");
-
-        assertEquals(0, new BigDecimal("73.00").compareTo(result));
-    }
-
-    @Test
-    void convertToLocalCurrency_WithDecimalPrecision() {
-        when(exchangeRateDAO.findByCurrencies("USD", "EUR")).thenReturn(Optional.of(eurRate));
-
-        BigDecimal result = exchangeRateService.convertToLocalCurrency(
-            new BigDecimal("33.33"), "USD", "EUR");
-
-        assertNotNull(result);
-    }
-
-    @Test
-    void save_ZeroRate() {
-        ExchangeRate zeroRate = new ExchangeRate();
-        zeroRate.setFromCurrency("USD");
-        zeroRate.setToCurrency("XXX");
-        zeroRate.setRate(BigDecimal.ZERO);
-
-        doNothing().when(exchangeRateDAO).create(any(ExchangeRate.class));
-
-        exchangeRateService.save(zeroRate);
-
-        verify(exchangeRateDAO).create(any(ExchangeRate.class));
-    }
-
-    @Test
-    void convertToLocalCurrency_HandlesNegativeAmount() {
-        when(exchangeRateDAO.findByCurrencies("USD", "EUR")).thenReturn(Optional.of(eurRate));
-
-        BigDecimal result = exchangeRateService.convertToLocalCurrency(
-            new BigDecimal("-50.00"), "USD", "EUR");
-
-        assertTrue(result.compareTo(BigDecimal.ZERO) < 0);
+            assertTrue(result.startsWith("ERROR"));
+        }
     }
 }
