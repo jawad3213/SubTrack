@@ -1,6 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="jakarta.faces.html" xmlns:f="jakarta.faces.core"
-    xmlns:ui="jakarta.faces.facelets" xmlns:p="http://primefaces.org/ui">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
 <h:head>
     <f:facet name="first">
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -352,13 +355,13 @@
 </h:head>
 <h:body>
     <div class="header">
-        <a href="#{request.contextPath}/" class="logo">
+        <h:outputLink value="#{request.contextPath}/" styleClass="logo">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#185FA5" stroke-width="2"
                 stroke-linecap="round" stroke-linejoin="round" style="margin-right:2px">
                 <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
             </svg>
             Sub<span>Track</span>
-        </a>
+        </h:outputLink>
         <div class="nav-links">
             <a href="#">Products</a>
             <a href="#">Use Cases</a>
@@ -368,8 +371,8 @@
             <a href="#" style="font-weight:600">Pricing</a>
         </div>
         <div class="nav-actions">
-            <a href="#{request.contextPath}/login.xhtml" class="btn-login">Login</a>
-            <a href="#{request.contextPath}/register.xhtml" class="btn-primary">Get Started Free</a>
+            <h:outputLink value="#{request.contextPath}/login.xhtml" styleClass="btn-login">Login</h:outputLink>
+            <h:outputLink value="#{request.contextPath}/register.xhtml" styleClass="btn-primary">Get Started Free</h:outputLink>
         </div>
     </div>
 
@@ -379,7 +382,7 @@
             <h1 class="hero-title">Take Control of Your SaaS and <span>Optimize Costs In Real-Time</span></h1>
             <p class="hero-desc">AI-ready analytics and automation by design.</p>
             <div class="hero-buttons">
-                <a href="#{request.contextPath}/register.xhtml" class="btn-primary btn-large">Start Building</a>
+                <h:outputLink value="#{request.contextPath}/register.xhtml" styleClass="btn-primary btn-large">Start Building</h:outputLink>
                 <a href="#learn-more" class="btn-primary btn-secondary btn-large">Learn More</a>
             </div>
         </div>
