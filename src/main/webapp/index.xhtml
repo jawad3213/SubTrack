@@ -1,9 +1,6 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="jakarta.faces.html"
-      xmlns:f="jakarta.faces.core"
-      xmlns:ui="jakarta.faces.facelets"
-      xmlns:p="http://primefaces.org/ui">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="jakarta.faces.html" xmlns:f="jakarta.faces.core"
+    xmlns:ui="jakarta.faces.facelets" xmlns:p="http://primefaces.org/ui">
 <h:head>
     <f:facet name="first">
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -12,77 +9,354 @@
         <meta name="apple-mobile-web-app-capable" content="yes" />
     </f:facet>
     <title>SubTrack - The Leading Subscription Intelligence Platform</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap"
+        rel="stylesheet" />
     <style>
-        body { margin: 0; padding: 0; font-family: 'Inter', sans-serif; overflow-x: hidden; color: #1e293b; background: white; }
-        .header { display: flex; justify-content: space-between; align-items: center; padding: 1.2rem 4rem; border-bottom: 1px solid #e2e8f0; background: white; position: relative; z-index: 10; }
-        .logo { font-size: 1.8rem; font-weight: 700; color: #042C53; display: flex; align-items: center; gap: 0.5rem; text-decoration: none; letter-spacing:-0.5px;}
-        .logo span { color: #185FA5; }
-        
-        .nav-links { display: flex; gap: 2.5rem; }
-        .nav-links a { text-decoration: none; color: #475569; font-weight: 500; font-size: 1rem; transition: color 0.2s; display:flex; align-items:center; gap: 0.2rem;}
-        .nav-links a:hover { color: #185FA5; }
-        .nav-links a::after { content: " ⌄"; font-size: 0.8em; margin-top:-2px;}
-        
-        .nav-actions { display: flex; gap: 1.5rem; align-items: center; }
-        .btn-login { text-decoration: none; color: #042C53; font-weight: 600; font-size: 1rem; transition: color 0.2s; }
-        .btn-login:hover { color: #185FA5; }
-        .btn-primary { background: #185FA5; color: white; padding: 0.7rem 1.8rem; border-radius: 6px; text-decoration: none; font-weight: 600; transition: all 0.2s; border: none; cursor:pointer;}
-        .btn-primary:hover { background: #0C447C; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(24,95,165,0.2);}
-        
-        .hero-section { display: flex; height: calc(100vh - 84px); position: relative; overflow: hidden; align-items: center; }
-        
-        .hero-content { flex: 1; padding: 0 2rem 0 6rem; max-width: 650px; z-index: 2; margin-top: -5vh;}
-        .hero-subtitle { font-size: 0.85rem; font-weight: 700; color: #185FA5; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 1.5rem; display: block; }
-        .hero-title { font-size: 3.8rem; font-weight: 700; line-height: 1.15; color: #0f172a; margin-bottom: 1.5rem; letter-spacing: -1px; }
-        .hero-title span { color: #27500A; } /* Reusing success green from app */
-        .hero-desc { font-size: 1.3rem; font-weight: 500; color: #1e293b; margin-bottom: 2.5rem; }
-        
-        .hero-buttons { display: flex; gap: 1rem; }
-        .btn-large { padding: 0.9rem 2.2rem; font-size: 1.1rem; border-radius: 4px; }
-        .btn-secondary { background: white; color: #185FA5; border: 1.5px solid #185FA5; }
-        .btn-secondary:hover { background: #f4f7fe; transform: translateY(-1px); }
-        
-        /* The Wave / Graphic container */
-        .hero-graphic { flex: 1.2; position: relative; height: 100%; display: flex; align-items: center; justify-content: flex-end; }
-        .wave-bg { position: absolute; right: 0; top: 0; bottom: 0; width: 110%; background: #0f172a; border-radius: 50% 0 0 50% / 50% 0 0 50%; overflow: hidden; box-shadow: -15px 0 40px rgba(0,0,0,0.15); transform: translateX(5%); }
-        .dashboard-img { width: 100%; height: 100%; object-fit: cover; opacity: 0.95; mix-blend-mode: screen; filter: contrast(1.1) saturate(1.2); }
-        
-        /* Floating interactive elements layered on the image */
-        .ui-element { position: absolute; z-index: 3; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); transition: transform 0.4s ease; cursor: pointer; }
-        .ui-element:hover { transform: translateY(-5px) scale(1.02); }
-        
-        .ui-card-1 { top: 20%; left: 5%; padding: 1.5rem; width: 220px; animation: float 6s ease-in-out infinite; }
-        .ui-card-2 { bottom: 15%; right: 15%; padding: 1.5rem; width: 280px; animation: float 7s ease-in-out infinite reverse; }
-        
-        .circle-pulse { width: 45px; height: 45px; border-radius: 50%; border: 3px solid #185FA5; border-top-color: transparent; animation: spin 1.5s linear infinite; margin-bottom: 15px;}
-        .line-mock { height: 6px; background: rgba(255,255,255,0.15); border-radius: 3px; margin-bottom: 10px; width: 100%; }
-        .line-mock.short { width: 60%; }
-        .line-mock.green { background: #639922; }
-        
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-15px); } 100% { transform: translateY(0px); } }
-        
-        @media (max-width: 1100px) {
-            .hero-title { font-size: 3rem; }
-            .hero-content { padding-left: 4rem; }
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            color: #1e293b;
+            background: white;
         }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.2rem 4rem;
+            border-bottom: 1px solid #e2e8f0;
+            background: white;
+            position: relative;
+            z-index: 10;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #042C53;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+
+        .logo span {
+            color: #185FA5;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #475569;
+            font-weight: 500;
+            font-size: 1rem;
+            transition: color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.2rem;
+        }
+
+        .nav-links a:hover {
+            color: #185FA5;
+        }
+
+        .nav-links a::after {
+            content: " ⌄";
+            font-size: 0.8em;
+            margin-top: -2px;
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .btn-login {
+            text-decoration: none;
+            color: #042C53;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: color 0.2s;
+        }
+
+        .btn-login:hover {
+            color: #185FA5;
+        }
+
+        .btn-primary {
+            background: #185FA5;
+            color: white;
+            padding: 0.7rem 1.8rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            background: #0C447C;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(24, 95, 165, 0.2);
+        }
+
+        .hero-section {
+            display: flex;
+            height: calc(100vh - 84px);
+            position: relative;
+            overflow: hidden;
+            align-items: center;
+        }
+
+        .hero-content {
+            flex: 1;
+            padding: 0 2rem 0 6rem;
+            max-width: 650px;
+            z-index: 2;
+            margin-top: -5vh;
+        }
+
+        .hero-subtitle {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #185FA5;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 1.5rem;
+            display: block;
+        }
+
+        .hero-title {
+            font-size: 3.8rem;
+            font-weight: 700;
+            line-height: 1.15;
+            color: #0f172a;
+            margin-bottom: 1.5rem;
+            letter-spacing: -1px;
+        }
+
+        .hero-title span {
+            color: #27500A;
+        }
+
+        /* Reusing success green from app */
+        .hero-desc {
+            font-size: 1.3rem;
+            font-weight: 500;
+            color: #1e293b;
+            margin-bottom: 2.5rem;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-large {
+            padding: 0.9rem 2.2rem;
+            font-size: 1.1rem;
+            border-radius: 4px;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #185FA5;
+            border: 1.5px solid #185FA5;
+        }
+
+        .btn-secondary:hover {
+            background: #f4f7fe;
+            transform: translateY(-1px);
+        }
+
+        /* The Wave / Graphic container */
+        .hero-graphic {
+            flex: 1.2;
+            position: relative;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+        }
+
+        .wave-bg {
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 110%;
+            background: #0f172a;
+            border-radius: 50% 0 0 50% / 50% 0 0 50%;
+            overflow: hidden;
+            box-shadow: -15px 0 40px rgba(0, 0, 0, 0.15);
+            transform: translateX(5%);
+        }
+
+        .dashboard-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.95;
+            mix-blend-mode: screen;
+            filter: contrast(1.1) saturate(1.2);
+        }
+
+        /* Floating interactive elements layered on the image */
+        .ui-element {
+            position: absolute;
+            z-index: 3;
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: transform 0.4s ease;
+            cursor: pointer;
+        }
+
+        .ui-element:hover {
+            transform: translateY(-5px) scale(1.02);
+        }
+
+        .ui-card-1 {
+            top: 20%;
+            left: 5%;
+            padding: 1.5rem;
+            width: 220px;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .ui-card-2 {
+            bottom: 15%;
+            right: 15%;
+            padding: 1.5rem;
+            width: 280px;
+            animation: float 7s ease-in-out infinite reverse;
+        }
+
+        .circle-pulse {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: 3px solid #185FA5;
+            border-top-color: transparent;
+            animation: spin 1.5s linear infinite;
+            margin-bottom: 15px;
+        }
+
+        .line-mock {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 3px;
+            margin-bottom: 10px;
+            width: 100%;
+        }
+
+        .line-mock.short {
+            width: 60%;
+        }
+
+        .line-mock.green {
+            background: #639922;
+        }
+
+        @keyframes spin {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-15px);
+            }
+
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        @media (max-width: 1100px) {
+            .hero-title {
+                font-size: 3rem;
+            }
+
+            .hero-content {
+                padding-left: 4rem;
+            }
+        }
+
         @media (max-width: 992px) {
-            .header { padding: 1rem 2rem; }
-            .nav-links { display: none; }
-            .hero-section { flex-direction: column; height: auto; }
-            .hero-content { padding: 4rem 2rem; text-align: center; max-width: 100%; margin-top:0;}
-            .hero-buttons { justify-content: center; }
-            .hero-graphic { width: 100%; height: 60vh; min-height: 500px; justify-content: center;}
-            .wave-bg { width: 150%; border-radius: 50% 50% 0 0 / 20% 20% 0 0; transform: translateX(0) translateY(10%); right: auto; top: auto; bottom: -20%; left: -25%; height: 120%; }
-            .ui-card-1 { top: 10%; left: 50%; transform: translateX(-50%); }
+            .header {
+                padding: 1rem 2rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .hero-section {
+                flex-direction: column;
+                height: auto;
+            }
+
+            .hero-content {
+                padding: 4rem 2rem;
+                text-align: center;
+                max-width: 100%;
+                margin-top: 0;
+            }
+
+            .hero-buttons {
+                justify-content: center;
+            }
+
+            .hero-graphic {
+                width: 100%;
+                height: 60vh;
+                min-height: 500px;
+                justify-content: center;
+            }
+
+            .wave-bg {
+                width: 150%;
+                border-radius: 50% 50% 0 0 / 20% 20% 0 0;
+                transform: translateX(0) translateY(10%);
+                right: auto;
+                top: auto;
+                bottom: -20%;
+                left: -25%;
+                height: 120%;
+            }
+
+            .ui-card-1 {
+                top: 10%;
+                left: 50%;
+                transform: translateX(-50%);
+            }
         }
     </style>
 </h:head>
 <h:body>
     <div class="header">
         <a href="#{request.contextPath}/" class="logo">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#185FA5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:2px"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#185FA5" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" style="margin-right:2px">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+            </svg>
             Sub<span>Track</span>
         </a>
         <div class="nav-links">
@@ -98,7 +372,7 @@
             <a href="#{request.contextPath}/register.xhtml" class="btn-primary">Get Started Free</a>
         </div>
     </div>
-    
+
     <div class="hero-section">
         <div class="hero-content">
             <span class="hero-subtitle">THE WORLD'S LEADING SUBSCRIPTION PLATFORM</span>
@@ -112,24 +386,34 @@
         <div class="hero-graphic">
             <div class="wave-bg">
                 <!-- Fallback background gradient if image fails to load -->
-                <div style="position:absolute; width:100%; height:100%; background:linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #4338ca 100%); opacity:0.5; z-index:-1;"></div>
-                
-                <img src="#{resource['images/hero_dashboard.png']}" alt="Dashboard Mockup" class="dashboard-img" onerror="this.style.opacity='0.2';" />
+                <div
+                    style="position:absolute; width:100%; height:100%; background:linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #4338ca 100%); opacity:0.5; z-index:-1;">
+                </div>
+
+                <img src="#{resource['images/hero_dashboard.png']}" alt="Dashboard Mockup" class="dashboard-img"
+                    onerror="this.style.opacity='0.2';" />
             </div>
-            
+
             <div class="ui-element ui-card-1">
-                <div style="font-size: 11px; color:#94a3b8; font-weight:600; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px;">Auto Sync</div>
+                <div
+                    style="font-size: 11px; color:#94a3b8; font-weight:600; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px;">
+                    Auto Sync</div>
                 <div class="circle-pulse"></div>
                 <div class="line-mock"></div>
                 <div class="line-mock short"></div>
             </div>
-            
+
             <div class="ui-element ui-card-2" style="display:flex; align-items:center; gap: 15px;">
-                <div style="width:50px; height:50px; border-radius:8px; background:rgba(99,153,34,0.2); display:flex; align-items:center; justify-content:center;">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#639922" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                <div
+                    style="width:50px; height:50px; border-radius:8px; background:rgba(99,153,34,0.2); display:flex; align-items:center; justify-content:center;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#639922" stroke-width="2">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
                 </div>
                 <div style="flex:1;">
-                    <div style="font-size: 14px; color:white; font-weight:600; margin-bottom:4px;">Savings Detected</div>
+                    <div style="font-size: 14px; color:white; font-weight:600; margin-bottom:4px;">Savings Detected
+                    </div>
                     <div class="line-mock green" style="width: 80%;"></div>
                     <div style="font-size: 11px; color:#94a3b8;">$1,240 / year optimized</div>
                 </div>
@@ -137,4 +421,5 @@
         </div>
     </div>
 </h:body>
+
 </html>
