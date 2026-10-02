@@ -6,12 +6,14 @@
     
     <display-name>SubTrack - SaaS Subscription Management</display-name>
 
+    <!-- Credentials come from environment variables. WildFly only resolves ${...}
+         here when spec-descriptor-property-replacement is enabled (see wildfly/enable-property-replacement.cli). -->
     <data-source>
         <name>java:global/SubtrackDS</name>
         <class-name>org.postgresql.ds.PGSimpleDataSource</class-name>
-        <url>jdbc:postgresql://localhost:5432/subtrack</url>
-        <user>postgres</user>
-        <password>12345</password>
+        <url>${env.SUBTRACK_DB_URL:jdbc:postgresql://localhost:5432/subtrack}</url>
+        <user>${env.SUBTRACK_DB_USER:postgres}</user>
+        <password>${env.SUBTRACK_DB_PASSWORD}</password>
     </data-source>
     
     <!-- Jakarta Faces Configuration -->
@@ -27,17 +29,19 @@
     
     <!-- Welcome Files -->
     <welcome-file-list>
-        <welcome-file>login.xhtml</welcome-file>
+        <welcome-file>index.xhtml</welcome-file>
     </welcome-file-list>
     
     <!-- Session Configuration -->
-    <!-- Note: Set <secure>true</secure> before deploying to production -->
+    <!-- Session cookie is HTTPS-only by default. For plain-HTTP local runs (other than localhost),
+         set SUBTRACK_SECURE_COOKIES=false. -->
     <session-config>
         <session-timeout>30</session-timeout>
         <cookie-config>
             <http-only>true</http-only>
-            <secure>false</secure>
+            <secure>${env.SUBTRACK_SECURE_COOKIES:true}</secure>
         </cookie-config>
+        <tracking-mode>COOKIE</tracking-mode>
     </session-config>
     
     <!-- JSF State Saving -->
@@ -46,11 +50,10 @@
         <param-value>server</param-value>
     </context-param>
     
-    <!-- Project Stage (Development/Production) -->
-    <!-- Note: Switch to Production before deploying to production -->
+    <!-- Project Stage: Production unless SUBTRACK_PROJECT_STAGE=Development is set -->
     <context-param>
         <param-name>jakarta.faces.PROJECT_STAGE</param-name>
-        <param-value>Development</param-value>
+        <param-value>${env.SUBTRACK_PROJECT_STAGE:Production}</param-value>
     </context-param>
     
     <!-- Default Resource Bundle -->

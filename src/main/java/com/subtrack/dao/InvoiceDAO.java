@@ -20,7 +20,7 @@ public interface InvoiceDAO {
     
     List<Invoice> findByClientId(UUID clientId);
     
-    List<Invoice> findUnprocessedInvoices();
+    List<Invoice> findUnprocessedInvoices(int maxParseAttempts);
     
     List<Invoice> findByDateRange(LocalDate startDate, LocalDate endDate);
 }

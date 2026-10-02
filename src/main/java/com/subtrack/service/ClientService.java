@@ -4,9 +4,11 @@ import com.subtrack.dao.ClientDAO;
 import com.subtrack.entity.Client;
 import com.subtrack.enums.AccountType;
 import com.subtrack.enums.Role;
+import com.subtrack.exception.UserFacingException;
 import com.subtrack.util.PasswordUtil;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -14,17 +16,19 @@ import java.util.UUID;
 @ApplicationScoped
 public class ClientService {
 
+    private static final long PASSWORD_RESET_VALIDITY_MINUTES = 60;
+
     @Inject
     private ClientDAO clientDAO;
 
     public Client registerClient(String email, String password, String firstName, 
                                   String lastName, AccountType accountType) {
         if (clientDAO.existsByEmail(email)) {
-            throw new IllegalArgumentException("Email already registered");
+            throw new UserFacingException("Email already registered");
         }
         
         if (!PasswordUtil.isPasswordStrong(password)) {
-            throw new IllegalArgumentException("Password must be at least 8 characters with uppercase, lowercase, and digits");
+            throw new UserFacingException("Password must be at least 8 characters with uppercase, lowercase, and digits");
         }
         
         Client client = new Client();
@@ -40,29 +44,19 @@ public class ClientService {
         return client;
     }
 
+    /**
+     * Returns the client if the credentials match. The deactivated-account message is only
+     * given after a correct password, so it can't be used to discover which emails exist.
+     */
     public Optional<Client> authenticate(String email, String password) {
-        System.out.println(">>> ClientService.authenticate called for email: " + email);
         Optional<Client> clientOpt = clientDAO.findByEmail(email);
-        
-        System.out.println(">>> Client found in DB: " + clientOpt.isPresent());
-        if (clientOpt.isEmpty()) {
+        if (clientOpt.isEmpty() || !PasswordUtil.verifyPassword(password, clientOpt.get().getPassword())) {
             return Optional.empty();
         }
-        
-        Client client = clientOpt.get();
-        
-        if (client.getIsActive() == null || !client.getIsActive()) {
-            System.out.println(">>> Client account is deactivated");
-            throw new IllegalStateException("Account is deactivated");
+        if (!Boolean.TRUE.equals(clientOpt.get().getIsActive())) {
+            throw new UserFacingException("Account is deactivated");
         }
-        
-        boolean pwMatch = PasswordUtil.verifyPassword(password, client.getPassword());
-        System.out.println(">>> Password match: " + pwMatch);
-        if (pwMatch) {
-            return Optional.of(client);
-        }
-        
-        return Optional.empty();
+        return clientOpt;
     }
 
     public Optional<Client> findById(UUID id) {
@@ -77,16 +71,8 @@ public class ClientService {
         return clientDAO.findAll();
     }
 
-    public List<Client> findAdmins() {
-        return clientDAO.findByRole(Role.ADMIN);
-    }
-
     public List<Client> findActiveClients() {
         return clientDAO.findActiveClients();
-    }
-
-    public void updateClient(Client client) {
-        clientDAO.update(client);
     }
 
     public void deactivateClient(UUID id) {
@@ -107,10 +93,6 @@ public class ClientService {
         clientDAO.findById(id).ifPresent(clientDAO::delete);
     }
 
-    public boolean isEmailTaken(String email) {
-        return clientDAO.existsByEmail(email);
-    }
-    
     public void update(Client client) {
         clientDAO.update(client);
     }
@@ -123,7 +105,7 @@ public class ClientService {
         
         Client client = clientOpt.get();
         if (!PasswordUtil.verifyPassword(currentPassword, client.getPassword())) {
-            throw new IllegalArgumentException("Current password is incorrect");
+            throw new UserFacingException("Current password is incorrect");
         }
         
         client.setPassword(PasswordUtil.hashPassword(newPassword));
@@ -149,5 +131,48 @@ public class ClientService {
     
     public void deleteAccount(UUID clientId) {
         clientDAO.findById(clientId).ifPresent(clientDAO::delete);
+    }
+
+    /**
+     * Issues a single-use reset token for an active account. The user's current password
+     * stays valid until the token is actually used. Returns the raw token to email,
+     * or empty if no active account has this email.
+     */
+    public Optional<String> createPasswordResetToken(String email) {
+        Optional<Client> clientOpt = clientDAO.findByEmail(email);
+        if (clientOpt.isEmpty() || !Boolean.TRUE.equals(clientOpt.get().getIsActive())) {
+            return Optional.empty();
+        }
+        Client client = clientOpt.get();
+        String token = PasswordUtil.generateRandomToken();
+        client.setPasswordResetTokenHash(PasswordUtil.sha256Hex(token));
+        client.setPasswordResetExpiresAt(LocalDateTime.now().plusMinutes(PASSWORD_RESET_VALIDITY_MINUTES));
+        clientDAO.update(client);
+        return Optional.of(token);
+    }
+
+    public boolean isPasswordResetTokenValid(String token) {
+        return findClientByValidResetToken(token).isPresent();
+    }
+
+    public void resetPasswordWithToken(String token, String newPassword) {
+        Client client = findClientByValidResetToken(token)
+            .orElseThrow(() -> new UserFacingException("This reset link is invalid or has expired"));
+        if (!PasswordUtil.isPasswordStrong(newPassword)) {
+            throw new UserFacingException("Password must be at least 8 characters with uppercase, lowercase, and digits");
+        }
+        client.setPassword(PasswordUtil.hashPassword(newPassword));
+        client.setPasswordResetTokenHash(null);
+        client.setPasswordResetExpiresAt(null);
+        clientDAO.update(client);
+    }
+
+    private Optional<Client> findClientByValidResetToken(String token) {
+        if (token == null || token.isBlank()) {
+            return Optional.empty();
+        }
+        return clientDAO.findByPasswordResetTokenHash(PasswordUtil.sha256Hex(token))
+            .filter(c -> c.getPasswordResetExpiresAt() != null
+                && c.getPasswordResetExpiresAt().isAfter(LocalDateTime.now()));
     }
 }

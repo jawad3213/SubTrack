@@ -19,6 +19,10 @@ import java.util.UUID;
 @ApplicationScoped
 public class InvoiceService {
 
+    static final int MAX_PARSE_ATTEMPTS = 5;
+
+    private static final org.slf4j.Logger LOGGER = org.slf4j.LoggerFactory.getLogger(InvoiceService.class);
+
     @Inject
     private InvoiceDAO invoiceDAO;
     
@@ -90,12 +94,8 @@ public class InvoiceService {
     
     @Transactional
     public Subscription createSubscriptionFromInvoice(Invoice invoice) {
-        System.out.println(">>> InvoiceService: createSubscriptionFromInvoice called.");
-        System.out.println(">>>   serviceName=" + invoice.getServiceName() 
-            + ", amount=" + invoice.getAmount() 
-            + ", currency=" + invoice.getCurrency()
-            + ", date=" + invoice.getInvoiceDate()
-            + ", isProcessed=" + invoice.getIsProcessed());
+        LOGGER.info("InvoiceService: createSubscriptionFromInvoice called.");
+        LOGGER.info("serviceName=" + invoice.getServiceName() + ", amount=" + invoice.getAmount() + ", currency=" + invoice.getCurrency() + ", date=" + invoice.getInvoiceDate() + ", isProcessed=" + invoice.getIsProcessed());
 
         // Only call the AI if essential fields are truly missing.
         // This avoids burning Gemini quota when data was already parsed during sync.
@@ -103,7 +103,7 @@ public class InvoiceService {
                             && invoice.getAmount() == null;
 
         if (needsParsing && invoice.getRawContent() != null && !invoice.getRawContent().isBlank()) {
-            System.out.println(">>> InvoiceService: Both serviceName and amount are missing. Attempting AI parsing...");
+            LOGGER.info("InvoiceService: Both serviceName and amount are missing. Attempting AI parsing...");
             try {
                 // Call Gemini directly (NOT through @Transactional parseInvoiceEmail)
                 // to avoid nested transaction rollback issues
@@ -113,12 +113,12 @@ public class InvoiceService {
                     if (result.getAmount() != null) invoice.setAmount(result.getAmount());
                     if (result.getCurrency() != null) invoice.setCurrency(result.getCurrency());
                     if (result.getInvoiceDate() != null) invoice.setInvoiceDate(result.getInvoiceDate());
-                    System.out.println(">>> InvoiceService: AI parsing succeeded: " + result.getServiceName());
+                    LOGGER.info("InvoiceService: AI parsing succeeded: " + result.getServiceName());
                 } else {
-                    System.err.println(">>> InvoiceService: AI parsing returned failure: " + result.getErrorMessage());
+                    LOGGER.warn("InvoiceService: AI parsing returned failure: " + result.getErrorMessage());
                 }
             } catch (Exception e) {
-                System.err.println(">>> InvoiceService: AI parsing failed (quota?), will use fallback values. Error: " + e.getMessage());
+                LOGGER.warn("InvoiceService: AI parsing failed (quota?), will use fallback values. Error", e);
             }
         }
 
@@ -148,7 +148,7 @@ public class InvoiceService {
         subscription.setStartDate(startDate);
         
         subscriptionService.create(subscription);
-        System.out.println(">>> InvoiceService: Subscription created for '" + name + "' — " + amount + " " + currency);
+        LOGGER.info("InvoiceService: Subscription created for '" + name + "' — " + amount + " " + currency);
         
         // Mark invoice as processed
         invoice.setIsProcessed(true);
@@ -157,37 +157,49 @@ public class InvoiceService {
         return subscription;
     }
     
+    /** Unprocessed invoices that haven't used up their AI parsing attempts yet. */
     public List<Invoice> getUnprocessedInvoices() {
-        return invoiceDAO.findUnprocessedInvoices();
+        return invoiceDAO.findUnprocessedInvoices(MAX_PARSE_ATTEMPTS);
     }
     
     @Transactional
     public void parseInvoiceEmail(Invoice invoice) {
         if (invoice == null || invoice.getRawContent() == null || invoice.getRawContent().isBlank()) {
-            System.err.println(">>> InvoiceService: Cannot parse invoice - no raw content.");
+            LOGGER.warn("InvoiceService: Cannot parse invoice - no raw content.");
             return;
         }
 
-        GeminiService.InvoiceParseResult result = geminiService.extractInvoiceData(invoice.getRawContent());
-
-        if (result.isSuccess()) {
-            if (result.getServiceName() != null) {
-                invoice.setServiceName(result.getServiceName());
-            }
-            if (result.getAmount() != null) {
-                invoice.setAmount(result.getAmount());
-            }
-            if (result.getCurrency() != null) {
-                invoice.setCurrency(result.getCurrency());
-            }
-            if (result.getInvoiceDate() != null) {
-                invoice.setInvoiceDate(result.getInvoiceDate());
-            }
-            invoice.setIsProcessed(true);
-            invoiceDAO.update(invoice);
-            System.out.println(">>> InvoiceService: Successfully parsed invoice - " + invoice.getServiceName() + " | " + invoice.getAmount() + " " + invoice.getCurrency());
-        } else {
-            System.err.println(">>> InvoiceService: AI parsing failed - " + result.getErrorMessage());
+        GeminiService.InvoiceParseResult result;
+        try {
+            result = geminiService.extractInvoiceData(invoice.getRawContent());
+        } catch (RuntimeException e) {
+            LOGGER.warn("Gemini call failed for invoice {}", invoice.getId(), e);
+            result = null;
         }
+
+        if (result == null || !result.isSuccess()) {
+            // Count the failure so the scheduler stops retrying (and spending Gemini quota) after MAX_PARSE_ATTEMPTS.
+            invoice.setParseAttempts(invoice.getParseAttempts() + 1);
+            invoiceDAO.update(invoice);
+            LOGGER.warn("AI parsing failed for invoice {} (attempt {}/{}): {}", invoice.getId(),
+                invoice.getParseAttempts(), MAX_PARSE_ATTEMPTS, result != null ? result.getErrorMessage() : "exception");
+            return;
+        }
+
+        if (result.getServiceName() != null) {
+            invoice.setServiceName(result.getServiceName());
+        }
+        if (result.getAmount() != null) {
+            invoice.setAmount(result.getAmount());
+        }
+        if (result.getCurrency() != null) {
+            invoice.setCurrency(result.getCurrency());
+        }
+        if (result.getInvoiceDate() != null) {
+            invoice.setInvoiceDate(result.getInvoiceDate());
+        }
+        invoice.setIsProcessed(true);
+        invoiceDAO.update(invoice);
+        LOGGER.info("InvoiceService: Successfully parsed invoice - " + invoice.getServiceName() + " | " + invoice.getAmount() + " " + invoice.getCurrency());
     }
 }

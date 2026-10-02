@@ -1,25 +1,31 @@
 package com.subtrack.enums;
 
+import java.time.LocalDate;
+
 public enum Frequency {
-    WEEKLY("Weekly", 7),
-    MONTHLY("Monthly", 30),
-    QUARTERLY("Quarterly", 90),
-    ANNUAL("Annual", 365);
+    WEEKLY("Weekly"),
+    MONTHLY("Monthly"),
+    QUARTERLY("Quarterly"),
+    ANNUAL("Annual");
 
     private final String displayName;
-    private final int days;
 
-    Frequency(String displayName, int days) {
+    Frequency(String displayName) {
         this.displayName = displayName;
-        this.days = days;
     }
 
     public String getDisplayName() {
         return displayName;
     }
 
-    public int getDays() {
-        return days;
+    /** The date {@code periods} billing periods after {@code start} (computed from start, so month ends don't drift). */
+    public LocalDate addPeriods(LocalDate start, long periods) {
+        return switch (this) {
+            case WEEKLY -> start.plusWeeks(periods);
+            case MONTHLY -> start.plusMonths(periods);
+            case QUARTERLY -> start.plusMonths(3 * periods);
+            case ANNUAL -> start.plusYears(periods);
+        };
     }
 
     public double getMonthlyMultiplier() {

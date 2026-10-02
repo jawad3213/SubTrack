@@ -23,6 +23,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -151,27 +152,6 @@ class AlertServiceTest {
     }
 
     @Test
-    void getActiveAlerts_ReturnsActive() {
-        List<AlertRule> activeAlerts = List.of(testAlert);
-        when(alertRuleDAO.findActiveAlertRules()).thenReturn(activeAlerts);
-
-        List<AlertRule> result = alertService.getActiveAlerts();
-
-        assertEquals(1, result.size());
-        assertTrue(result.get(0).getIsActive());
-    }
-
-    @Test
-    void getAlertsDueSoon_ReturnsDueAlerts() {
-        List<AlertRule> dueAlerts = List.of(testAlert);
-        when(alertRuleDAO.findAlertsDueSoon(3)).thenReturn(dueAlerts);
-
-        List<AlertRule> result = alertService.getAlertsDueSoon(3);
-
-        assertEquals(1, result.size());
-    }
-
-    @Test
     void sendEmailNotification_Success() {
         doNothing().when(emailService).sendEmail(anyString(), anyString(), anyString());
         doNothing().when(notificationLogDAO).create(any());
@@ -221,5 +201,33 @@ class AlertServiceTest {
         verify(alertRuleDAO).create(argThat(alert -> 
             alert.getTimingDays() == 0
         ));
+    }
+
+    @Test
+    void checkAndSendAlerts_sendsOnlyOnTheConfiguredDay() {
+        LocalDate today = LocalDate.of(2026, 1, 10);
+        testSubscription.setNextBillingDate(today.plusDays(3)); // timingDays = 3
+        when(alertRuleDAO.findActiveAlertRules()).thenReturn(List.of(testAlert));
+
+        alertService.checkAndSendAlerts(today);
+        verify(emailService, times(1)).sendEmail(eq("test@example.com"), any(), any());
+
+        // One day later the billing date is only 2 days away: no repeat reminder
+        alertService.checkAndSendAlerts(today.plusDays(1));
+        // ...and none after the billing date has passed
+        alertService.checkAndSendAlerts(today.plusDays(10));
+        verify(emailService, times(1)).sendEmail(any(), any(), any());
+    }
+
+    @Test
+    void checkAndSendAlerts_skipsInactiveSubscriptions() {
+        LocalDate today = LocalDate.of(2026, 1, 10);
+        testSubscription.setNextBillingDate(today.plusDays(3));
+        testSubscription.setStatus(SubscriptionStatus.PAUSED);
+        when(alertRuleDAO.findActiveAlertRules()).thenReturn(List.of(testAlert));
+
+        alertService.checkAndSendAlerts(today);
+
+        verifyNoInteractions(emailService);
     }
 }

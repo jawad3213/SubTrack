@@ -3,7 +3,6 @@ package com.subtrack.dao;
 import com.subtrack.entity.NotificationLog;
 import com.subtrack.enums.AlertChannel;
 import java.util.List;
-import java.util.UUID;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;

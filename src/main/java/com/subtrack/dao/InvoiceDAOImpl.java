@@ -56,10 +56,11 @@ public class InvoiceDAOImpl implements InvoiceDAO {
     }
 
     @Override
-    public List<Invoice> findUnprocessedInvoices() {
+    public List<Invoice> findUnprocessedInvoices(int maxParseAttempts) {
         TypedQuery<Invoice> query = em.createQuery(
-            "SELECT i FROM Invoice i WHERE i.isProcessed = false ORDER BY i.createdAt ASC", 
+            "SELECT i FROM Invoice i WHERE i.isProcessed = false AND i.parseAttempts < :max ORDER BY i.createdAt ASC", 
             Invoice.class);
+        query.setParameter("max", maxParseAttempts);
         return query.getResultList();
     }
 

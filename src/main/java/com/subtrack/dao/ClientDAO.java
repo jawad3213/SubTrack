@@ -25,4 +25,6 @@ public interface ClientDAO {
     List<Client> findActiveClients();
     
     boolean existsByEmail(String email);
+
+    Optional<Client> findByPasswordResetTokenHash(String tokenHash);
 }

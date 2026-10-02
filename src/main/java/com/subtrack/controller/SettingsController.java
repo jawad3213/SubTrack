@@ -1,5 +1,6 @@
 package com.subtrack.controller;
 
+import com.subtrack.util.FacesErrors;
 import com.subtrack.entity.Client;
 import com.subtrack.service.ClientService;
 import jakarta.annotation.PostConstruct;
@@ -64,7 +65,7 @@ public class SettingsController implements Serializable {
             return null;
         } catch (Exception e) {
             FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", e.getMessage()));
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", FacesErrors.message(e)));
             return null;
         }
     }
@@ -97,7 +98,7 @@ public class SettingsController implements Serializable {
             return null;
         } catch (Exception e) {
             FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", e.getMessage()));
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", FacesErrors.message(e)));
             return null;
         }
     }
@@ -121,7 +122,7 @@ public class SettingsController implements Serializable {
             return null;
         } catch (Exception e) {
             FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", e.getMessage()));
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", FacesErrors.message(e)));
             return null;
         }
     }
@@ -136,7 +137,7 @@ public class SettingsController implements Serializable {
             return null;
         } catch (Exception e) {
             FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", e.getMessage()));
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", FacesErrors.message(e)));
             return null;
         }
     }

@@ -90,21 +90,32 @@ public class Subscription {
         updatedAt = LocalDateTime.now();
     }
 
+    /** Sets the next billing date to the first billing date after today. */
     public void calculateNextBillingDate() {
         if (startDate != null && frequency != null) {
-            LocalDate today = LocalDate.now();
-            LocalDate next = startDate;
-            
-            while (next.isBefore(today) || next.isEqual(today)) {
-                next = switch (frequency) {
-                    case WEEKLY -> next.plusWeeks(1);
-                    case MONTHLY -> next.plusMonths(1);
-                    case QUARTERLY -> next.plusMonths(3);
-                    case ANNUAL -> next.plusYears(1);
-                };
-            }
-            nextBillingDate = next;
+            nextBillingDate = firstBillingDateFrom(LocalDate.now().plusDays(1));
         }
+    }
+
+    /**
+     * If the next billing date has passed, moves it to the first billing date on or after
+     * {@code today}. Returns true if the date changed.
+     */
+    public boolean rollBillingDateForward(LocalDate today) {
+        if (startDate == null || frequency == null || nextBillingDate == null || !nextBillingDate.isBefore(today)) {
+            return false;
+        }
+        nextBillingDate = firstBillingDateFrom(today);
+        return true;
+    }
+
+    private LocalDate firstBillingDateFrom(LocalDate earliest) {
+        long periods = 0;
+        LocalDate date = startDate;
+        while (date.isBefore(earliest)) {
+            date = frequency.addPeriods(startDate, ++periods);
+        }
+        return date;
     }
 
     public BigDecimal getMonthlyCost() {

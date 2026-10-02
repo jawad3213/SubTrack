@@ -27,11 +27,7 @@ public class WebhookService {
         GEMINI_INVOICE_PARSED,
         GEMINI_ERROR,
         EXCHANGE_RATE_UPDATED,
-        EXCHANGE_RATE_ERROR,
-        SUBSCRIPTION_CREATED,
-        SUBSCRIPTION_EXPIRED,
-        PAYMENT_RECEIVED,
-        SYSTEM_ERROR
+        EXCHANGE_RATE_ERROR
     }
 
     public static class WebhookResult {
@@ -125,23 +121,6 @@ public class WebhookService {
         data.put("status", "error");
         data.put("source", "ExchangeRateScheduler");
         sendWebhook(WebhookEvent.EXCHANGE_RATE_ERROR, data);
-    }
-
-    public void notifySubscriptionCreated(String subscriptionName, String clientEmail) {
-        Map<String, Object> data = new HashMap<>();
-        data.put("subscriptionName", subscriptionName);
-        data.put("clientEmail", clientEmail);
-        data.put("action", "created");
-        sendWebhook(WebhookEvent.SUBSCRIPTION_CREATED, data);
-    }
-
-    public void notifyPaymentReceived(String subscriptionName, String amount, String currency) {
-        Map<String, Object> data = new HashMap<>();
-        data.put("subscriptionName", subscriptionName);
-        data.put("amount", amount);
-        data.put("currency", currency);
-        data.put("action", "payment_received");
-        sendWebhook(WebhookEvent.PAYMENT_RECEIVED, data);
     }
 
     private String readResponse(java.io.InputStream inputStream) {

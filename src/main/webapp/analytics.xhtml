@@ -1,153 +1,267 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
 <ui:composition template="/templates/layout.xhtml">
     <ui:define name="title">Analytics - SubTrack</ui:define>
-    
+
     <ui:define name="content">
-        <div class="page-header" style="margin-bottom: 30px;">
-            <h1 style="color: #1A1A1A;">Analytics</h1>
-            <p style="color: #5F5E5A;">Track your spending patterns</p>
-        </div>
-        
-        <!-- Stats Grid -->
-        <div class="stats-grid">
-            <div class="stat-card primary">
-                <div class="stat-value">
-                    <h:outputText value="#{dashboardController.totalMonthlyCost}">
-                        <f:convertNumber pattern="#,##0.00"/>
-                    </h:outputText>
-                </div>
-                <div class="stat-label">Monthly Spending</div>
+        <div class="page-header-row">
+            <div>
+                <h1>Analytics</h1>
+                <p>Spending trends and breakdowns, in #{dashboardController.userCurrency}.</p>
             </div>
-            
-            <div class="stat-card success">
-                <div class="stat-value">
-                    <h:outputText value="#{dashboardController.totalAnnualCost}">
-                        <f:convertNumber pattern="#,##0.00"/>
-                    </h:outputText>
-                </div>
-                <div class="stat-label">Annual Spending</div>
-            </div>
-            
-            <div class="stat-card warning">
-                <div class="stat-value">
-                    <h:outputText value="#{dashboardController.activeSubscriptionCount}"/>
-                </div>
-                <div class="stat-label">Active Subscriptions</div>
+            <div class="header-actions">
+                <h:link outcome="/export" value="Export data" styleClass="btn-secondary"/>
             </div>
         </div>
-        
-        <div class="row" style="display: flex; gap: 20px;">
-            <div class="col-md-6" style="flex: 1;">
+
+        <h:panelGroup rendered="#{not dashboardController.hasSubscriptions}">
+            <div class="card">
+                <div class="empty-inline">
+                    <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                    <p style="margin-bottom: 14px;">Analytics appear once you've added subscriptions.</p>
+                    <h:link outcome="/subscriptions/create" value="Add a subscription" styleClass="btn-primary"/>
+                </div>
+            </div>
+        </h:panelGroup>
+
+        <h:panelGroup rendered="#{dashboardController.hasSubscriptions}">
+
+            <!-- KPIs -->
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-icon blue">
+                        <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                    </div>
+                    <div class="kpi-body">
+                        <div class="kpi-label">Monthly spend</div>
+                        <div class="kpi-value">
+                            <h:outputText value="#{dashboardController.totalMonthlyCost}"><f:convertNumber pattern="#,##0.00"/></h:outputText>
+                            <span class="unit">#{dashboardController.userCurrency}</span>
+                        </div>
+                        <div class="kpi-sub">
+                            <h:outputText value="#{dashboardController.totalAnnualCost}"><f:convertNumber pattern="#,##0"/></h:outputText>
+                            #{dashboardController.userCurrency} per year
+                        </div>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon green">
+                        <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                    </div>
+                    <div class="kpi-body">
+                        <div class="kpi-label">Average per subscription</div>
+                        <div class="kpi-value">
+                            <h:outputText value="#{dashboardController.averageMonthlyCost}"><f:convertNumber pattern="#,##0.00"/></h:outputText>
+                            <span class="unit">/mo</span>
+                        </div>
+                        <div class="kpi-sub">#{dashboardController.activeSubscriptionCount} active subscriptions</div>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon amber">
+                        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                    </div>
+                    <div class="kpi-body">
+                        <div class="kpi-label">Due in 30 days</div>
+                        <div class="kpi-value">
+                            <h:outputText value="#{dashboardController.upcomingTotal}"><f:convertNumber pattern="#,##0.00"/></h:outputText>
+                            <span class="unit">#{dashboardController.userCurrency}</span>
+                        </div>
+                        <div class="kpi-sub">#{dashboardController.upcomingRenewals.size()} renewal(s)</div>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon red">
+                        <svg viewBox="0 0 24 24"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>
+                    </div>
+                    <div class="kpi-body">
+                        <div class="kpi-label">Potential savings</div>
+                        <div class="kpi-value">
+                            <h:outputText value="#{dashboardController.totalPotentialSavings}"><f:convertNumber pattern="#,##0.00"/></h:outputText>
+                            <span class="unit">/mo</span>
+                        </div>
+                        <div class="kpi-sub">#{dashboardController.optimizationSuggestions.size()} suggestion(s)</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid-wide-narrow">
+                <!-- Trend -->
                 <div class="card">
                     <div class="card-header">
-                        <h2 class="card-title">Spending by Category</h2>
+                        <div>
+                            <h2 class="card-title">Monthly spending trend</h2>
+                            <div class="card-subtitle">Last 6 months</div>
+                        </div>
                     </div>
-                    
-                    <h:dataTable value="#{dashboardController.categoryBreakdown}" var="cat" 
-                                 styleClass="data-table"
-                                 rendered="#{not empty dashboardController.categoryBreakdown}">
-                        <h:column>
-                            <f:facet name="header">Category</f:facet>
-                            #{cat.categoryName}
-                        </h:column>
-                        <h:column>
-                            <f:facet name="header">Count</f:facet>
-                            #{cat.count}
-                        </h:column>
-                        <h:column>
-                            <f:facet name="header">Monthly</f:facet>
-                            <h:outputText value="#{cat.monthlyCost}">
-                                <f:convertNumber pattern="#,##0.00"/>
-                            </h:outputText>
-                        </h:column>
-                    </h:dataTable>
-                    
+                    <div class="bar-chart">
+                        <ui:repeat value="#{dashboardController.trend}" var="bar">
+                            <div class="bar-col">
+                                <div class="bar-track">
+                                    <div class="bar #{bar.current ? 'current' : ''}" style="height: #{bar.heightPercent}%;">
+                                        <span class="bar-value"><h:outputText value="#{bar.amount}"><f:convertNumber pattern="#,##0"/></h:outputText></span>
+                                    </div>
+                                </div>
+                                <div class="bar-label #{bar.current ? 'current' : ''}">#{bar.month}</div>
+                            </div>
+                        </ui:repeat>
+                    </div>
+                    <p class="chart-note">Estimated from your subscriptions' start dates and current prices
+                        (cancelled subscriptions are excluded).</p>
+                </div>
+
+                <!-- Status + frequency -->
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <h2 class="card-title">Portfolio</h2>
+                            <div class="card-subtitle">#{dashboardController.totalSubscriptionCount} subscriptions in total</div>
+                        </div>
+                    </div>
+                    <div class="stacked-bar">
+                        <span class="seg-active" style="width: #{dashboardController.totalSubscriptionCount == 0 ? 0 : dashboardController.activeSubscriptionCount * 100 / dashboardController.totalSubscriptionCount}%;"></span>
+                        <span class="seg-paused" style="width: #{dashboardController.totalSubscriptionCount == 0 ? 0 : dashboardController.pausedCount * 100 / dashboardController.totalSubscriptionCount}%;"></span>
+                        <span class="seg-cancelled" style="width: #{dashboardController.totalSubscriptionCount == 0 ? 0 : dashboardController.cancelledCount * 100 / dashboardController.totalSubscriptionCount}%;"></span>
+                    </div>
+                    <div class="status-legend">
+                        <span><i class="seg-active"></i>Active <strong>#{dashboardController.activeSubscriptionCount}</strong></span>
+                        <span><i class="seg-paused"></i>Paused <strong>#{dashboardController.pausedCount}</strong></span>
+                        <span><i class="seg-cancelled"></i>Cancelled <strong>#{dashboardController.cancelledCount}</strong></span>
+                    </div>
+
+                    <h3 style="font-size: 14px; font-weight: 600; color: #1A1A1A; margin: 26px 0 6px;">Billing cycles</h3>
+                    <ul class="hbar-list">
+                        <ui:repeat value="#{dashboardController.frequencyMix}" var="fm">
+                            <li>
+                                <div class="hbar-head">
+                                    <span class="hbar-name">#{fm.label}</span>
+                                    <span class="hbar-amount">#{fm.count} · #{fm.percent}%</span>
+                                </div>
+                                <div class="hbar-track"><div class="hbar-fill" style="width: #{fm.percent}%; background: #378ADD;"></div></div>
+                            </li>
+                        </ui:repeat>
+                    </ul>
+                    <h:panelGroup rendered="#{empty dashboardController.frequencyMix}">
+                        <p class="chart-note">No active subscriptions.</p>
+                    </h:panelGroup>
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <!-- Categories -->
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <h2 class="card-title">Spending by category</h2>
+                            <div class="card-subtitle">Monthly, active subscriptions</div>
+                        </div>
+                    </div>
+                    <h:panelGroup rendered="#{not empty dashboardController.categoryBreakdown}">
+                        <div class="donut-wrap">
+                            <div class="donut" style="background: #{dashboardController.categoryDonutGradient};">
+                                <div class="donut-center">
+                                    <strong>#{dashboardController.categoryBreakdown.size()}</strong>
+                                    <span>categories</span>
+                                </div>
+                            </div>
+                            <ul class="legend">
+                                <ui:repeat value="#{dashboardController.categoryBreakdown}" var="cat">
+                                    <li>
+                                        <span class="legend-swatch" style="background: #{cat.color};"></span>
+                                        <span class="legend-name">#{cat.categoryName} <span style="color: #5F5E5A;">(#{cat.count})</span></span>
+                                        <span class="legend-value">
+                                            <h:outputText value="#{cat.monthlyCost}"><f:convertNumber pattern="#,##0.00"/></h:outputText>
+                                            <strong>#{cat.percent}%</strong>
+                                        </span>
+                                    </li>
+                                </ui:repeat>
+                            </ul>
+                        </div>
+                    </h:panelGroup>
                     <h:panelGroup rendered="#{empty dashboardController.categoryBreakdown}">
-                        <div class="empty-state">
-                            <p>No subscriptions yet. Add subscriptions to see analytics.</p>
-                        </div>
+                        <div class="empty-inline"><p>No active subscriptions.</p></div>
                     </h:panelGroup>
                 </div>
-            </div>
-            
-            <div class="col-md-6" style="flex: 1;">
+
+                <!-- Savings suggestions -->
                 <div class="card">
                     <div class="card-header">
-                        <h2 class="card-title">Monthly Spending Trend</h2>
+                        <div>
+                            <h2 class="card-title">Savings opportunities</h2>
+                            <div class="card-subtitle">Duplicates and subscriptions you may not use</div>
+                        </div>
                     </div>
-                    <h:dataTable value="#{dashboardController.monthlyTrend}" var="month"
-                                 styleClass="data-table"
-                                 rendered="#{not empty dashboardController.monthlyTrend}">
-                        <h:column>
-                            <f:facet name="header">Month</f:facet>
-                            #{month.month}
-                        </h:column>
-                        <h:column>
-                            <f:facet name="header">Amount</f:facet>
-                            <h:outputText value="#{month.amount}">
-                                <f:convertNumber pattern="#,##0.00"/>
-                            </h:outputText>
-                        </h:column>
-                    </h:dataTable>
-                    <h:panelGroup rendered="#{empty dashboardController.monthlyTrend}">
-                        <div class="empty-state">
-                            <p>No trend data yet. Add subscriptions to track monthly spending.</p>
+                    <h:panelGroup rendered="#{not empty dashboardController.optimizationSuggestions}">
+                        <ul class="renewal-list">
+                            <ui:repeat value="#{dashboardController.optimizationSuggestions}" var="sug">
+                                <li>
+                                    <div class="renewal-info">
+                                        <div class="renewal-name">#{sug.title}</div>
+                                        <div class="renewal-when">#{sug.description}</div>
+                                    </div>
+                                    <div class="renewal-amount" style="color: #27500A;">
+                                        −<h:outputText value="#{sug.potentialSavings}"><f:convertNumber pattern="#,##0.00"/></h:outputText>/mo
+                                    </div>
+                                </li>
+                            </ui:repeat>
+                        </ul>
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{empty dashboardController.optimizationSuggestions}">
+                        <div class="empty-inline">
+                            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                            <p>No duplicates or unused subscriptions found.</p>
                         </div>
                     </h:panelGroup>
                 </div>
             </div>
-        </div>
-        
-        <div class="card" style="margin-top: 20px;">
-            <div class="card-header">
-                <h2 class="card-title">Recent Subscriptions</h2>
-            </div>
-            
-            <h:dataTable value="#{dashboardController.recentSubscriptions}" var="sub" 
-                         styleClass="data-table"
-                         rendered="#{not empty dashboardController.recentSubscriptions}">
-                <h:column>
-                    <f:facet name="header">Service</f:facet>
-                    #{sub.name}
-                </h:column>
-                <h:column>
-                    <f:facet name="header">Price</f:facet>
-                    <h:outputText value="#{sub.price}">
-                        <f:convertNumber pattern="#,##0.00"/>
-                    </h:outputText>
-                    #{sub.originalCurrency}
-                </h:column>
-                <h:column>
-                    <f:facet name="header">Frequency</f:facet>
-                    #{sub.frequency.displayName}
-                </h:column>
-                <h:column>
-                    <f:facet name="header">Monthly Cost</f:facet>
-                    <h:outputText value="#{sub.monthlyCost}">
-                        <f:convertNumber pattern="#,##0.00"/>
-                    </h:outputText>
-                </h:column>
-                <h:column>
-                    <f:facet name="header">Status</f:facet>
-                    <span class="badge #{sub.status.name().toLowerCase()}">
-                        #{sub.status}
-                    </span>
-                </h:column>
-            </h:dataTable>
-            
-            <h:panelGroup rendered="#{empty dashboardController.recentSubscriptions}">
-                <div class="empty-state">
-                    <p>No subscriptions yet. 
-                        <h:link outcome="/subscriptions/create" value="Add your first subscription"/>
-                    </p>
+
+            <!-- Full ranking -->
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <h2 class="card-title">All active subscriptions by cost</h2>
+                        <div class="card-subtitle">Monthly equivalent, converted to #{dashboardController.userCurrency}</div>
+                    </div>
                 </div>
-            </h:panelGroup>
-        </div>
+                <h:dataTable value="#{dashboardController.activeByCost}" var="r" styleClass="data-table"
+                             rendered="#{not empty dashboardController.activeByCost}">
+                    <h:column>
+                        <f:facet name="header">Service</f:facet>
+                        <h:link outcome="/subscriptions/detail" value="#{r.subscription.name}" style="color: #1A1A1A; font-weight: 500; text-decoration: none;">
+                            <f:param name="id" value="#{r.subscription.id}"/>
+                        </h:link>
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Category</f:facet>
+                        #{r.subscription.category != null ? r.subscription.category.name : 'Uncategorized'}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Price</f:facet>
+                        <h:outputText value="#{r.subscription.price}"><f:convertNumber pattern="#,##0.00"/></h:outputText>
+                        #{r.subscription.originalCurrency} / #{r.subscription.frequency.displayName}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Per month</f:facet>
+                        <h:outputText value="#{r.monthlyCost}"><f:convertNumber pattern="#,##0.00"/></h:outputText>
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Share</f:facet>
+                        <div style="display: flex; align-items: center; gap: 10px; min-width: 140px;">
+                            <div class="hbar-track" style="flex: 1;"><div class="hbar-fill" style="width: #{r.percentOfTotal}%;"></div></div>
+                            <span style="font-size: 12px; color: #5F5E5A; width: 34px; text-align: right;">#{r.percentOfTotal}%</span>
+                        </div>
+                    </h:column>
+                </h:dataTable>
+                <h:panelGroup rendered="#{empty dashboardController.activeByCost}">
+                    <div class="empty-inline"><p>No active subscriptions.</p></div>
+                </h:panelGroup>
+            </div>
+        </h:panelGroup>
     </ui:define>
 </ui:composition>
 </html>

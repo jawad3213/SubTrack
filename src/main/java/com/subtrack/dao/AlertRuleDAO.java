@@ -21,5 +21,4 @@ public interface AlertRuleDAO {
     
     List<AlertRule> findActiveAlertRules();
     
-    List<AlertRule> findAlertsDueSoon(int days);
 }

@@ -1,5 +1,6 @@
 package com.subtrack.converter;
 
+import com.subtrack.controller.UserContext;
 import com.subtrack.entity.Subscription;
 import com.subtrack.service.SubscriptionService;
 import jakarta.faces.component.UIComponent;
@@ -15,6 +16,9 @@ public class SubscriptionConverter implements Converter<Subscription> {
     @Inject
     private SubscriptionService subscriptionService;
 
+    @Inject
+    private UserContext userContext;
+
     @Override
     public Subscription getAsObject(FacesContext context, UIComponent component, String value) {
         if (value == null || value.isEmpty()) {
@@ -22,7 +26,7 @@ public class SubscriptionConverter implements Converter<Subscription> {
         }
         try {
             UUID id = UUID.fromString(value);
-            return subscriptionService.findById(id).orElse(null);
+            return subscriptionService.findByIdForClient(id, userContext.getClientId()).orElse(null);
         } catch (IllegalArgumentException e) {
             return null;
         }

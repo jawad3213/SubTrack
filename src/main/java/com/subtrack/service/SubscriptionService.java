@@ -10,7 +10,6 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +26,9 @@ public class SubscriptionService {
     @Inject
     private PaymentHistoryDAO paymentHistoryDAO;
 
+    @Inject
+    private CurrencyService currencyService;
+
     public List<Subscription> findAll() {
         return subscriptionDAO.findAll();
     }
@@ -41,6 +43,15 @@ public class SubscriptionService {
 
     public Optional<Subscription> findById(UUID id) {
         return subscriptionDAO.findById(id);
+    }
+
+    /** Looks up a subscription only if it belongs to the given client. */
+    public Optional<Subscription> findByIdForClient(UUID id, UUID clientId) {
+        if (id == null || clientId == null) {
+            return Optional.empty();
+        }
+        return subscriptionDAO.findById(id)
+            .filter(sub -> sub.getClient() != null && clientId.equals(sub.getClient().getId()));
     }
 
     @Transactional
@@ -62,7 +73,7 @@ public class SubscriptionService {
         List<Subscription> subscriptions = findActiveByClientId(clientId);
         BigDecimal total = BigDecimal.ZERO;
         for (Subscription sub : subscriptions) {
-            total = total.add(sub.getMonthlyCost());
+            total = total.add(monthlyCostInDisplayCurrency(sub));
         }
         return total;
     }
@@ -71,9 +82,22 @@ public class SubscriptionService {
         List<Subscription> subscriptions = findActiveByClientId(clientId);
         BigDecimal total = BigDecimal.ZERO;
         for (Subscription sub : subscriptions) {
-            total = total.add(sub.getAnnualCost());
+            total = total.add(currencyService.toDisplayCurrency(sub.getAnnualCost(), sub.getOriginalCurrency()));
         }
         return total;
+    }
+    
+    /** Moves every active subscription whose billing date has passed to its next billing date. */
+    @Transactional
+    public int rollOverBillingDates(java.time.LocalDate today) {
+        int updated = 0;
+        for (Subscription sub : subscriptionDAO.findActiveWithBillingDateBefore(today)) {
+            if (sub.rollBillingDateForward(today)) {
+                subscriptionDAO.update(sub);
+                updated++;
+            }
+        }
+        return updated;
     }
     
     @Transactional
@@ -97,20 +121,6 @@ public class SubscriptionService {
         subscriptionDAO.update(subscription);
     }
     
-    @Transactional
-    private void recordPayment(Subscription subscription) {
-        PaymentHistory payment = new PaymentHistory();
-        payment.setSubscription(subscription);
-        payment.setAmount(subscription.getPrice());
-        payment.setCurrency(subscription.getOriginalCurrency());
-        payment.setPaymentDate(LocalDate.now());
-        paymentHistoryDAO.create(payment);
-    }
-    
-    public List<PaymentHistory> getPaymentHistoryBySubscriptionId(UUID subscriptionId) {
-        return paymentHistoryDAO.findBySubscriptionId(subscriptionId);
-    }
-    
     public List<PaymentHistory> getPaymentHistoryByClientId(UUID clientId) {
         List<Subscription> subscriptions = subscriptionDAO.findByClientId(clientId);
         List<PaymentHistory> allPayments = new ArrayList<>();
@@ -118,17 +128,6 @@ public class SubscriptionService {
             allPayments.addAll(paymentHistoryDAO.findBySubscriptionId(sub.getId()));
         }
         return allPayments;
-    }
-    
-    public BigDecimal calculateTotalByCategory(UUID clientId, UUID categoryId) {
-        List<Subscription> subscriptions = subscriptionDAO.findByClientIdAndCategoryId(clientId, categoryId);
-        BigDecimal total = BigDecimal.ZERO;
-        for (Subscription sub : subscriptions) {
-            if (sub.getStatus() == SubscriptionStatus.ACTIVE) {
-                total = total.add(sub.getMonthlyCost());
-            }
-        }
-        return total;
     }
     
     public List<OptimizationSuggestion> detectRedundantSubscriptions(UUID clientId) {
@@ -146,7 +145,7 @@ public class SubscriptionService {
                 List<Subscription> duplicates = entry.getValue();
                 BigDecimal potentialSavings = BigDecimal.ZERO;
                 for (int i = 1; i < duplicates.size(); i++) {
-                    potentialSavings = potentialSavings.add(duplicates.get(i).getMonthlyCost());
+                    potentialSavings = potentialSavings.add(monthlyCostInDisplayCurrency(duplicates.get(i)));
                 }
                 suggestions.add(new OptimizationSuggestion(
                     "Duplicate subscription: " + duplicates.get(0).getName(),
@@ -171,7 +170,7 @@ public class SubscriptionService {
                     suggestions.add(new OptimizationSuggestion(
                         "Unused subscription: " + sub.getName(),
                         "No payment history found. Consider pausing or cancelling.",
-                        sub.getMonthlyCost(),
+                        monthlyCostInDisplayCurrency(sub),
                         List.of(sub)
                     ));
                 }
@@ -179,6 +178,15 @@ public class SubscriptionService {
         }
         
         return suggestions;
+    }
+    
+    /** Monthly cost converted to the display currency, so costs in different currencies can be summed. */
+    public BigDecimal monthlyCostInDisplayCurrency(Subscription sub) {
+        return currencyService.toDisplayCurrency(sub.getMonthlyCost(), sub.getOriginalCurrency());
+    }
+
+    public String getDisplayCurrency() {
+        return currencyService.getDisplayCurrency();
     }
     
     public static class OptimizationSuggestion {

@@ -5,37 +5,58 @@ import jakarta.servlet.ServletContextListener;
 import jakarta.servlet.annotation.WebListener;
 
 /**
- * DatabaseInitializer uses its own EntityManagerFactory (resource-local)
- * so it works reliably at servlet startup without CDI injection issues.
- * The main app still uses JTA via the container data source.
+ * Runs at deployment: applies Flyway schema migrations, then seeds categories, config values
+ * and the first admin. Uses the DataSource directly (plain JDBC) because CDI injection
+ * is not guaranteed to be ready inside a @WebListener.
  */
 @WebListener
 public class DatabaseInitializer implements ServletContextListener {
 
+    private static final org.slf4j.Logger LOGGER = org.slf4j.LoggerFactory.getLogger(DatabaseInitializer.class);
+
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        System.out.println(">>> DatabaseInitializer.contextInitialized called");
-        // We use a separate persistence unit with RESOURCE_LOCAL for init-time work
-        // because CDI @Inject is not guaranteed to be ready inside @WebListener.
-        // The application itself uses the JTA persistence unit (subtrackPU).
+        LOGGER.info("DatabaseInitializer.contextInitialized called");
+        javax.sql.DataSource ds;
         try {
-            // Attempt initialization via JTA EntityManager from JNDI
-            // Attempt initialization via JTA EntityManager from JNDI
-            initViaJndi(sce);
-            System.out.println(">>> DatabaseInitializer: initialization completed successfully");
+            ds = (javax.sql.DataSource) new javax.naming.InitialContext().lookup("java:global/SubtrackDS");
+        } catch (javax.naming.NamingException e) {
+            throw new IllegalStateException("DataSource java:global/SubtrackDS not found", e);
+        }
+
+        // Schema changes must succeed: let a failed migration fail the deployment.
+        migrateSchema(ds);
+
+        try {
+            seedData(ds, sce);
+            LOGGER.info("DatabaseInitializer: initialization completed successfully");
         } catch (Exception e) {
-            System.err.println(">>> DatabaseInitializer: initialization FAILED - " + e.getMessage());
-            e.printStackTrace(System.err);
+            LOGGER.warn("DatabaseInitializer: initialization FAILED", e);
+            LOGGER.error("Unexpected error", e);
         }
     }
 
-    private void initViaJndi(ServletContextEvent sce) throws Exception {
-        javax.naming.InitialContext ctx = new javax.naming.InitialContext();
-        javax.sql.DataSource ds = (javax.sql.DataSource) ctx.lookup("java:global/SubtrackDS");
+    /**
+     * Applies src/main/resources/db/migration. Databases created earlier by
+     * hibernate.hbm2ddl.auto=update already contain the V1 tables, so they are baselined at 1.
+     */
+    private void migrateSchema(javax.sql.DataSource ds) {
+        var result = org.flywaydb.core.Flyway.configure()
+            .dataSource(ds)
+            .locations("classpath:db/migration")
+            .baselineOnMigrate(true)
+            .baselineVersion("1")
+            .load()
+            .migrate();
+        LOGGER.info("Flyway: applied " + result.migrationsExecuted + " migration(s), schema version " + result.targetSchemaVersion);
+    }
+
+    private void seedData(javax.sql.DataSource ds, ServletContextEvent sce) throws Exception {
+        java.util.Properties dotEnv = loadDotEnv(sce);
         try (java.sql.Connection conn = ds.getConnection()) {
-            initSystemConfig(conn, sce);
+            initSystemConfig(conn, dotEnv);
             initCategories(conn);
-            initUsers(conn);
+            initAdmin(conn, dotEnv);
         }
     }
 
@@ -62,25 +83,16 @@ public class DatabaseInitializer implements ServletContextListener {
                         ins.setString(3, cat[2]);
                         ins.setString(4, cat[3]);
                         ins.executeUpdate();
-                        System.out.println(">>> Created category: " + cat[0]);
+                        LOGGER.info("Created category: " + cat[0]);
                     }
                 }
             }
         }
     }
 
-    private void initSystemConfig(java.sql.Connection conn, ServletContextEvent sce) throws Exception {
-        try (java.sql.Statement stmt = conn.createStatement()) {
-            stmt.execute("CREATE TABLE IF NOT EXISTS system_config (" +
-                         "config_key VARCHAR(100) PRIMARY KEY, " +
-                         "config_value VARCHAR(1000), " +
-                         "updated_at TIMESTAMP)");
-            System.out.println(">>> Initialized system_config table");
-        }
-
-        // Helper to get config from env or .env file
+    private java.util.Properties loadDotEnv(ServletContextEvent sce) {
         java.util.Properties dotEnv = new java.util.Properties();
-        java.io.File envFile = new java.io.File(sce.getServletContext().getRealPath("/"), "../../.env"); 
+        java.io.File envFile = new java.io.File(sce.getServletContext().getRealPath("/"), "../../.env");
         // Note: in a standard Maven/WildFly layout, the .env is usually 2 levels up from the deployment root during mvn wildfly:run
         if (!envFile.exists()) {
             envFile = new java.io.File(".env"); // Fallback for various run modes
@@ -90,25 +102,23 @@ public class DatabaseInitializer implements ServletContextListener {
             try (java.io.FileInputStream fis = new java.io.FileInputStream(envFile)) {
                 dotEnv.load(fis);
             } catch (java.io.IOException e) {
-                System.err.println(">>> Failed to load .env file: " + e.getMessage());
+                LOGGER.warn("Failed to load .env file", e);
             }
         }
+        return dotEnv;
+    }
 
-        String clientId = System.getenv("GOOGLE_OAUTH_CLIENT_ID");
-        if (clientId == null) clientId = dotEnv.getProperty("GOOGLE_OAUTH_CLIENT_ID");
-        if (clientId == null) clientId = "YOUR_GOOGLE_OAUTH_CLIENT_ID";
+    private static String envOrDotEnv(String key, java.util.Properties dotEnv) {
+        String value = System.getenv(key);
+        if (value == null || value.isBlank()) value = dotEnv.getProperty(key);
+        return (value == null || value.isBlank()) ? null : value.trim();
+    }
 
-        String clientSecret = System.getenv("GOOGLE_OAUTH_CLIENT_SECRET");
-        if (clientSecret == null) clientSecret = dotEnv.getProperty("GOOGLE_OAUTH_CLIENT_SECRET");
-        if (clientSecret == null) clientSecret = "YOUR_GOOGLE_OAUTH_CLIENT_SECRET";
-
-        String geminiKey = System.getenv("GEMINI_API_KEY");
-        if (geminiKey == null) geminiKey = dotEnv.getProperty("GEMINI_API_KEY");
-        if (geminiKey == null) geminiKey = "YOUR_GEMINI_API_KEY";
-        
-        syncConfig(conn, "GOOGLE_OAUTH_CLIENT_ID", clientId);
-        syncConfig(conn, "GOOGLE_OAUTH_CLIENT_SECRET", clientSecret);
-        syncConfig(conn, "GEMINI_API_KEY", geminiKey);
+    private void initSystemConfig(java.sql.Connection conn, java.util.Properties dotEnv) throws Exception {
+        syncConfig(conn, "GOOGLE_OAUTH_CLIENT_ID", envOrDotEnv("GOOGLE_OAUTH_CLIENT_ID", dotEnv));
+        syncConfig(conn, "GOOGLE_OAUTH_CLIENT_SECRET", envOrDotEnv("GOOGLE_OAUTH_CLIENT_SECRET", dotEnv));
+        syncConfig(conn, "GEMINI_API_KEY", envOrDotEnv("GEMINI_API_KEY", dotEnv));
+        syncConfig(conn, "APP_BASE_URL", envOrDotEnv("APP_BASE_URL", dotEnv));
     }
 
     private void syncConfig(java.sql.Connection conn, String key, String value) throws Exception {
@@ -124,7 +134,7 @@ public class DatabaseInitializer implements ServletContextListener {
                     ins.setString(1, key);
                     ins.setString(2, value);
                     ins.executeUpdate();
-                    System.out.println(">>> Set system config: " + key);
+                    LOGGER.info("Set system config: " + key);
                 }
             } else {
                 String existingValue = rs.getString(1);
@@ -134,107 +144,58 @@ public class DatabaseInitializer implements ServletContextListener {
                         upd.setString(1, value);
                         upd.setString(2, key);
                         upd.executeUpdate();
-                        System.out.println(">>> Synchronized config from environment: " + key);
+                        LOGGER.info("Synchronized config from environment: " + key);
                     }
                 }
             }
         }
     }
 
-    private void initUsers(java.sql.Connection conn) throws Exception {
-        // Admin user
-        createUserIfNotExists(conn,
-            "admin@subtrack.com",
-            PasswordUtil.hashPassword("Admin@123!"),
-            "System", "Admin",
-            "ADMIN", "B2C");
-
-        // Test user
-        createUserIfNotExists(conn,
-            "user@subtrack.com",
-            PasswordUtil.hashPassword("User@123!"),
-            "Normal", "User",
-            "CLIENT", "B2C");
-
-        // Verify admin account is healthy
-        verifyAdminAccount(conn, "admin@subtrack.com", "Admin@123!");
-    }
-
-    private void verifyAdminAccount(java.sql.Connection conn, String email, String expectedPassword) throws Exception {
-        try (java.sql.PreparedStatement stmt = conn.prepareStatement(
-                "SELECT password, is_active, role FROM client WHERE email = ?")) {
-            stmt.setString(1, email);
-            java.sql.ResultSet rs = stmt.executeQuery();
-            if (!rs.next()) {
-                System.err.println(">>> ADMIN VERIFICATION FAILED: account '" + email + "' does not exist in the database!");
-            } else {
-                String storedHash = rs.getString("password");
-                boolean isActive  = rs.getBoolean("is_active");
-                String role       = rs.getString("role");
-                boolean pwOk      = PasswordUtil.verifyPassword(expectedPassword, storedHash);
-
-                if (!pwOk) {
-                    System.err.println(">>> ADMIN VERIFICATION FAILED: password hash for '" + email + "' is invalid or corrupted! Resetting...");
-                    try (java.sql.PreparedStatement upd = conn.prepareStatement(
-                            "UPDATE client SET password = ?, is_active = true WHERE email = ?")) {
-                        upd.setString(1, PasswordUtil.hashPassword(expectedPassword));
-                        upd.setString(2, email);
-                        upd.executeUpdate();
-                        System.out.println(">>> Admin password hash reset successfully for: " + email);
-                    }
-                } else if (!isActive) {
-                    System.err.println(">>> ADMIN VERIFICATION WARNING: account '" + email + "' exists but is deactivated! Re-activating...");
-                    try (java.sql.PreparedStatement upd = conn.prepareStatement(
-                            "UPDATE client SET is_active = true WHERE email = ?")) {
-                        upd.setString(1, email);
-                        upd.executeUpdate();
-                        System.out.println(">>> Admin account re-activated: " + email);
-                    }
-                } else if (!"ADMIN".equals(role)) {
-                    System.err.println(">>> ADMIN VERIFICATION FAILED: account '" + email + "' exists but has role '" + role + "' instead of ADMIN!");
-                } else {
-                    System.out.println(">>> Admin account verified OK: " + email + " | active=" + isActive + " | role=" + role + " | passwordHash=valid");
-                }
+    /**
+     * Creates the first admin account only when the database has no ADMIN yet, using
+     * SUBTRACK_ADMIN_EMAIL / SUBTRACK_ADMIN_PASSWORD. Existing accounts are never modified,
+     * so an admin's changed password survives restarts.
+     */
+    private void initAdmin(java.sql.Connection conn, java.util.Properties dotEnv) throws Exception {
+        try (java.sql.Statement stmt = conn.createStatement();
+             java.sql.ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM client WHERE role = 'ADMIN'")) {
+            rs.next();
+            if (rs.getInt(1) > 0) {
+                return;
             }
         }
-    }
 
-    private void createUserIfNotExists(java.sql.Connection conn,
-            String email, String hashedPassword,
-            String firstName, String lastName,
-            String role, String accountType) throws Exception {
+        String email = envOrDotEnv("SUBTRACK_ADMIN_EMAIL", dotEnv);
+        String password = envOrDotEnv("SUBTRACK_ADMIN_PASSWORD", dotEnv);
+        if (email == null || password == null) {
+            LOGGER.warn("No admin account exists. Set SUBTRACK_ADMIN_EMAIL and SUBTRACK_ADMIN_PASSWORD to create one.");
+            return;
+        }
+        if (!PasswordUtil.isPasswordStrong(password)) {
+            LOGGER.warn("SUBTRACK_ADMIN_PASSWORD is too weak (min 8 chars, upper, lower, digit). Admin not created.");
+            return;
+        }
+        email = email.toLowerCase();
+
         try (java.sql.PreparedStatement check = conn.prepareStatement(
                 "SELECT COUNT(*) FROM client WHERE email = ?")) {
             check.setString(1, email);
-            java.sql.ResultSet rs = check.executeQuery();
-            rs.next();
-            if (rs.getInt(1) == 0) {
-                try (java.sql.PreparedStatement ins = conn.prepareStatement(
-                        "INSERT INTO client(id, email, password, first_name, last_name, role, account_type, is_active, created_at, updated_at) " +
-                        "VALUES (gen_random_uuid(), ?, ?, ?, ?, ?, ?, true, NOW(), NOW())")) {
-                    ins.setString(1, email);
-                    ins.setString(2, hashedPassword);
-                    ins.setString(3, firstName);
-                    ins.setString(4, lastName);
-                    ins.setString(5, role);
-                    ins.setString(6, accountType);
-                    ins.executeUpdate();
-                    System.out.println(">>> Created user: " + email);
+            try (java.sql.ResultSet rs = check.executeQuery()) {
+                rs.next();
+                if (rs.getInt(1) > 0) {
+                    LOGGER.warn("SUBTRACK_ADMIN_EMAIL '" + email + "' already belongs to a non-admin account. Admin not created.");
+                    return;
                 }
-            } else {
-                // Ensure existing admin is active
-                if ("ADMIN".equals(role)) {
-                    try (java.sql.PreparedStatement upd = conn.prepareStatement(
-                            "UPDATE client SET is_active = true WHERE email = ? AND is_active = false")) {
-                        upd.setString(1, email);
-                        int updated = upd.executeUpdate();
-                        if (updated > 0) {
-                            System.out.println(">>> Re-activated user: " + email);
-                        }
-                    }
-                }
-                System.out.println(">>> User already exists: " + email);
             }
+        }
+
+        try (java.sql.PreparedStatement ins = conn.prepareStatement(
+                "INSERT INTO client(id, email, password, first_name, last_name, role, account_type, is_active, created_at, updated_at) " +
+                "VALUES (gen_random_uuid(), ?, ?, 'System', 'Admin', 'ADMIN', 'B2C', true, NOW(), NOW())")) {
+            ins.setString(1, email);
+            ins.setString(2, PasswordUtil.hashPassword(password));
+            ins.executeUpdate();
+            LOGGER.info("Created initial admin account: " + email);
         }
     }
 

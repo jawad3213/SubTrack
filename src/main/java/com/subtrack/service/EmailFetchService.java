@@ -6,7 +6,6 @@ import com.subtrack.entity.EmailIntegration;
 import com.subtrack.entity.Invoice;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.transaction.Transactional;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -27,6 +26,8 @@ import java.io.StringReader;
 @ApplicationScoped
 public class EmailFetchService {
 
+    private static final org.slf4j.Logger LOGGER = org.slf4j.LoggerFactory.getLogger(EmailFetchService.class);
+
     @Inject
     private EmailIntegrationService emailIntegrationService;
     
@@ -40,18 +41,18 @@ public class EmailFetchService {
     private static final String GMAIL_GET_API = "https://gmail.googleapis.com/gmail/v1/users/me/messages/";
     
     public int fetchEmailsForClient(UUID clientId) {
-        System.out.println(">>> EmailFetchService: Starting sync for client " + clientId);
+        LOGGER.debug("EmailFetchService: Starting sync for client " + clientId);
         int totalProcessed = 0;
         
         Optional<EmailIntegration> integrationOpt = emailIntegrationService.findByClientId(clientId);
         if (integrationOpt.isEmpty()) {
-            System.err.println(">>> EmailFetchService: No email integration found for client " + clientId);
+            LOGGER.warn("EmailFetchService: No email integration found for client " + clientId);
             return 0;
         }
         
         EmailIntegration integration = integrationOpt.get();
         if (!integration.getIsActive()) {
-            System.err.println(">>> EmailFetchService: Email integration is not active");
+            LOGGER.warn("EmailFetchService: Email integration is not active");
             return 0;
         }
         
@@ -59,10 +60,10 @@ public class EmailFetchService {
         
         // If token is expired, try to refresh it first
         if (integration.isTokenExpired()) {
-            System.out.println(">>> EmailFetchService: Token expired, attempting refresh...");
+            LOGGER.debug("EmailFetchService: Token expired, attempting refresh...");
             accessToken = refreshAccessToken(integration);
             if (accessToken == null) {
-                System.err.println(">>> EmailFetchService: Access token is null and refresh failed");
+                LOGGER.warn("EmailFetchService: Access token is null and refresh failed");
                 return 0;
             }
         }
@@ -71,43 +72,43 @@ public class EmailFetchService {
         
         try {
             List<String> emailIds = fetchInvoiceEmailIds(accessToken);
-            System.out.println(">>> EmailFetchService: Found " + emailIds.size() + " potential invoice emails in the last 30 days");
+            LOGGER.debug("EmailFetchService: Found " + emailIds.size() + " potential invoice emails in the last 30 days");
             
             if (emailIds.isEmpty()) {
-                System.out.println(">>> EmailFetchService: No matching emails found.");
+                LOGGER.debug("EmailFetchService: No matching emails found.");
                 return 0;
             }
             
-            System.out.println(">>> EmailFetchService: Syncing for " + client.getEmail());
+            LOGGER.debug("EmailFetchService: Syncing for " + client.getEmail());
 
             for (String emailId : emailIds) {
                 try {
-                    System.out.println(">>> EmailFetchService: Fetching email ID: " + emailId);
+                    LOGGER.debug("EmailFetchService: Fetching email ID: " + emailId);
                     String emailContent = fetchEmailContent(accessToken, emailId);
                     
                     if (emailContent == null) {
-                        System.err.println(">>> EmailFetchService: Could not extract content from email " + emailId);
+                        LOGGER.warn("EmailFetchService: Could not extract content from email " + emailId);
                         continue;
                     }
                     
                     if (looksLikeInvoice(emailContent)) {
-                        System.out.println(">>> EmailFetchService: Email looks like an invoice, creating record...");
+                        LOGGER.debug("EmailFetchService: Email looks like an invoice, creating record...");
                         createInvoiceRecord(client, emailContent, emailId);
                         totalProcessed++;
                         
                         // Small delay to respect Gemini 1.5-flash free-tier (15 RPM)
                         try { Thread.sleep(3500); } catch (InterruptedException e) { Thread.currentThread().interrupt(); }
                     } else {
-                        System.out.println(">>> EmailFetchService: Email " + emailId + " does NOT look like an invoice, skipping.");
+                        LOGGER.debug("EmailFetchService: Email " + emailId + " does NOT look like an invoice, skipping.");
                     }
                 } catch (Exception e) {
-                    System.err.println(">>> EmailFetchService: Error processing email " + emailId + ": " + e.getMessage());
+                    LOGGER.warn("EmailFetchService: Error processing email " + emailId + "", e);
                 }
             }
-            System.out.println(">>> EmailFetchService: Sync complete. Imported " + totalProcessed + " invoices.");
+            LOGGER.debug("EmailFetchService: Sync complete. Imported " + totalProcessed + " invoices.");
             return totalProcessed;
         } catch (Exception e) {
-            System.err.println(">>> EmailFetchService: Failed to fetch emails: " + e.getMessage());
+            LOGGER.warn("EmailFetchService: Failed to fetch emails", e);
             return 0;
         }
     }
@@ -118,7 +119,7 @@ public class EmailFetchService {
     private String refreshAccessToken(EmailIntegration integration) {
         String refreshToken = integration.getRefreshToken();
         if (refreshToken == null || refreshToken.isBlank()) {
-            System.err.println(">>> EmailFetchService: No refresh token available");
+            LOGGER.warn("EmailFetchService: No refresh token available");
             return null;
         }
         
@@ -162,7 +163,7 @@ public class EmailFetchService {
                         // Update the stored token
                         LocalDateTime expiresAt = LocalDateTime.now().plusSeconds(expiresIn);
                         emailIntegrationService.refreshToken(integration.getClient().getId(), newAccessToken, expiresAt);
-                        System.out.println(">>> EmailFetchService: Token refreshed successfully");
+                        LOGGER.debug("EmailFetchService: Token refreshed successfully");
                         return newAccessToken;
                     }
                 }
@@ -174,10 +175,10 @@ public class EmailFetchService {
                         errorResponse.append(line);
                     }
                 }
-                System.err.println(">>> EmailFetchService: Token refresh failed with HTTP " + responseCode + ": " + errorResponse);
+                LOGGER.warn("EmailFetchService: Token refresh failed with HTTP " + responseCode + ": " + errorResponse);
             }
         } catch (Exception e) {
-            System.err.println(">>> EmailFetchService: Token refresh error: " + e.getMessage());
+            LOGGER.warn("EmailFetchService: Token refresh error", e);
         }
         return null;
     }
@@ -189,7 +190,7 @@ public class EmailFetchService {
         String encodedQuery = java.net.URLEncoder.encode(query, "UTF-8");
         
         URL url = new URL(GMAIL_API + "?q=" + encodedQuery + "&maxResults=20");
-        System.out.println(">>> EmailFetchService: Gmail API URL: " + url);
+        LOGGER.debug("EmailFetchService: Gmail API URL: " + url);
         
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("GET");
@@ -198,7 +199,7 @@ public class EmailFetchService {
         conn.setReadTimeout(30000);
         
         int responseCode = conn.getResponseCode();
-        System.out.println(">>> EmailFetchService: Gmail API response code: " + responseCode);
+        LOGGER.debug("EmailFetchService: Gmail API response code: " + responseCode);
         
         if (responseCode != 200) {
             StringBuilder errorResponse = new StringBuilder();
@@ -209,10 +210,10 @@ public class EmailFetchService {
                     errorResponse.append(line);
                 }
             }
-            System.err.println(">>> EmailFetchService: Gmail API error: " + errorResponse);
+            LOGGER.warn("EmailFetchService: Gmail API error: " + errorResponse);
             
             if (responseCode == 401) {
-                System.err.println(">>> EmailFetchService: Token expired or invalid (401)");
+                LOGGER.warn("EmailFetchService: Token expired or invalid (401)");
             }
             return java.util.Collections.emptyList();
         }
@@ -225,7 +226,7 @@ public class EmailFetchService {
             }
         }
         
-        System.out.println(">>> EmailFetchService: Gmail API response: " + response.toString().substring(0, Math.min(500, response.length())));
+        LOGGER.debug("EmailFetchService: Gmail API response: " + response.toString().substring(0, Math.min(500, response.length())));
         return parseEmailIdsFromResponse(response.toString());
     }
     
@@ -238,7 +239,7 @@ public class EmailFetchService {
         conn.setReadTimeout(15000);
         
         if (conn.getResponseCode() != 200) {
-            System.err.println(">>> EmailFetchService: Failed to fetch email " + emailId + " - HTTP " + conn.getResponseCode());
+            LOGGER.warn("EmailFetchService: Failed to fetch email " + emailId + " - HTTP " + conn.getResponseCode());
             return null;
         }
         
@@ -263,10 +264,10 @@ public class EmailFetchService {
                     ids.add(messages.getJsonObject(i).getString("id"));
                 }
             } else {
-                System.out.println(">>> EmailFetchService: No 'messages' key in Gmail response. resultSizeEstimate=" + obj.getInt("resultSizeEstimate", 0));
+                LOGGER.debug("EmailFetchService: No 'messages' key in Gmail response. resultSizeEstimate=" + obj.getInt("resultSizeEstimate", 0));
             }
         } catch (Exception e) {
-            System.err.println(">>> EmailFetchService: Failed to parse Gmail message IDs: " + e.getMessage());
+            LOGGER.warn("EmailFetchService: Failed to parse Gmail message IDs", e);
         }
         return ids;
     }
@@ -283,7 +284,7 @@ public class EmailFetchService {
                     for (int i = 0; i < headers.size(); i++) {
                         JsonObject header = headers.getJsonObject(i);
                         if ("Subject".equalsIgnoreCase(header.getString("name", ""))) {
-                            System.out.println(">>> EmailFetchService: Email subject: " + header.getString("value", ""));
+                            LOGGER.debug("EmailFetchService: Email subject: " + header.getString("value", ""));
                         }
                     }
                 }
@@ -321,12 +322,12 @@ public class EmailFetchService {
             // Fallback: use snippet
             String snippet = obj.getString("snippet", null);
             if (snippet != null && !snippet.isBlank()) {
-                System.out.println(">>> EmailFetchService: Using snippet as email body");
+                LOGGER.debug("EmailFetchService: Using snippet as email body");
                 return snippet;
             }
         } catch (Exception e) {
-            System.err.println(">>> EmailFetchService: Failed to extract email body: " + e.getMessage());
-            e.printStackTrace();
+            LOGGER.warn("EmailFetchService: Failed to extract email body", e);
+            LOGGER.error("Unexpected error", e);
         }
         return null;
     }
@@ -345,14 +346,14 @@ public class EmailFetchService {
         // Always save the raw invoice record first
         Invoice invoice = invoiceService.createInvoice(client, content, null, null, null, null);
         if (invoice != null) {
-            System.out.println(">>> EmailFetchService: Invoice record created with ID: " + invoice.getId());
+            LOGGER.debug("EmailFetchService: Invoice record created with ID: " + invoice.getId());
             try {
                 // Then try to parse it with Gemini AI
                 invoiceService.parseInvoiceEmail(invoice);
-                System.out.println(">>> EmailFetchService: AI parsing completed for invoice: " + invoice.getId());
+                LOGGER.debug("EmailFetchService: AI parsing completed for invoice: " + invoice.getId());
             } catch (Exception e) {
                 // If Gemini fails (rate limit, network, etc.) — the raw record is still saved
-                System.err.println(">>> EmailFetchService: AI parsing failed for invoice " + invoice.getId() + ": " + e.getMessage() + ". Raw record saved.");
+                LOGGER.warn("EmailFetchService: AI parsing failed for invoice " + invoice.getId() + ": " + e.getMessage() + ". Raw record saved.");
             }
         }
     }

@@ -1,5 +1,6 @@
 package com.subtrack.controller;
 
+import com.subtrack.util.FacesErrors;
 import com.subtrack.dao.SystemConfigDAO;
 import com.subtrack.entity.Client;
 import com.subtrack.entity.EmailIntegration;
@@ -29,6 +30,8 @@ import java.io.StringReader;
 @Named
 @SessionScoped
 public class EmailController implements Serializable {
+
+    private static final org.slf4j.Logger LOGGER = org.slf4j.LoggerFactory.getLogger(EmailController.class);
 
     private static final long serialVersionUID = 1L;
 
@@ -84,21 +87,17 @@ public class EmailController implements Serializable {
                 return null;
             }
             
-            oauthState = java.util.UUID.randomUUID().toString();
+            oauthState = com.subtrack.util.PasswordUtil.generateRandomToken();
             
             ExternalContext ec = ctx.getExternalContext();
-            String baseUrl = ec.getRequestScheme() + "://" + ec.getRequestServerName() 
-                + (ec.getRequestServerPort() != 80 && ec.getRequestServerPort() != 443 
-                   ? ":" + ec.getRequestServerPort() : "")
-                + ec.getRequestContextPath();
-            String redirectUri = baseUrl + "/oauth/callback";
+            String redirectUri = buildRedirectUri(ec);
             
             String authUrl = "https://accounts.google.com/o/oauth2/v2/auth?"
                 + "client_id=" + clientId
                 + "&redirect_uri=" + java.net.URLEncoder.encode(redirectUri, "UTF-8")
                 + "&response_type=code"
                 + "&scope=" + java.net.URLEncoder.encode("https://www.googleapis.com/auth/gmail.readonly email openid", "UTF-8")
-                + "&state=" + oauthState
+                + "&state=" + java.net.URLEncoder.encode(oauthState, "UTF-8")
                 + "&access_type=offline"
                 + "&prompt=consent";
             
@@ -106,9 +105,9 @@ public class EmailController implements Serializable {
             ctx.responseComplete();
             return null;
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Unexpected error", e);
             FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Failed to initiate OAuth: " + e.getMessage()));
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", FacesErrors.message(e, "Could not start the email connection. Please try again.")));
             return null;
         }
     }
@@ -125,15 +124,22 @@ public class EmailController implements Serializable {
                 return null;
             }
             
+            // CSRF protection: the state must match the one generated for this session, and is single-use.
+            String expectedState = oauthState;
+            oauthState = null;
+            if (expectedState == null || state == null
+                    || !java.security.MessageDigest.isEqual(
+                        expectedState.getBytes(StandardCharsets.UTF_8), state.getBytes(StandardCharsets.UTF_8))) {
+                FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Invalid OAuth state. Please try connecting again."));
+                return null;
+            }
+            
             String clientId = systemConfigDAO.getValue("GOOGLE_OAUTH_CLIENT_ID", "");
             String clientSecret = systemConfigDAO.getValue("GOOGLE_OAUTH_CLIENT_SECRET", "");
             
             ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
-            String baseUrl = ec.getRequestScheme() + "://" + ec.getRequestServerName() 
-                + (ec.getRequestServerPort() != 80 && ec.getRequestServerPort() != 443 
-                   ? ":" + ec.getRequestServerPort() : "")
-                + ec.getRequestContextPath();
-            String redirectUri = baseUrl + "/oauth/callback";
+            String redirectUri = buildRedirectUri(ec);
             
             URL url = new URL("https://oauth2.googleapis.com/token");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -143,9 +149,9 @@ public class EmailController implements Serializable {
             conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
             conn.setDoOutput(true);
             
-            String params = "client_id=" + clientId
-                + "&client_secret=" + clientSecret
-                + "&code=" + code
+            String params = "client_id=" + java.net.URLEncoder.encode(clientId, "UTF-8")
+                + "&client_secret=" + java.net.URLEncoder.encode(clientSecret, "UTF-8")
+                + "&code=" + java.net.URLEncoder.encode(code, "UTF-8")
                 + "&grant_type=authorization_code"
                 + "&redirect_uri=" + java.net.URLEncoder.encode(redirectUri, "UTF-8");
             
@@ -197,13 +203,21 @@ public class EmailController implements Serializable {
             loadEmailIntegration();
             return "/settings.xhtml?faces-redirect=true";
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Unexpected error", e);
             FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "OAuth error: " + e.getMessage()));
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", FacesErrors.message(e, "Could not connect your email. Please try again.")));
             return null;
         }
     }
     
+    /** Must be identical in the authorization request and the token exchange, or Google rejects it. */
+    private String buildRedirectUri(ExternalContext ec) {
+        int port = ec.getRequestServerPort();
+        return ec.getRequestScheme() + "://" + ec.getRequestServerName()
+            + (port != 80 && port != 443 ? ":" + port : "")
+            + ec.getRequestContextPath() + "/oauth/callback";
+    }
+
     private String fetchUserEmail(String accessToken) {
         try {
             URL url = new URL("https://www.googleapis.com/oauth2/v3/userinfo");
@@ -226,23 +240,11 @@ public class EmailController implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.err.println("Failed to fetch user email: " + e.getMessage());
+            LOGGER.warn("Failed to fetch user email", e);
         }
         return null;
     }
 
-    private String extractJsonField(String json, String field) {
-        int idx = json.indexOf("\"" + field + "\"");
-        if (idx == -1) return null;
-        int colon = json.indexOf(":", idx);
-        if (colon == -1) return null;
-        int start = json.indexOf("\"", colon);
-        if (start == -1) return null;
-        int end = json.indexOf("\"", start + 1);
-        if (end == -1) return null;
-        return json.substring(start + 1, end);
-    }
-    
     private Integer parseInt(String s) {
         try { return s != null ? Integer.parseInt(s) : null; } catch (Exception e) { return null; }
     }
@@ -270,7 +272,7 @@ public class EmailController implements Serializable {
             return null;
         } catch (Exception e) {
             FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", e.getMessage()));
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", FacesErrors.message(e)));
             return null;
         }
     }
@@ -301,7 +303,7 @@ public class EmailController implements Serializable {
                 }
             } catch (Exception e) {
                 FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Failed to sync emails: " + e.getMessage()));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", FacesErrors.message(e, "Failed to sync emails. Please try again.")));
             }
         }
         return null;
@@ -331,10 +333,6 @@ public class EmailController implements Serializable {
         isConnected = connected;
     }
     
-    public String getOauthState() {
-        return oauthState;
-    }
-
     public String getOauthCode() {
         return oauthCode;
     }

@@ -15,13 +15,11 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 @Stateless
 public class ExchangeRateScheduler {
 
-    private static final Logger LOGGER = Logger.getLogger(ExchangeRateScheduler.class.getName());
+    private static final org.slf4j.Logger LOGGER = org.slf4j.LoggerFactory.getLogger(ExchangeRateScheduler.class);
     private static final AppLogger APP_LOGGER = AppLogger.getLogger(ExchangeRateScheduler.class);
 
     @Inject
@@ -41,7 +39,7 @@ public class ExchangeRateScheduler {
         String baseUrl = systemConfigDAO.getValue("EXCHANGE_RATE_URL", "https://api.exchangerate-api.com/v4/latest/USD");
         
         if (baseUrl.isBlank()) {
-            LOGGER.warning("ExchangeRateScheduler: EXCHANGE_RATE_URL not configured");
+            LOGGER.warn("ExchangeRateScheduler: EXCHANGE_RATE_URL not configured");
             APP_LOGGER.logError("EXCHANGE_RATE_URL not configured");
             return;
         }
@@ -60,7 +58,7 @@ public class ExchangeRateScheduler {
             
             int responseCode = conn.getResponseCode();
             if (responseCode != 200) {
-                LOGGER.log(Level.WARNING, "ExchangeRateScheduler: API returned HTTP " + responseCode);
+                LOGGER.warn("ExchangeRateScheduler: API returned HTTP " + responseCode);
                 APP_LOGGER.logError("Exchange Rate API returned HTTP " + responseCode);
                 webhookService.notifyExchangeRateError("API returned HTTP " + responseCode);
                 return;
@@ -82,7 +80,7 @@ public class ExchangeRateScheduler {
             webhookService.notifyExchangeRateSuccess(rates.size());
             
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "ExchangeRateScheduler: Failed to fetch rates", e);
+            LOGGER.error("ExchangeRateScheduler: Failed to fetch rates", e);
             APP_LOGGER.logError("Failed to fetch exchange rates: " + e.getMessage());
             webhookService.notifyExchangeRateError("Connection failed: " + e.getMessage());
         }
@@ -124,7 +122,7 @@ public class ExchangeRateScheduler {
                 exchangeRateService.save(rate);
                 savedCount++;
             } catch (Exception e) {
-                LOGGER.log(Level.WARNING, "ExchangeRateScheduler: Failed to save rate for " + entry.getKey(), e);
+                LOGGER.warn("ExchangeRateScheduler: Failed to save rate for " + entry.getKey(), e);
             }
         }
         LOGGER.info("ExchangeRateScheduler: Saved " + savedCount + " rates to database");

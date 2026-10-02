@@ -23,21 +23,13 @@
                     </div>
                     
                     <p style="color: #5F5E5A; margin-bottom: 15px;">
-                        Download all your subscriptions in CSV or PDF format.
+                        Download your subscriptions as a CSV file (opens in Excel).
                     </p>
                     
                     <h:form>
                         <div class="form-group">
-                            <h:outputLabel for="subFormat" value="Format:" styleClass="form-label"/>
-                            <h:selectOneMenu id="subFormat" styleClass="form-control">
-                                <f:selectItem itemLabel="CSV (Excel compatible)" itemValue="csv"/>
-                                <f:selectItem itemLabel="PDF (Printable)" itemValue="pdf"/>
-                            </h:selectOneMenu>
-                        </div>
-                        
-                        <div class="form-group">
                             <h:outputLabel for="subStatus" value="Status Filter:" styleClass="form-label"/>
-                            <h:selectOneMenu id="subStatus" styleClass="form-control">
+                            <h:selectOneMenu id="subStatus" value="#{exportBean.subStatus}" styleClass="form-control">
                                 <f:selectItem itemLabel="All Subscriptions" itemValue="all"/>
                                 <f:selectItem itemLabel="Active Only" itemValue="active"/>
                                 <f:selectItem itemLabel="Paused Only" itemValue="paused"/>
@@ -58,27 +50,17 @@
                     </div>
                     
                     <p style="color: #5F5E5A; margin-bottom: 15px;">
-                        Download your complete payment history for accounting purposes.
+                        Download your payment history as a CSV file for accounting purposes.
                     </p>
                     
                     <h:form>
                         <div class="form-group">
-                            <h:outputLabel for="payFormat" value="Format:" styleClass="form-label"/>
-                            <h:selectOneMenu id="payFormat" styleClass="form-control">
-                                <f:selectItem itemLabel="CSV (Excel compatible)" itemValue="csv"/>
-                                <f:selectItem itemLabel="PDF (Invoice-ready)" itemValue="pdf"/>
-                                <f:selectItem itemLabel="OFX (Accounting software)" itemValue="ofx"/>
-                            </h:selectOneMenu>
-                        </div>
-                        
-                        <div class="form-group">
                             <h:outputLabel for="dateRange" value="Date Range:" styleClass="form-label"/>
-                            <h:selectOneMenu id="dateRange" styleClass="form-control">
+                            <h:selectOneMenu id="dateRange" value="#{exportBean.dateRange}" styleClass="form-control">
                                 <f:selectItem itemLabel="All Time" itemValue="all"/>
-                                <f:selectItem itemLabel="This Month" itemValue="month"/>
-                                <f:selectItem itemLabel="This Quarter" itemValue="quarter"/>
-                                <f:selectItem itemLabel="This Year" itemValue="year"/>
-                                <f:selectItem itemLabel="Custom Range" itemValue="custom"/>
+                                <f:selectItem itemLabel="Last Month" itemValue="month"/>
+                                <f:selectItem itemLabel="Last 3 Months" itemValue="quarter"/>
+                                <f:selectItem itemLabel="Last 12 Months" itemValue="year"/>
                             </h:selectOneMenu>
                         </div>
                         
@@ -99,22 +81,7 @@
             </p>
             
             <h:form>
-                <div class="form-group">
-                    <h:outputLabel for="backupFormat" value="Format:" styleClass="form-label"/>
-                    <h:selectOneMenu id="backupFormat" styleClass="form-control">
-                        <f:selectItem itemLabel="JSON (Full data backup)" itemValue="json"/>
-                        <f:selectItem itemLabel="ZIP (Includes all attachments)" itemValue="zip"/>
-                    </h:selectOneMenu>
-                </div>
-                
-                <div class="alert alert-info">
-                    <p style="margin-bottom: 0;">
-                        <strong>Note:</strong> Large accounts may take a few minutes to generate. 
-                        You will receive an email when the backup is ready for download.
-                    </p>
-                </div>
-                
-                <h:commandButton value="Request Full Backup" action="#{exportBean.requestFullBackup}" styleClass="btn-secondary"/>
+                <h:commandButton value="Download Backup (JSON)" action="#{exportBean.requestFullBackup}" styleClass="btn-secondary"/>
             </h:form>
         </div>
 

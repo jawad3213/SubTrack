@@ -1,9 +1,9 @@
 package com.subtrack.controller;
 
+import com.subtrack.util.FacesErrors;
 import com.subtrack.entity.Client;
 import com.subtrack.entity.PaymentHistory;
 import com.subtrack.entity.Subscription;
-import com.subtrack.enums.SubscriptionStatus;
 import com.subtrack.service.SubscriptionService;
 import jakarta.annotation.PostConstruct;
 import jakarta.faces.application.FacesMessage;
@@ -13,7 +13,6 @@ import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import java.io.IOException;
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -31,11 +30,8 @@ public class ExportBean implements Serializable {
     @Inject
     private UserContext userContext;
 
-    private String subFormat = "csv";
     private String subStatus = "all";
-    private String payFormat = "csv";
     private String dateRange = "all";
-    private String backupFormat = "json";
 
     @PostConstruct
     public void init() {
@@ -75,7 +71,7 @@ public class ExportBean implements Serializable {
 
         } catch (Exception e) {
             FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Export failed: " + e.getMessage()));
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", FacesErrors.message(e, "Export failed. Please try again.")));
         }
     }
 
@@ -110,7 +106,7 @@ public class ExportBean implements Serializable {
 
         } catch (Exception e) {
             FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Export failed: " + e.getMessage()));
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", FacesErrors.message(e, "Export failed. Please try again.")));
         }
     }
 
@@ -170,7 +166,7 @@ public class ExportBean implements Serializable {
 
         } catch (Exception e) {
             FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Backup failed: " + e.getMessage()));
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", FacesErrors.message(e, "Backup failed. Please try again.")));
         }
     }
 
@@ -237,14 +233,8 @@ public class ExportBean implements Serializable {
         return new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
     }
 
-    public String getSubFormat() { return subFormat; }
-    public void setSubFormat(String s) { this.subFormat = s; }
     public String getSubStatus() { return subStatus; }
     public void setSubStatus(String s) { this.subStatus = s; }
-    public String getPayFormat() { return payFormat; }
-    public void setPayFormat(String s) { this.payFormat = s; }
     public String getDateRange() { return dateRange; }
     public void setDateRange(String s) { this.dateRange = s; }
-    public String getBackupFormat() { return backupFormat; }
-    public void setBackupFormat(String s) { this.backupFormat = s; }
 }

@@ -25,4 +25,6 @@ public interface SubscriptionDAO {
     List<Subscription> findByClientIdAndCategoryId(UUID clientId, UUID categoryId);
     
     List<Subscription> findByNameContaining(String name);
+
+    List<Subscription> findActiveWithBillingDateBefore(java.time.LocalDate date);
 }

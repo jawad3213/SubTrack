@@ -36,6 +36,10 @@ public class Invoice {
     @Column(name = "is_processed", nullable = false)
     private Boolean isProcessed = false;
 
+    /** Failed AI parsing attempts; the scheduler gives up after InvoiceService.MAX_PARSE_ATTEMPTS. */
+    @Column(name = "parse_attempts", nullable = false)
+    private int parseAttempts = 0;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -99,6 +103,14 @@ public class Invoice {
 
     public void setInvoiceDate(LocalDate invoiceDate) {
         this.invoiceDate = invoiceDate;
+    }
+
+    public int getParseAttempts() {
+        return parseAttempts;
+    }
+
+    public void setParseAttempts(int parseAttempts) {
+        this.parseAttempts = parseAttempts;
     }
 
     public Boolean getIsProcessed() {

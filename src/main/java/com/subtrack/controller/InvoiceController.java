@@ -1,5 +1,6 @@
 package com.subtrack.controller;
 
+import com.subtrack.util.FacesErrors;
 import com.subtrack.entity.Invoice;
 import com.subtrack.service.InvoiceService;
 import jakarta.annotation.PostConstruct;
@@ -10,11 +11,12 @@ import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
 import java.io.Serializable;
 import java.util.List;
-import java.util.UUID;
 
 @Named
 @SessionScoped
 public class InvoiceController implements Serializable {
+
+    private static final org.slf4j.Logger LOGGER = org.slf4j.LoggerFactory.getLogger(InvoiceController.class);
 
     private static final long serialVersionUID = 1L;
 
@@ -40,49 +42,45 @@ public class InvoiceController implements Serializable {
     }
 
     public void processInvoice() {
-        System.out.println(">>> InvoiceController: Processing invoice " + (selectedInvoice != null ? selectedInvoice.getId() : "null"));
+        LOGGER.info("InvoiceController: Processing invoice " + (selectedInvoice != null ? selectedInvoice.getId() : "null"));
         if (selectedInvoice != null) {
             try {
                 invoiceService.createSubscriptionFromInvoice(selectedInvoice);
                 FacesContext.getCurrentInstance().addMessage(null, 
                     new FacesMessage(FacesMessage.SEVERITY_INFO, 
                     "Success", "Subscription created successfully from invoice."));
-                System.out.println(">>> InvoiceController: Successfully created subscription for invoice " + selectedInvoice.getId());
+                LOGGER.info("InvoiceController: Successfully created subscription for invoice " + selectedInvoice.getId());
                 loadInvoices();
             } catch (Exception e) {
-                System.err.println(">>> InvoiceController: Failed to process invoice: " + e.getMessage());
+                LOGGER.warn("InvoiceController: Failed to process invoice", e);
                 FacesContext.getCurrentInstance().addMessage(null, 
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                    "Error", "Failed to process invoice: " + e.getMessage()));
+                    "Error", FacesErrors.message(e, "Failed to process invoice. Please try again.")));
             }
         }
     }
 
     public void deleteInvoice() {
-        System.out.println(">>> InvoiceController: Deleting invoice " + (selectedInvoice != null ? selectedInvoice.getId() : "null"));
+        LOGGER.info("InvoiceController: Deleting invoice " + (selectedInvoice != null ? selectedInvoice.getId() : "null"));
         if (selectedInvoice != null) {
             try {
                 invoiceService.delete(selectedInvoice);
                 FacesContext.getCurrentInstance().addMessage(null, 
                     new FacesMessage(FacesMessage.SEVERITY_INFO, 
                     "Success", "Invoice deleted successfully."));
-                System.out.println(">>> InvoiceController: Successfully deleted invoice " + selectedInvoice.getId());
+                LOGGER.info("InvoiceController: Successfully deleted invoice " + selectedInvoice.getId());
                 loadInvoices();
             } catch (Exception e) {
-                System.err.println(">>> InvoiceController: Failed to delete invoice: " + e.getMessage());
+                LOGGER.warn("InvoiceController: Failed to delete invoice", e);
                 FacesContext.getCurrentInstance().addMessage(null, 
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                    "Error", "Failed to delete invoice: " + e.getMessage()));
+                    "Error", FacesErrors.message(e, "Failed to delete invoice. Please try again.")));
             }
         }
     }
 
-    public void selectInvoice(Invoice invoice) {
-        selectedInvoice = invoice;
-    }
-
     public void updateInvoice() {
-        System.out.println(">>> InvoiceController: Updating invoice " + (selectedInvoice != null ? selectedInvoice.getId() : "null"));
+        LOGGER.info("InvoiceController: Updating invoice " + (selectedInvoice != null ? selectedInvoice.getId() : "null"));
         if (selectedInvoice != null) {
             try {
                 invoiceService.update(selectedInvoice);
@@ -91,10 +89,10 @@ public class InvoiceController implements Serializable {
                     "Success", "Invoice updated successfully."));
                 loadInvoices();
             } catch (Exception e) {
-                System.err.println(">>> InvoiceController: Failed to update invoice: " + e.getMessage());
+                LOGGER.warn("InvoiceController: Failed to update invoice", e);
                 FacesContext.getCurrentInstance().addMessage(null, 
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                    "Error", "Failed to update invoice: " + e.getMessage()));
+                    "Error", FacesErrors.message(e, "Failed to update invoice. Please try again.")));
             }
         }
     }

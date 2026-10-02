@@ -1,25 +1,34 @@
 package com.subtrack.controller;
 
-import com.subtrack.dao.ClientDAO;
-import com.subtrack.entity.Client;
-import com.subtrack.service.EmailService;
+import com.subtrack.util.FacesErrors;
+import com.subtrack.dao.SystemConfigDAO;
+import com.subtrack.service.AttemptLimiter;
 import com.subtrack.service.ClientService;
-import com.subtrack.util.PasswordUtil;
+import com.subtrack.service.EmailService;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.faces.application.FacesMessage;
+import jakarta.faces.context.ExternalContext;
 import jakarta.faces.context.FacesContext;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.Optional;
-import java.util.UUID;
 
 @Named
 @RequestScoped
 public class ForgotPasswordController implements Serializable {
 
     private static final long serialVersionUID = 1L;
+
+    // Reset emails allowed per address within the window; extra requests are silently ignored.
+    private static final int MAX_RESET_EMAILS = 3;
+    private static final Duration RESET_WINDOW = Duration.ofHours(1);
+
+    @Inject
+    private AttemptLimiter attemptLimiter;
 
     @Inject
     private ClientService clientService;
@@ -28,105 +37,89 @@ public class ForgotPasswordController implements Serializable {
     private EmailService emailService;
 
     @Inject
-    private ClientDAO clientDAO;
+    private SystemConfigDAO systemConfigDAO;
 
     private String email;
     private String resetToken;
+    private String newPassword;
+    private String confirmPassword;
     private boolean tokenSent;
-    private boolean tokenVerified;
 
     public String requestReset() {
-        Optional<Client> clientOpt = clientService.findByEmail(email);
-        
-        if (clientOpt.isEmpty()) {
-            FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", 
-                    "No account found with this email address"));
-            return null;
+        String sanitizedEmail = (email != null) ? email.trim().toLowerCase() : "";
+        String limitKey = "reset:email:" + sanitizedEmail;
+        Optional<String> token = Optional.empty();
+        if (!attemptLimiter.isBlocked(limitKey, MAX_RESET_EMAILS, RESET_WINDOW)) {
+            attemptLimiter.record(limitKey);
+            token = clientService.createPasswordResetToken(sanitizedEmail);
         }
 
-        Client client = clientOpt.get();
-        String token = UUID.randomUUID().toString();
+        if (token.isPresent()) {
+            String resetLink = getBaseUrl() + "/reset-password.xhtml?token="
+                + URLEncoder.encode(token.get(), StandardCharsets.UTF_8);
+            emailService.sendEmail(sanitizedEmail, "SubTrack Password Reset",
+                "To reset your password, open the following link:\n" + resetLink +
+                "\n\nThis link expires in 1 hour and can only be used once." +
+                "\n\nIf you didn't request this, ignore this email; your password has not changed.");
+        }
 
-        client.setPassword(PasswordUtil.hashPassword(token));
-        clientDAO.update(client);
-
-        String resetLink = FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath() 
-            + "/reset-password.xhtml?token=" + token;
-
-        emailService.sendEmail(email, "SubTrack Password Reset",
-            "To reset your password, click the following link:\n" + resetLink + 
-            "\n\nThis link will expire in 1 hour.\n\nIf you didn't request this, please ignore this email.");
-
+        // Same response whether or not the account exists, so emails can't be enumerated.
         tokenSent = true;
         FacesContext.getCurrentInstance().addMessage(null,
-            new FacesMessage(FacesMessage.SEVERITY_INFO, "Success", 
-                "Password reset link sent to your email"));
-        
+            new FacesMessage(FacesMessage.SEVERITY_INFO, "Check your inbox",
+                "If an account exists for this email, a reset link has been sent."));
         return null;
     }
 
-    public String verifyToken() {
-        if (resetToken == null || resetToken.isBlank()) {
+    public boolean isTokenValid() {
+        return clientService.isPasswordResetTokenValid(resetToken);
+    }
+
+    public String resetPassword() {
+        if (newPassword == null || !newPassword.equals(confirmPassword)) {
             FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Invalid token"));
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Passwords do not match"));
             return null;
         }
 
         try {
-            Optional<Client> clientOpt = clientDAO.findAll().stream()
-                .filter(c -> clientDAO.findById(c.getId()).isPresent())
-                .findFirst();
-
-            if (clientOpt.isPresent()) {
-                Client client = clientOpt.get();
-                if (client.getUpdatedAt() != null && 
-                    java.time.Duration.between(client.getUpdatedAt(), LocalDateTime.now()).toMinutes() < 60) {
-                    tokenVerified = true;
-                    return "/reset-password.xhtml?faces-redirect=true";
-                }
-            }
-        } catch (Exception e) {
-            FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Token expired or invalid"));
-        }
-        return null;
-    }
-
-    public String resetPassword(String newPassword) {
-        Optional<Client> clientOpt = clientService.findByEmail(email);
-        
-        if (clientOpt.isEmpty()) {
-            FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Session expired"));
+            clientService.resetPasswordWithToken(resetToken, newPassword);
+            FacesContext context = FacesContext.getCurrentInstance();
+            context.getExternalContext().getFlash().setKeepMessages(true);
+            context.addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO, "Success",
+                    "Password reset successfully. You can now sign in."));
             return "/login.xhtml?faces-redirect=true";
-        }
-
-        if (!PasswordUtil.isPasswordStrong(newPassword)) {
+        } catch (IllegalArgumentException e) {
             FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", 
-                    "Password must be at least 8 characters with uppercase, lowercase, and digits"));
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", FacesErrors.message(e)));
             return null;
         }
+    }
 
-        try {
-            clientService.changePassword(clientOpt.get().getId(), "", newPassword);
-            FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO, "Success", 
-                    "Password reset successfully"));
-            return "/login.xhtml?faces-redirect=true";
-        } catch (Exception e) {
-            FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", 
-                    "Failed to reset password: " + e.getMessage()));
+    /**
+     * Prefers the configured APP_BASE_URL so a forged Host header can't redirect reset links
+     * to another domain; falls back to the current request for local development.
+     */
+    private String getBaseUrl() {
+        String configured = systemConfigDAO.getValue("APP_BASE_URL", "");
+        if (configured != null && !configured.isBlank()) {
+            return configured.endsWith("/") ? configured.substring(0, configured.length() - 1) : configured;
         }
-        return null;
+        ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
+        int port = ec.getRequestServerPort();
+        return ec.getRequestScheme() + "://" + ec.getRequestServerName()
+            + (port != 80 && port != 443 ? ":" + port : "")
+            + ec.getRequestContextPath();
     }
 
     public String getEmail() { return email; }
-    public void setEmail(String e) { this.email = e; }
+    public void setEmail(String email) { this.email = email; }
     public String getResetToken() { return resetToken; }
     public void setResetToken(String t) { this.resetToken = t; }
+    public String getNewPassword() { return newPassword; }
+    public void setNewPassword(String p) { this.newPassword = p; }
+    public String getConfirmPassword() { return confirmPassword; }
+    public void setConfirmPassword(String p) { this.confirmPassword = p; }
     public boolean isTokenSent() { return tokenSent; }
-    public boolean isTokenVerified() { return tokenVerified; }
 }

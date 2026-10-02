@@ -77,4 +77,13 @@ public class ClientDAOImpl implements ClientDAO {
         query.setParameter("email", email);
         return query.getSingleResult() > 0;
     }
+
+    @Override
+    public Optional<Client> findByPasswordResetTokenHash(String tokenHash) {
+        TypedQuery<Client> query = em.createQuery(
+            "SELECT c FROM Client c WHERE c.passwordResetTokenHash = :hash", Client.class);
+        query.setParameter("hash", tokenHash);
+        List<Client> results = query.getResultList();
+        return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
+    }
 }

@@ -9,6 +9,8 @@ import com.subtrack.entity.Invoice;
 @Stateless
 public class InvoiceScheduler {
 
+    private static final org.slf4j.Logger LOGGER = org.slf4j.LoggerFactory.getLogger(InvoiceScheduler.class);
+
     @Inject
     private InvoiceService invoiceService;
     
@@ -28,7 +30,7 @@ public class InvoiceScheduler {
                     invoiceService.processInvoice(invoice.getId());
                 }
             } catch (Exception e) {
-                System.err.println("Failed to process invoice: " + invoice.getId() + " - " + e.getMessage());
+                LOGGER.warn("Failed to process invoice: " + invoice.getId() + "", e);
             }
         }
     }

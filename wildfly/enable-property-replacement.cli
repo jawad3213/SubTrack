@@ -1,0 +1,4 @@
+# Lets web.xml use ${env.X} expressions (e.g. for the datasource credentials).
+# WildFly's default "ee" layer disables this for standard descriptors.
+/subsystem=ee:write-attribute(name=spec-descriptor-property-replacement,value=true)
+reload

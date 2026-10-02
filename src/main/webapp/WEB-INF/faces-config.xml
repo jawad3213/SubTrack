@@ -79,17 +79,6 @@
         <converter-class>com.subtrack.converter.SubscriptionConverter</converter-class>
     </converter>
     
-    <!-- Validators -->
-    <validator>
-        <validator-id>emailValidator</validator-id>
-        <validator-class>com.subtrack.validator.EmailValidator</validator-class>
-    </validator>
-    
-    <validator>
-        <validator-id>passwordValidator</validator-id>
-        <validator-class>com.subtrack.validator.PasswordValidator</validator-class>
-    </validator>
-    
     <!-- Enum Converters -->
     <converter>
         <converter-for-class>com.subtrack.enums.Frequency</converter-for-class>

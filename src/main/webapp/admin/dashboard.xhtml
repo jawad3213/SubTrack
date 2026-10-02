@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
@@ -8,47 +8,134 @@
     <ui:define name="title">Admin Dashboard - SubTrack</ui:define>
 
     <ui:define name="content">
-        <div class="page-header" style="margin-bottom: 28px;">
-            <h1 style="color: #1A1A1A; font-size: 22px; font-weight: 700;">Admin Dashboard</h1>
-            <p style="color: #5F5E5A; font-size: 14px;">Platform health and key metrics overview</p>
-        </div>
-
-        <!-- KPI Cards -->
-        <div class="admin-kpi-grid">
-            <div class="admin-kpi-card">
-                <div class="admin-kpi-icon blue">
-                    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-                </div>
-                <div class="admin-kpi-body">
-                    <div class="admin-kpi-value">#{adminDashboardBean.totalCatalogServices}</div>
-                    <div class="admin-kpi-label">Total SaaS Services</div>
-                </div>
+        <div class="page-header-row">
+            <div>
+                <h1>Admin Dashboard</h1>
+                <p>Platform health and key metrics</p>
             </div>
-            <div class="admin-kpi-card">
-                <div class="admin-kpi-icon amber">
-                    <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
-                </div>
-                <div class="admin-kpi-body">
-                    <div class="admin-kpi-value">#{adminDashboardBean.totalUsers}</div>
-                    <div class="admin-kpi-label">Total Registered Users</div>
-                </div>
-            </div>
-            <div class="admin-kpi-card">
-                <div class="admin-kpi-icon red">
-                    <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
-                </div>
-                <div class="admin-kpi-body">
-                    <div class="admin-kpi-value">#{adminDashboardBean.newUsersThisMonth}</div>
-                    <div class="admin-kpi-label">New Users This Month</div>
-                </div>
+            <div class="header-actions">
+                <h:link outcome="/admin/users" value="Manage users" styleClass="btn-secondary"/>
+                <h:link outcome="/admin/catalog" value="+ Add SaaS service" styleClass="btn-primary"/>
             </div>
         </div>
 
-        <div class="admin-two-col">
-            <!-- Recent Activity Feed -->
+        <!-- KPIs -->
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-icon blue">
+                    <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </div>
+                <div class="kpi-body">
+                    <div class="kpi-label">Registered users</div>
+                    <div class="kpi-value">#{adminDashboardBean.totalUsers}</div>
+                    <div class="kpi-sub">#{adminDashboardBean.activeUsers} active · #{adminDashboardBean.suspendedUsers} suspended</div>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon green">
+                    <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                </div>
+                <div class="kpi-body">
+                    <div class="kpi-label">Active subscriptions</div>
+                    <div class="kpi-value">#{adminDashboardBean.activeSubscriptions}</div>
+                    <div class="kpi-sub">of #{adminDashboardBean.totalSubscriptions} tracked</div>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon amber">
+                    <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                </div>
+                <div class="kpi-body">
+                    <div class="kpi-label">Spend tracked per month</div>
+                    <div class="kpi-value">
+                        <h:outputText value="#{adminDashboardBean.platformMonthlySpend}"><f:convertNumber pattern="#,##0"/></h:outputText>
+                        <span class="unit">#{adminDashboardBean.displayCurrency}</span>
+                    </div>
+                    <div class="kpi-sub">All users, active subscriptions</div>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon red">
+                    <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+                </div>
+                <div class="kpi-body">
+                    <div class="kpi-label">New users this month</div>
+                    <div class="kpi-value">#{adminDashboardBean.newUsersThisMonth}</div>
+                    <div class="kpi-sub">#{adminDashboardBean.averageSubscriptionsPerUser} subscriptions per user</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid-wide-narrow">
+            <!-- Sign-ups chart -->
             <div class="card">
                 <div class="card-header">
-                    <h2 class="card-title">Recent Activity</h2>
+                    <div>
+                        <h2 class="card-title">New sign-ups</h2>
+                        <div class="card-subtitle">Last 6 months</div>
+                    </div>
+                </div>
+                <div class="bar-chart">
+                    <ui:repeat value="#{adminDashboardBean.signupTrend}" var="bar">
+                        <div class="bar-col">
+                            <div class="bar-track">
+                                <div class="bar #{bar.current ? 'current' : ''}" style="height: #{bar.heightPercent}%;">
+                                    <span class="bar-value">#{bar.count}</span>
+                                </div>
+                            </div>
+                            <div class="bar-label #{bar.current ? 'current' : ''}">#{bar.month}</div>
+                        </div>
+                    </ui:repeat>
+                </div>
+            </div>
+
+            <!-- Subscription status -->
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <h2 class="card-title">Subscription status</h2>
+                        <div class="card-subtitle">#{adminDashboardBean.totalSubscriptions} subscriptions</div>
+                    </div>
+                </div>
+                <div class="stacked-bar">
+                    <span class="seg-active" style="width: #{adminDashboardBean.activePercent}%;"></span>
+                    <span class="seg-paused" style="width: #{adminDashboardBean.pausedPercent}%;"></span>
+                    <span class="seg-cancelled" style="width: #{adminDashboardBean.cancelledPercent}%;"></span>
+                </div>
+                <div class="status-legend">
+                    <span><i class="seg-active"></i>Active <strong>#{adminDashboardBean.activeSubscriptions}</strong></span>
+                    <span><i class="seg-paused"></i>Paused <strong>#{adminDashboardBean.pausedSubscriptions}</strong></span>
+                    <span><i class="seg-cancelled"></i>Cancelled <strong>#{adminDashboardBean.cancelledSubscriptions}</strong></span>
+                </div>
+
+                <h3 style="font-size: 14px; font-weight: 600; color: #1A1A1A; margin: 26px 0 6px;">Most tracked services</h3>
+                <h:panelGroup rendered="#{not empty adminDashboardBean.topServices}">
+                    <ul class="hbar-list">
+                        <ui:repeat value="#{adminDashboardBean.topServices}" var="svc">
+                            <li>
+                                <div class="hbar-head">
+                                    <span class="hbar-name">#{svc.name}</span>
+                                    <span class="hbar-amount">#{svc.count} user(s)</span>
+                                </div>
+                                <div class="hbar-track"><div class="hbar-fill" style="width: #{svc.percentOfMax}%;"></div></div>
+                            </li>
+                        </ui:repeat>
+                    </ul>
+                </h:panelGroup>
+                <h:panelGroup rendered="#{empty adminDashboardBean.topServices}">
+                    <p class="chart-note">No subscriptions yet.</p>
+                </h:panelGroup>
+            </div>
+        </div>
+
+        <div class="grid-2">
+            <!-- Activity -->
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <h2 class="card-title">Recent activity</h2>
+                        <div class="card-subtitle">Last 7 days</div>
+                    </div>
                 </div>
                 <h:panelGroup rendered="#{not empty adminDashboardBean.recentActivities}">
                     <ul class="activity-feed">
@@ -62,49 +149,42 @@
                     </ul>
                 </h:panelGroup>
                 <h:panelGroup rendered="#{empty adminDashboardBean.recentActivities}">
-                    <div class="empty-state"><p>No recent activity recorded.</p></div>
+                    <div class="empty-inline"><p>No activity in the last 7 days.</p></div>
                 </h:panelGroup>
             </div>
 
-            <!-- System Status -->
+            <!-- Integrations -->
             <div class="card">
                 <div class="card-header">
-                    <h2 class="card-title">System Status</h2>
+                    <div>
+                        <h2 class="card-title">Integrations</h2>
+                        <div class="card-subtitle">#{adminDashboardBean.totalCatalogServices} services in the catalog</div>
+                    </div>
+                    <h:link outcome="/admin/config" value="Configure" styleClass="card-link"/>
                 </div>
                 <div class="system-status-grid" style="grid-template-columns: 1fr;">
                     <div class="system-status-card">
-                        <div class="system-status-name">Exchange Rate API</div>
+                        <div class="system-status-name">Exchange rate API</div>
                         <span class="status-indicator #{adminDashboardBean.exchangeRateConfigured ? 'operational' : 'unreachable'}">
-                            <span class="dot"></span> #{adminDashboardBean.exchangeRateConfigured ? 'Operational' : 'Not configured'}
+                            <span class="dot"></span> #{adminDashboardBean.exchangeRateConfigured ? 'Configured' : 'Not configured'}
                         </span>
-                        <div class="system-status-detail">Last updated: #{adminDashboardBean.exchangeRateConfigured ? 'Auto-refresh every 6h' : 'Not configured'}</div>
+                        <div class="system-status-detail">Rates refresh automatically every 6 hours</div>
                     </div>
                     <div class="system-status-card">
-                        <div class="system-status-name">n8n Orchestrator</div>
-                        <span class="status-indicator #{adminDashboardBean.n8nWebhookConfigured ? 'operational' : 'unreachable'}">
-                            <span class="dot"></span> #{adminDashboardBean.n8nWebhookConfigured ? 'Operational' : 'Not configured'}
-                        </span>
-                        <div class="system-status-detail">Last webhook: #{adminDashboardBean.n8nWebhookConfigured ? 'Ready to receive' : 'Not configured'}</div>
-                    </div>
-                    <div class="system-status-card">
-                        <div class="system-status-name">Google Gemini API</div>
+                        <div class="system-status-name">Google Gemini (invoice parsing)</div>
                         <span class="status-indicator #{adminDashboardBean.geminiConfigured ? 'operational' : 'unreachable'}">
-                            <span class="dot"></span> #{adminDashboardBean.geminiConfigured ? 'Operational' : 'Not configured'}
+                            <span class="dot"></span> #{adminDashboardBean.geminiConfigured ? 'Configured' : 'Not configured'}
                         </span>
-                        <div class="system-status-detail">Last invoice processed: #{adminDashboardBean.geminiConfigured ? 'Ready' : 'Not configured'}</div>
+                        <div class="system-status-detail">Pending invoices are processed every 5 minutes</div>
+                    </div>
+                    <div class="system-status-card">
+                        <div class="system-status-name">n8n webhook</div>
+                        <span class="status-indicator #{adminDashboardBean.n8nWebhookConfigured ? 'operational' : 'unreachable'}">
+                            <span class="dot"></span> #{adminDashboardBean.n8nWebhookConfigured ? 'Configured' : 'Not configured'}
+                        </span>
+                        <div class="system-status-detail">Receives invoice and exchange-rate events</div>
                     </div>
                 </div>
-            </div>
-        </div>
-
-        <!-- Quick Actions -->
-        <div class="admin-section" style="margin-top: 4px;">
-            <div class="admin-section-header">
-                <h3 class="admin-section-title">Quick Actions</h3>
-            </div>
-            <div class="admin-quick-actions">
-                <h:link outcome="/admin/catalog" value="+ Add SaaS Service" styleClass="btn-primary"/>
-                <h:link outcome="/admin/users" value="Export User Data" styleClass="btn-secondary"/>
             </div>
         </div>
     </ui:define>

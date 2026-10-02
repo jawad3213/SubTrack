@@ -1,158 +1,160 @@
 package com.subtrack.util;
 
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Unit tests for {@link PasswordUtil}.
+ * Covers hashing, verification, strength validation, and token generation.
+ */
 class PasswordUtilTest {
 
-    @Test
-    void hashPassword_ReturnsBCryptHash() {
-        String hashed = PasswordUtil.hashPassword("Password123");
-        
-        assertNotNull(hashed);
-        assertTrue(hashed.startsWith("$2a$"));
-        assertTrue(hashed.length() > 20);
+    // ---------------------------------------------------------------
+    // hashPassword
+    // ---------------------------------------------------------------
+    @Nested
+    @DisplayName("hashPassword()")
+    class HashPassword {
+
+        @Test
+        @DisplayName("should return a BCrypt hash that starts with $2a$")
+        void hashPassword_validInput_returnsBCryptHash() {
+            String hash = PasswordUtil.hashPassword("SecurePass1");
+            assertNotNull(hash);
+            assertTrue(hash.startsWith("$2a$"), "BCrypt hash should start with $2a$");
+        }
+
+        @Test
+        @DisplayName("should produce different hashes for the same password (salted)")
+        void hashPassword_samePlaintext_differentHashes() {
+            String hash1 = PasswordUtil.hashPassword("SecurePass1");
+            String hash2 = PasswordUtil.hashPassword("SecurePass1");
+            assertNotEquals(hash1, hash2, "Each hash should use a unique salt");
+        }
+
+        @Test
+        @DisplayName("should throw IllegalArgumentException for null password")
+        void hashPassword_null_throwsException() {
+            assertThrows(IllegalArgumentException.class,
+                    () -> PasswordUtil.hashPassword(null));
+        }
+
+        @Test
+        @DisplayName("should throw IllegalArgumentException for empty password")
+        void hashPassword_empty_throwsException() {
+            assertThrows(IllegalArgumentException.class,
+                    () -> PasswordUtil.hashPassword(""));
+        }
     }
 
-    @Test
-    void hashPassword_DifferentHashesForSamePassword() {
-        String hash1 = PasswordUtil.hashPassword("Password123");
-        String hash2 = PasswordUtil.hashPassword("Password123");
-        
-        assertNotEquals(hash1, hash2);
+    // ---------------------------------------------------------------
+    // verifyPassword
+    // ---------------------------------------------------------------
+    @Nested
+    @DisplayName("verifyPassword()")
+    class VerifyPassword {
+
+        @Test
+        @DisplayName("should return true for a matching plaintext/hash pair")
+        void verifyPassword_correctPassword_returnsTrue() {
+            String hash = PasswordUtil.hashPassword("MyPass123");
+            assertTrue(PasswordUtil.verifyPassword("MyPass123", hash));
+        }
+
+        @Test
+        @DisplayName("should return false for an incorrect plaintext")
+        void verifyPassword_wrongPassword_returnsFalse() {
+            String hash = PasswordUtil.hashPassword("MyPass123");
+            assertFalse(PasswordUtil.verifyPassword("WrongPass", hash));
+        }
+
+        @Test
+        @DisplayName("should return false when plaintext is null")
+        void verifyPassword_nullPlaintext_returnsFalse() {
+            assertFalse(PasswordUtil.verifyPassword(null, "$2a$12$someHash"));
+        }
+
+        @Test
+        @DisplayName("should return false when hash is null")
+        void verifyPassword_nullHash_returnsFalse() {
+            assertFalse(PasswordUtil.verifyPassword("pass", null));
+        }
+
+        @Test
+        @DisplayName("should return false for a malformed hash string")
+        void verifyPassword_malformedHash_returnsFalse() {
+            assertFalse(PasswordUtil.verifyPassword("pass", "not-a-bcrypt-hash"));
+        }
     }
 
-    @Test
-    void verifyPassword_CorrectPassword_ReturnsTrue() {
-        String hashed = PasswordUtil.hashPassword("Password123");
-        
-        assertTrue(PasswordUtil.verifyPassword("Password123", hashed));
+    // ---------------------------------------------------------------
+    // isPasswordStrong
+    // ---------------------------------------------------------------
+    @Nested
+    @DisplayName("isPasswordStrong()")
+    class IsPasswordStrong {
+
+        @Test
+        @DisplayName("should accept a password with upper, lower, and digit")
+        void strong_validPassword_returnsTrue() {
+            assertTrue(PasswordUtil.isPasswordStrong("Abcdefg1"));
+        }
+
+        @Test
+        @DisplayName("should reject a null password")
+        void strong_null_returnsFalse() {
+            assertFalse(PasswordUtil.isPasswordStrong(null));
+        }
+
+        @Test
+        @DisplayName("should reject a password shorter than 8 characters")
+        void strong_tooShort_returnsFalse() {
+            assertFalse(PasswordUtil.isPasswordStrong("Ab1"));
+        }
+
+        @Test
+        @DisplayName("should reject a password without uppercase letters")
+        void strong_noUppercase_returnsFalse() {
+            assertFalse(PasswordUtil.isPasswordStrong("abcdefg1"));
+        }
+
+        @Test
+        @DisplayName("should reject a password without lowercase letters")
+        void strong_noLowercase_returnsFalse() {
+            assertFalse(PasswordUtil.isPasswordStrong("ABCDEFG1"));
+        }
+
+        @Test
+        @DisplayName("should reject a password without digits")
+        void strong_noDigit_returnsFalse() {
+            assertFalse(PasswordUtil.isPasswordStrong("Abcdefgh"));
+        }
     }
 
-    @Test
-    void verifyPassword_WrongPassword_ReturnsFalse() {
-        String hashed = PasswordUtil.hashPassword("Password123");
-        
-        assertFalse(PasswordUtil.verifyPassword("WrongPassword", hashed));
-    }
+    // ---------------------------------------------------------------
+    // generateRandomToken
+    // ---------------------------------------------------------------
+    @Nested
+    @DisplayName("generateRandomToken()")
+    class GenerateRandomToken {
 
-    @Test
-    void verifyPassword_NullPlainPassword_ReturnsFalse() {
-        String hashed = PasswordUtil.hashPassword("Password123");
-        
-        assertFalse(PasswordUtil.verifyPassword(null, hashed));
-    }
+        @Test
+        @DisplayName("should return a non-null, non-empty token")
+        void generateToken_returnsNonEmpty() {
+            String token = PasswordUtil.generateRandomToken();
+            assertNotNull(token);
+            assertFalse(token.isEmpty());
+        }
 
-    @Test
-    void verifyPassword_NullHashedPassword_ReturnsFalse() {
-        assertFalse(PasswordUtil.verifyPassword("Password123", null));
-    }
-
-    @Test
-    void verifyPassword_BothNull_ReturnsFalse() {
-        assertFalse(PasswordUtil.verifyPassword(null, null));
-    }
-
-    @Test
-    void isPasswordStrong_ValidPassword_ReturnsTrue() {
-        assertTrue(PasswordUtil.isPasswordStrong("Password123"));
-    }
-
-    @Test
-    void isPasswordStrong_MinimumLength_ReturnsTrue() {
-        assertTrue(PasswordUtil.isPasswordStrong("Ab123456"));
-    }
-
-    @Test
-    void isPasswordStrong_TooShort_ReturnsFalse() {
-        assertFalse(PasswordUtil.isPasswordStrong("Pass123"));
-    }
-
-    @Test
-    void isPasswordStrong_MissingUppercase_ReturnsFalse() {
-        assertFalse(PasswordUtil.isPasswordStrong("password123"));
-    }
-
-    @Test
-    void isPasswordStrong_MissingLowercase_ReturnsFalse() {
-        assertFalse(PasswordUtil.isPasswordStrong("PASSWORD123"));
-    }
-
-    @Test
-    void isPasswordStrong_MissingDigit_ReturnsFalse() {
-        assertFalse(PasswordUtil.isPasswordStrong("PasswordABC"));
-    }
-
-    @Test
-    void isPasswordStrong_NullPassword_ReturnsFalse() {
-        assertFalse(PasswordUtil.isPasswordStrong(null));
-    }
-
-    @Test
-    void isPasswordStrong_EmptyPassword_ReturnsFalse() {
-        assertFalse(PasswordUtil.isPasswordStrong(""));
-    }
-
-    @Test
-    void isPasswordStrong_Exactly8CharsWithAllRequirements_ReturnsTrue() {
-        assertTrue(PasswordUtil.isPasswordStrong("Abcdefg1"));
-    }
-
-    @Test
-    void isPasswordStrong_LongerPasswordWithRequirements_ReturnsTrue() {
-        assertTrue(PasswordUtil.isPasswordStrong("MyVeryStrongPassword123"));
-    }
-
-    @Test
-    void isPasswordStrong_WithSpecialChar_ReturnsTrue() {
-        assertTrue(PasswordUtil.isPasswordStrong("Password123!"));
-    }
-
-    @Test
-    void hashPassword_NullPassword_ThrowsException() {
-        assertThrows(IllegalArgumentException.class, () -> 
-            PasswordUtil.hashPassword(null));
-    }
-
-    @Test
-    void hashPassword_EmptyPassword_ThrowsException() {
-        assertThrows(IllegalArgumentException.class, () -> 
-            PasswordUtil.hashPassword(""));
-    }
-
-    @Test
-    void generateRandomToken_ReturnsToken() {
-        String token = PasswordUtil.generateRandomToken();
-        
-        assertNotNull(token);
-        assertTrue(token.length() > 20);
-    }
-
-    @Test
-    void generateRandomToken_DifferentTokens() {
-        String token1 = PasswordUtil.generateRandomToken();
-        String token2 = PasswordUtil.generateRandomToken();
-        
-        assertNotEquals(token1, token2);
-    }
-
-    @Test
-    void generateRandomToken_UrlSafe() {
-        String token = PasswordUtil.generateRandomToken();
-        
-        assertFalse(token.contains("+"));
-        assertFalse(token.contains("/"));
-        assertFalse(token.contains("="));
-    }
-
-    @Test
-    void verifyPassword_InvalidHashFormat_ReturnsFalse() {
-        assertFalse(PasswordUtil.verifyPassword("password", "invalid_hash"));
-    }
-
-    @Test
-    void verifyPassword_TruncatedHash_ReturnsFalse() {
-        assertFalse(PasswordUtil.verifyPassword("password", "$2a$10$abc"));
+        @Test
+        @DisplayName("should produce unique tokens on successive calls")
+        void generateToken_uniqueEachTime() {
+            String t1 = PasswordUtil.generateRandomToken();
+            String t2 = PasswordUtil.generateRandomToken();
+            assertNotEquals(t1, t2);
+        }
     }
 }

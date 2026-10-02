@@ -13,149 +13,100 @@
     
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.release>17</maven.compiler.release>
         <jakartaee.version>10.0.0</jakartaee.version>
-        <hibernate.version>6.4.4.Final</hibernate.version>
         <postgresql.version>42.7.1</postgresql.version>
+        <junit.version>5.10.1</junit.version>
+        <mockito.version>5.17.0</mockito.version>
     </properties>
     
     <dependencies>
-        <!-- Jakarta EE API -->
+        <!-- ===== Provided by WildFly (not packaged in the WAR) ===== -->
+
+        <!-- Full Jakarta EE 10 API: Faces, CDI, JPA, Servlet, EJB, JSON-P, Mail API, Validation... -->
         <dependency>
             <groupId>jakarta.platform</groupId>
             <artifactId>jakarta.jakartaee-api</artifactId>
             <version>${jakartaee.version}</version>
             <scope>provided</scope>
         </dependency>
-        
-        <!-- Jakarta Faces -->
+
+        <!-- Logging API; WildFly routes it to its own logging subsystem (server.log) -->
         <dependency>
-            <groupId>jakarta.faces</groupId>
-            <artifactId>jakarta.faces-api</artifactId>
-            <version>4.0.1</version>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>2.0.9</version>
             <scope>provided</scope>
         </dependency>
-        
-        <!-- Jakarta CDI -->
-        <dependency>
-            <groupId>jakarta.inject</groupId>
-            <artifactId>jakarta.inject-api</artifactId>
-            <version>2.0.1</version>
-        </dependency>
-        
-        <!-- Jakarta Persistence -->
-        <dependency>
-            <groupId>jakarta.persistence</groupId>
-            <artifactId>jakarta.persistence-api</artifactId>
-            <version>3.1.0</version>
-        </dependency>
-        
-        <!-- Jakarta Servlet -->
-        <dependency>
-            <groupId>jakarta.servlet</groupId>
-            <artifactId>jakarta.servlet-api</artifactId>
-            <version>6.0.0</version>
-            <scope>provided</scope>
-        </dependency>
-        
-        <!-- Hibernate ORM -->
-        <dependency>
-            <groupId>org.hibernate.orm</groupId>
-            <artifactId>hibernate-core</artifactId>
-            <version>${hibernate.version}</version>
-        </dependency>
-        
-        <!-- Hibernate Validator -->
-        <dependency>
-            <groupId>org.hibernate.validator</groupId>
-            <artifactId>hibernate-validator</artifactId>
-            <version>8.0.1.Final</version>
-        </dependency>
-        
-        <!-- PostgreSQL JDBC Driver -->
+
+        <!-- ===== Packaged in the WAR ===== -->
+
+        <!-- JDBC driver used by the datasource declared in web.xml -->
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <version>${postgresql.version}</version>
         </dependency>
-        
-        <!-- Jakarta Mail -->
+
+        <!-- Schema migrations (src/main/resources/db/migration) -->
         <dependency>
-            <groupId>org.eclipse.angus</groupId>
-            <artifactId>angus-mail</artifactId>
-            <version>2.0.2</version>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+            <version>9.22.3</version>
         </dependency>
-        
-        <!-- JSON Processing -->
-        <dependency>
-            <groupId>jakarta.json</groupId>
-            <artifactId>jakarta.json-api</artifactId>
-            <version>2.1.3</version>
-        </dependency>
-        
-        <!-- Commons Codec for BCrypt -->
-        <dependency>
-            <groupId>commons-codec</groupId>
-            <artifactId>commons-codec</artifactId>
-            <version>1.16.0</version>
-        </dependency>
-        
-        <!-- BCrypt for Password Hashing -->
+
+        <!-- Password hashing -->
         <dependency>
             <groupId>org.mindrot</groupId>
             <artifactId>jbcrypt</artifactId>
             <version>0.4</version>
         </dependency>
-        
-        <!-- PrimeFaces (UI Components) -->
+
+        <!-- UI components -->
         <dependency>
             <groupId>org.primefaces</groupId>
             <artifactId>primefaces</artifactId>
             <version>14.0.4</version>
             <classifier>jakarta</classifier>
         </dependency>
-        
-        <!-- JUnit 5 for Testing -->
+
+        <!-- Jakarta Mail implementation (the provisioned WildFly layers don't include mail) -->
+        <dependency>
+            <groupId>org.eclipse.angus</groupId>
+            <artifactId>angus-mail</artifactId>
+            <version>2.0.2</version>
+        </dependency>
+
+        <!-- ===== Tests ===== -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
-            <version>5.10.1</version>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
-            <version>5.10.1</version>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
-        
-        <!-- Mockito for Testing -->
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>5.8.0</version>
+            <version>${mockito.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-junit-jupiter</artifactId>
-            <version>5.8.0</version>
+            <version>${mockito.version}</version>
             <scope>test</scope>
         </dependency>
-        
-        <!-- SLF4J API -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>2.0.9</version>
-        </dependency>
-        
-        <!-- Logback Classic -->
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>1.4.11</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
     
@@ -166,10 +117,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.12.1</version>
-                <configuration>
-                    <source>17</source>
-                    <target>17</target>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -196,6 +143,16 @@
                         <layer>bean-validation</layer>
                     </layers>
                     <runtime-name>subtrack.war</runtime-name>
+                    <scripts>
+                        <script>${project.basedir}/wildfly/enable-property-replacement.cli</script>
+                    </scripts>
+                    <packaging-scripts>
+                        <packaging-script>
+                            <commands>
+                                <command>/subsystem=ee:write-attribute(name=spec-descriptor-property-replacement,value=true)</command>
+                            </commands>
+                        </packaging-script>
+                    </packaging-scripts>
                     <timeout>300</timeout>
                 </configuration>
             </plugin>

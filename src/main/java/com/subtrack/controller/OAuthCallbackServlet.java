@@ -18,7 +18,8 @@ public class OAuthCallbackServlet extends HttpServlet {
         String error = request.getParameter("error");
         
         if (error != null) {
-            response.sendRedirect(request.getContextPath() + "/settings.xhtml?error=" + error);
+            response.sendRedirect(request.getContextPath() + "/settings.xhtml?error="
+                + java.net.URLEncoder.encode(error, java.nio.charset.StandardCharsets.UTF_8));
             return;
         }
         

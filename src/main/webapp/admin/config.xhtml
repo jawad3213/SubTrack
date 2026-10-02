@@ -3,7 +3,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
-      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:pt="http://xmlns.jcp.org/jsf/passthrough">
 <ui:composition template="/templates/admin-layout.xhtml">
     <ui:define name="title">API Keys &amp; Configuration - SubTrack Admin</ui:define>
 
@@ -22,7 +23,7 @@
                 </div>
                 <div class="form-group">
                     <label>API Key</label>
-                    <h:inputSecret value="#{adminConfigBean.geminiApiKey}" styleClass="form-control masked-field" redisplay="true"/>
+                    <h:inputSecret value="#{adminConfigBean.geminiApiKey}" styleClass="form-control masked-field" pt:placeholder="#{adminConfigBean.isConfigured('GEMINI_API_KEY') ? 'Saved. Leave blank to keep the current value' : ''}"/>
                 </div>
                 <div style="display: flex; gap: 8px; align-items: center;">
                     <h:commandButton value="Test Connection" action="#{adminConfigBean.testGemini}" styleClass="btn-secondary" style="padding: 6px 14px; font-size: 13px;"/>
@@ -38,11 +39,11 @@
                 </div>
                 <div class="form-group">
                     <label>Client ID</label>
-                    <h:inputSecret value="#{adminConfigBean.googleClientId}" styleClass="form-control masked-field" redisplay="true"/>
+                    <h:inputSecret value="#{adminConfigBean.googleClientId}" styleClass="form-control masked-field" pt:placeholder="#{adminConfigBean.isConfigured('GOOGLE_OAUTH_CLIENT_ID') ? 'Saved. Leave blank to keep the current value' : ''}"/>
                 </div>
                 <div class="form-group">
                     <label>Client Secret</label>
-                    <h:inputSecret value="#{adminConfigBean.googleClientSecret}" styleClass="form-control masked-field" redisplay="true"/>
+                    <h:inputSecret value="#{adminConfigBean.googleClientSecret}" styleClass="form-control masked-field" pt:placeholder="#{adminConfigBean.isConfigured('GOOGLE_OAUTH_CLIENT_SECRET') ? 'Saved. Leave blank to keep the current value' : ''}"/>
                 </div>
                 <h:commandButton value="Test OAuth Configuration" action="#{adminConfigBean.testGoogleOAuth}" styleClass="btn-secondary" style="padding: 6px 14px; font-size: 13px;"/>
             </div>
@@ -55,7 +56,7 @@
                 </div>
                 <div class="form-group">
                     <label>API Key</label>
-                    <h:inputSecret value="#{adminConfigBean.exchangeRateApiKey}" styleClass="form-control masked-field" redisplay="true"/>
+                    <h:inputSecret value="#{adminConfigBean.exchangeRateApiKey}" styleClass="form-control masked-field" pt:placeholder="#{adminConfigBean.isConfigured('EXCHANGE_RATE_API_KEY') ? 'Saved. Leave blank to keep the current value' : ''}"/>
                 </div>
                 <div class="form-group">
                     <label>Endpoint URL</label>
@@ -85,7 +86,7 @@
                 </div>
                 <div class="form-group">
                     <label>Bot Token</label>
-                    <h:inputSecret value="#{adminConfigBean.telegramBotToken}" styleClass="form-control masked-field" redisplay="true"/>
+                    <h:inputSecret value="#{adminConfigBean.telegramBotToken}" styleClass="form-control masked-field" pt:placeholder="#{adminConfigBean.isConfigured('TELEGRAM_BOT_TOKEN') ? 'Saved. Leave blank to keep the current value' : ''}"/>
                 </div>
                 <h:commandButton value="Test Bot" action="#{adminConfigBean.testTelegram}" styleClass="btn-secondary" style="padding: 6px 14px; font-size: 13px;"/>
             </div>
@@ -98,7 +99,7 @@
                 </div>
                 <div class="form-group">
                     <label>API Key</label>
-                    <h:inputSecret value="#{adminConfigBean.whatsappApiKey}" styleClass="form-control masked-field" redisplay="true"/>
+                    <h:inputSecret value="#{adminConfigBean.whatsappApiKey}" styleClass="form-control masked-field" pt:placeholder="#{adminConfigBean.isConfigured('WHATSAPP_API_KEY') ? 'Saved. Leave blank to keep the current value' : ''}"/>
                 </div>
                 <div class="form-group">
                     <label>Endpoint URL</label>
@@ -128,7 +129,7 @@
                     </div>
                     <div class="form-group">
                         <label>Password</label>
-                        <h:inputSecret value="#{adminConfigBean.smtpPassword}" styleClass="form-control masked-field" redisplay="true"/>
+                        <h:inputSecret value="#{adminConfigBean.smtpPassword}" styleClass="form-control masked-field" pt:placeholder="#{adminConfigBean.isConfigured('SMTP_PASS') ? 'Saved. Leave blank to keep the current value' : ''}"/>
                     </div>
                 </div>
                 <h:commandButton value="Send Test Email" action="#{adminConfigBean.testSmtp}" styleClass="btn-secondary" style="padding: 6px 14px; font-size: 13px;"/>

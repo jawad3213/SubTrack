@@ -83,7 +83,4 @@ public class AppLogger {
         logger.error(message, t);
     }
 
-    public void logWarn(String message) {
-        logger.warn(message);
-    }
 }

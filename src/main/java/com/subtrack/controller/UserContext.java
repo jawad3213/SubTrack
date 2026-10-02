@@ -39,22 +39,18 @@ public class UserContext implements Serializable {
     }
 
     public boolean isAdmin() {
-        return getCurrentUser() != null && 
-               getCurrentUser().getRole() == Role.ADMIN;
+        Client user = getCurrentUser();
+        return user != null && user.getRole() == Role.ADMIN;
     }
 
     public String getUserName() {
-        if (currentUser != null) {
-            return currentUser.getFullName();
-        }
-        return "Guest";
+        Client user = getCurrentUser();
+        return user != null ? user.getFullName() : "Guest";
     }
     
     public java.util.UUID getClientId() {
-        if (currentUser != null) {
-            return currentUser.getId();
-        }
-        return null;
+        Client user = getCurrentUser();
+        return user != null ? user.getId() : null;
     }
 
     public void invalidate() {

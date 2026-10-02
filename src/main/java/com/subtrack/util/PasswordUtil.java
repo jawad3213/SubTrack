@@ -37,7 +37,6 @@ public class PasswordUtil {
         boolean hasUpper = false;
         boolean hasLower = false;
         boolean hasDigit = false;
-        boolean hasSpecial = false;
         
         for (char c : password.toCharArray()) {
             if (Character.isUpperCase(c)) hasUpper = true;
@@ -53,5 +52,15 @@ public class PasswordUtil {
         byte[] bytes = new byte[32];
         random.nextBytes(bytes);
         return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
+    }
+
+    public static String sha256Hex(String value) {
+        try {
+            byte[] digest = java.security.MessageDigest.getInstance("SHA-256")
+                .digest(value.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            return java.util.HexFormat.of().formatHex(digest);
+        } catch (java.security.NoSuchAlgorithmException e) {
+            throw new IllegalStateException(e);
+        }
     }
 }

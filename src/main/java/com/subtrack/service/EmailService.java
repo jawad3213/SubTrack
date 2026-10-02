@@ -16,6 +16,8 @@ import java.util.Properties;
 @ApplicationScoped
 public class EmailService {
 
+    private static final org.slf4j.Logger LOGGER = org.slf4j.LoggerFactory.getLogger(EmailService.class);
+
     @Inject
     private SystemConfigDAO configDAO;
 
@@ -26,7 +28,7 @@ public class EmailService {
         String password = configDAO.getValue("SMTP_PASS", "");
 
         if (host.isEmpty() || username.isEmpty() || password.isEmpty()) {
-            System.err.println(">>> Error: SMTP credentials are not fully configured in SystemConfig. Email not sent.");
+            LOGGER.warn("Error: SMTP credentials are not fully configured in SystemConfig. Email not sent.");
             return;
         }
 
@@ -53,11 +55,11 @@ public class EmailService {
             message.setText(body);
 
             Transport.send(message);
-            System.out.println(">>> Email sent successfully to: " + toAddress);
+            LOGGER.info("Email sent successfully to: " + toAddress);
             
         } catch (MessagingException e) {
-            System.err.println(">>> Failed to send email to " + toAddress);
-            e.printStackTrace();
+            LOGGER.warn("Failed to send email to " + toAddress);
+            LOGGER.error("Unexpected error", e);
         }
     }
 }

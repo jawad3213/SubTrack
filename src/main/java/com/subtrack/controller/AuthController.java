@@ -1,25 +1,40 @@
 package com.subtrack.controller;
 
+import com.subtrack.util.FacesErrors;
 import com.subtrack.entity.Client;
 import com.subtrack.enums.AccountType;
 import com.subtrack.enums.Role;
+import com.subtrack.service.AttemptLimiter;
 import com.subtrack.service.ClientService;
-import jakarta.enterprise.context.SessionScoped;
+import jakarta.enterprise.context.RequestScoped;
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
-import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.Serializable;
+import java.time.Duration;
 
+/**
+ * Handles the login/register forms. Request-scoped so typed passwords are not kept in the
+ * session; who is logged in lives only in {@link UserContext}.
+ */
 @Named
-@SessionScoped
+@RequestScoped
 public class AuthController implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    // Failed logins allowed per email / per IP address within the window before login is refused.
+    private static final int MAX_FAILURES_PER_EMAIL = 5;
+    private static final int MAX_FAILURES_PER_IP = 20;
+    private static final Duration FAILURE_WINDOW = Duration.ofMinutes(15);
+
     @Inject
     private ClientService clientService;
+
+    @Inject
+    private AttemptLimiter attemptLimiter;
     
     @Inject
     private UserContext userContext;
@@ -30,26 +45,34 @@ public class AuthController implements Serializable {
     private String firstName;
     private String lastName;
     private AccountType accountType;
-    private Client loggedInUser;
-    private boolean loggedIn = false;
 
     public String login() {
-        System.out.println(">>> AuthController.login called for email: " + email);
+        String sanitizedEmail = (email != null) ? email.trim().toLowerCase() : "";
+        String emailKey = "login:email:" + sanitizedEmail;
+        String ipKey = "login:ip:" + clientIp();
+
+        if (attemptLimiter.isBlocked(emailKey, MAX_FAILURES_PER_EMAIL, FAILURE_WINDOW)
+                || attemptLimiter.isBlocked(ipKey, MAX_FAILURES_PER_IP, FAILURE_WINDOW)) {
+            FacesContext.getCurrentInstance().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Login Failed", "Too many failed attempts. Please wait 15 minutes and try again."));
+            return null;
+        }
+
         try {
-            String sanitizedEmail = (email != null) ? email.trim().toLowerCase() : null;
             var result = clientService.authenticate(sanitizedEmail, password);
-            System.out.println(">>> Authenticate result isPresent: " + result.isPresent());
             if (result.isPresent()) {
-                loggedInUser = result.get();
-                loggedIn = true;
+                attemptLimiter.reset(emailKey);
+                Client loggedInUser = result.get();
+                renewSessionId();
                 userContext.setCurrentUser(loggedInUser);
-                System.out.println(">>> Login successful, redirecting...");
                 if (loggedInUser.getRole() == Role.ADMIN) {
                     return "/admin/dashboard?faces-redirect=true";
                 }
                 return "dashboard?faces-redirect=true";
             } else {
-                System.out.println(">>> Login failed, no matches");
+                attemptLimiter.record(emailKey);
+                attemptLimiter.record(ipKey);
                 FacesContext.getCurrentInstance().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                         "Login Failed", "Invalid email or password"));
@@ -58,7 +81,7 @@ public class AuthController implements Serializable {
         } catch (Exception e) {
             FacesContext.getCurrentInstance().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                    "Error", e.getMessage()));
+                    "Error", FacesErrors.message(e)));
             return null;
         }
     }
@@ -76,33 +99,38 @@ public class AuthController implements Serializable {
             Client client = clientService.registerClient(sanitizedEmail, password, 
                 firstName, lastName, accountType);
             
-            loggedInUser = client;
-            loggedIn = true;
-            userContext.setCurrentUser(loggedInUser);
+            renewSessionId();
+            userContext.setCurrentUser(client);
             
             return "dashboard?faces-redirect=true";
         } catch (IllegalArgumentException e) {
             FacesContext.getCurrentInstance().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                    "Registration Failed", e.getMessage()));
+                    "Registration Failed", FacesErrors.message(e)));
             return null;
         }
     }
 
+    private String clientIp() {
+        return ((HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest()).getRemoteAddr();
+    }
+
+    /** Prevents session fixation: the pre-login session ID must not stay valid after authentication. */
+    private void renewSessionId() {
+        ((HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest()).changeSessionId();
+    }
+
     public String logout() {
         userContext.invalidate();
-        loggedInUser = null;
-        loggedIn = false;
         return "/login?faces-redirect=true";
     }
 
     public boolean isLoggedIn() {
-        return loggedIn;
+        return userContext.isLoggedIn();
     }
 
     public boolean isAdmin() {
-        return loggedInUser != null && 
-               loggedInUser.getRole() == Role.ADMIN;
+        return userContext.isAdmin();
     }
 
     // Getters and Setters
@@ -154,11 +182,4 @@ public class AuthController implements Serializable {
         this.accountType = accountType;
     }
 
-    public Client getLoggedInUser() {
-        return loggedInUser;
-    }
-
-    public void setLoggedInUser(Client loggedInUser) {
-        this.loggedInUser = loggedInUser;
-    }
 }

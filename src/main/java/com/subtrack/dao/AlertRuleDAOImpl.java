@@ -60,14 +60,4 @@ public class AlertRuleDAOImpl implements AlertRuleDAO {
         return query.getResultList();
     }
 
-    @Override
-    public List<AlertRule> findAlertsDueSoon(int days) {
-        TypedQuery<AlertRule> query = em.createQuery(
-            "SELECT a FROM AlertRule a JOIN FETCH a.subscription s " +
-            "WHERE a.isActive = true AND s.nextBillingDate IS NOT NULL " +
-            "AND s.nextBillingDate <= :targetDate",
-            AlertRule.class);
-        query.setParameter("targetDate", java.time.LocalDate.now().plusDays(days));
-        return query.getResultList();
-    }
 }

@@ -1,5 +1,6 @@
 package com.subtrack.controller;
 
+import com.subtrack.util.FacesErrors;
 import com.subtrack.entity.AlertRule;
 import com.subtrack.entity.Subscription;
 import com.subtrack.enums.AlertChannel;
@@ -13,7 +14,6 @@ import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import java.io.Serializable;
 import java.util.List;
-import java.util.UUID;
 
 @Named
 @SessionScoped
@@ -70,7 +70,7 @@ public class AlertController implements Serializable {
             return null;
         } catch (Exception e) {
             FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", e.getMessage()));
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", FacesErrors.message(e)));
             return null;
         }
     }
@@ -88,7 +88,7 @@ public class AlertController implements Serializable {
             return null;
         } catch (Exception e) {
             FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", e.getMessage()));
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", FacesErrors.message(e)));
             return null;
         }
     }
@@ -106,7 +106,7 @@ public class AlertController implements Serializable {
             return null;
         } catch (Exception e) {
             FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", e.getMessage()));
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", FacesErrors.message(e)));
             return null;
         }
     }

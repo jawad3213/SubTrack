@@ -7,7 +7,6 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @ApplicationScoped
@@ -20,22 +19,9 @@ public class SaaSCatalogService {
         return saasServiceDAO.findAll();
     }
 
-    public Optional<SaaSService> getServiceById(UUID id) {
-        return saasServiceDAO.findById(id);
-    }
-
-    public List<SaaSService> searchServices(String name) {
-        return saasServiceDAO.findByNameContaining(name);
-    }
-
     @Transactional
     public void createService(SaaSService service) {
         saasServiceDAO.create(service);
-    }
-
-    @Transactional
-    public void updateService(SaaSService service) {
-        saasServiceDAO.update(service);
     }
 
     @Transactional

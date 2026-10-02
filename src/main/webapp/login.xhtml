@@ -65,10 +65,10 @@
                 </div>
                 
                 <div class="forgot-wrapper">
-                    <a href="#" class="forgot-link">Forgot password?</a>
+                    <h:link outcome="forgot-password" value="Forgot password?" styleClass="forgot-link"/>
                 </div>
                 
-                <h:messages globalOnly="true" styleClass="msg-error"/>
+                <h:messages globalOnly="true" errorClass="msg-error" infoClass="msg-success"/>
                 
                 <h:commandButton value="Sign in" 
                                  action="#{authController.login}" 

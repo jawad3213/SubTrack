@@ -1,5 +1,6 @@
 package com.subtrack.controller;
 
+import com.subtrack.util.FacesErrors;
 import com.subtrack.entity.Category;
 import com.subtrack.entity.Client;
 import com.subtrack.entity.Subscription;
@@ -8,9 +9,9 @@ import com.subtrack.enums.SubscriptionStatus;
 import com.subtrack.service.CategoryService;
 import com.subtrack.service.SubscriptionService;
 import jakarta.annotation.PostConstruct;
-import jakarta.enterprise.context.SessionScoped;
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
+import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import java.io.Serializable;
@@ -20,9 +21,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * View-scoped: each page/tab gets fresh data and its own form state. Pages that work on one
+ * subscription (edit, detail) receive it through the "id" view parameter.
+ */
 @Named
-@SessionScoped
+@ViewScoped
 public class SubscriptionController implements Serializable {
+
+    private static final org.slf4j.Logger LOGGER = org.slf4j.LoggerFactory.getLogger(SubscriptionController.class);
 
     private static final long serialVersionUID = 1L;
 
@@ -37,9 +44,7 @@ public class SubscriptionController implements Serializable {
 
     private List<Subscription> subscriptions;
     private Subscription selectedSubscription;
-    private Subscription newSubscription;
     private List<Category> categories;
-    private String searchTerm;
     private String editId;
     
     private String name;
@@ -57,7 +62,7 @@ public class SubscriptionController implements Serializable {
     public void init() {
         loadSubscriptions();
         loadCategories();
-        newSubscription = new Subscription();
+        clearForm();
     }
     
     public void loadSubscriptions() {
@@ -105,14 +110,15 @@ public class SubscriptionController implements Serializable {
             
             FacesContext.getCurrentInstance().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, "Success", "Subscription created successfully"));
+            FacesContext.getCurrentInstance().getExternalContext().getFlash().setKeepMessages(true);
             
             clearForm();
             loadSubscriptions();
             return "list?faces-redirect=true";
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Unexpected error", e);
             FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Failed to create subscription: " + e.getMessage()));
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", FacesErrors.message(e, "Failed to create subscription. Please try again.")));
             return null;
         }
     }
@@ -139,13 +145,14 @@ public class SubscriptionController implements Serializable {
             
             FacesContext.getCurrentInstance().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, "Success", "Subscription updated successfully"));
+            FacesContext.getCurrentInstance().getExternalContext().getFlash().setKeepMessages(true);
             
             clearForm();
             loadSubscriptions();
             return "list?faces-redirect=true";
         } catch (Exception e) {
             FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", e.getMessage()));
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", FacesErrors.message(e)));
             return null;
         }
     }
@@ -162,12 +169,13 @@ public class SubscriptionController implements Serializable {
             
             FacesContext.getCurrentInstance().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, "Success", "Subscription deleted successfully"));
+            FacesContext.getCurrentInstance().getExternalContext().getFlash().setKeepMessages(true);
             
             loadSubscriptions();
             return "/subscriptions/list?faces-redirect=true";
         } catch (Exception e) {
             FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", e.getMessage()));
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", FacesErrors.message(e)));
             return null;
         }
     }
@@ -189,7 +197,7 @@ public class SubscriptionController implements Serializable {
             return null;
         } catch (Exception e) {
             FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", e.getMessage()));
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", FacesErrors.message(e)));
             return null;
         }
     }
@@ -211,7 +219,7 @@ public class SubscriptionController implements Serializable {
             return null;
         } catch (Exception e) {
             FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", e.getMessage()));
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", FacesErrors.message(e)));
             return null;
         }
     }
@@ -233,51 +241,36 @@ public class SubscriptionController implements Serializable {
             return null;
         } catch (Exception e) {
             FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", e.getMessage()));
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", FacesErrors.message(e)));
             return null;
         }
     }
     
     public String prepareEdit(Subscription subscription) {
-        selectedSubscription = subscription;
-        name = subscription.getName();
-        description = subscription.getDescription();
-        price = subscription.getPrice();
-        originalCurrency = subscription.getOriginalCurrency();
-        frequency = subscription.getFrequency();
-        category = subscription.getCategory();
-        logoUrl = subscription.getLogoUrl();
-        cancelLink = subscription.getCancelLink();
-        notes = subscription.getNotes();
-        return "/subscriptions/edit?faces-redirect=true";
+        return "/subscriptions/edit?faces-redirect=true&id=" + subscription.getId();
     }
     
+    /** viewAction for edit.xhtml and detail.xhtml: loads the "id" parameter, only if it belongs to the current user. */
     public void loadForEdit() {
         if (editId != null && !editId.trim().isEmpty()) {
             try {
                 UUID uuid = UUID.fromString(editId);
-                if (selectedSubscription == null || !uuid.equals(selectedSubscription.getId())) {
-                    subscriptionService.findById(uuid).ifPresent(sub -> {
-                        selectedSubscription = sub;
-                        name = sub.getName();
-                        description = sub.getDescription();
-                        price = sub.getPrice();
-                        originalCurrency = sub.getOriginalCurrency();
-                        frequency = sub.getFrequency();
-                        category = sub.getCategory();
-                        logoUrl = sub.getLogoUrl();
-                        cancelLink = sub.getCancelLink();
-                        notes = sub.getNotes();
-                    });
-                }
+                subscriptionService.findByIdForClient(uuid, userContext.getClientId()).ifPresent(sub -> {
+                    selectedSubscription = sub;
+                    name = sub.getName();
+                    description = sub.getDescription();
+                    price = sub.getPrice();
+                    originalCurrency = sub.getOriginalCurrency();
+                    frequency = sub.getFrequency();
+                    category = sub.getCategory();
+                    logoUrl = sub.getLogoUrl();
+                    cancelLink = sub.getCancelLink();
+                    notes = sub.getNotes();
+                });
             } catch (IllegalArgumentException e) {
                 // Invalid UUID string, ignore and don't load anything
             }
         }
-    }
-    
-    public void prepareNew() {
-        clearForm();
     }
     
     private void clearForm() {
@@ -292,15 +285,6 @@ public class SubscriptionController implements Serializable {
         cancelLink = null;
         notes = null;
         selectedSubscription = null;
-    }
-    
-    public List<Subscription> getActiveSubscriptions() {
-        if (subscriptions == null) {
-            return new ArrayList<>();
-        }
-        return subscriptions.stream()
-            .filter(s -> s.getStatus() == SubscriptionStatus.ACTIVE)
-            .toList();
     }
     
     public BigDecimal getTotalMonthlyCost() {
@@ -334,28 +318,12 @@ public class SubscriptionController implements Serializable {
         this.selectedSubscription = selectedSubscription;
     }
 
-    public Subscription getNewSubscription() {
-        return newSubscription;
-    }
-
-    public void setNewSubscription(Subscription newSubscription) {
-        this.newSubscription = newSubscription;
-    }
-
     public List<Category> getCategories() {
         return categories;
     }
 
     public void setCategories(List<Category> categories) {
         this.categories = categories;
-    }
-
-    public String getSearchTerm() {
-        return searchTerm;
-    }
-
-    public void setSearchTerm(String searchTerm) {
-        this.searchTerm = searchTerm;
     }
 
     public String getEditId() {
@@ -450,7 +418,4 @@ public class SubscriptionController implements Serializable {
         return Frequency.values();
     }
     
-    public SubscriptionStatus[] getStatuses() {
-        return SubscriptionStatus.values();
-    }
 }

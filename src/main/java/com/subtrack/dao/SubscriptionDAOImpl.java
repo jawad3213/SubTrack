@@ -82,4 +82,14 @@ public class SubscriptionDAOImpl implements SubscriptionDAO {
         query.setParameter("name", name);
         return query.getResultList();
     }
+
+    @Override
+    public List<Subscription> findActiveWithBillingDateBefore(java.time.LocalDate date) {
+        TypedQuery<Subscription> query = em.createQuery(
+            "SELECT s FROM Subscription s WHERE s.status = :status AND s.nextBillingDate < :date",
+            Subscription.class);
+        query.setParameter("status", SubscriptionStatus.ACTIVE);
+        query.setParameter("date", date);
+        return query.getResultList();
+    }
 }

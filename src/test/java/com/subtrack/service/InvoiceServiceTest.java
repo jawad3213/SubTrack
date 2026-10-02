@@ -154,8 +154,6 @@ class InvoiceServiceTest {
 
     @Test
     void createSubscriptionFromInvoice_Success() {
-        when(invoiceDAO.findById(testInvoice.getId())).thenReturn(Optional.of(testInvoice));
-        doNothing().when(invoiceDAO).update(any(Invoice.class));
         doNothing().when(subscriptionService).create(any(Subscription.class));
 
         Subscription result = invoiceService.createSubscriptionFromInvoice(testInvoice);
@@ -173,8 +171,7 @@ class InvoiceServiceTest {
         testInvoice.setCurrency("EUR");
         testInvoice.setInvoiceDate(LocalDate.of(2024, 1, 15));
         
-        when(invoiceDAO.findById(testInvoice.getId())).thenReturn(Optional.of(testInvoice));
-        doNothing().when(invoiceDAO).update(any(Invoice.class));
+        
         doNothing().when(subscriptionService).create(any(Subscription.class));
 
         Subscription result = invoiceService.createSubscriptionFromInvoice(testInvoice);
@@ -187,7 +184,7 @@ class InvoiceServiceTest {
     @Test
     void getUnprocessedInvoices_ReturnsUnprocessed() {
         List<Invoice> unprocessed = List.of(testInvoice);
-        when(invoiceDAO.findUnprocessedInvoices()).thenReturn(unprocessed);
+        when(invoiceDAO.findUnprocessedInvoices(InvoiceService.MAX_PARSE_ATTEMPTS)).thenReturn(unprocessed);
 
         List<Invoice> result = invoiceService.getUnprocessedInvoices();
 
@@ -220,5 +217,30 @@ class InvoiceServiceTest {
             new BigDecimal("15.99"), "USD", null);
 
         assertNotNull(result.getInvoiceDate());
+    }
+
+    @Test
+    void parseInvoiceEmail_failureCountsAttempt() {
+        testInvoice.setRawContent("receipt text");
+        GeminiService.InvoiceParseResult failed = new GeminiService.InvoiceParseResult();
+        failed.setSuccess(false);
+        when(geminiService.extractInvoiceData("receipt text")).thenReturn(failed);
+
+        invoiceService.parseInvoiceEmail(testInvoice);
+
+        assertEquals(1, testInvoice.getParseAttempts());
+        assertFalse(testInvoice.getIsProcessed());
+        verify(invoiceDAO).update(testInvoice);
+    }
+
+    @Test
+    void parseInvoiceEmail_exceptionCountsAttempt() {
+        testInvoice.setRawContent("receipt text");
+        when(geminiService.extractInvoiceData("receipt text")).thenThrow(new RuntimeException("quota"));
+
+        invoiceService.parseInvoiceEmail(testInvoice);
+
+        assertEquals(1, testInvoice.getParseAttempts());
+        assertFalse(testInvoice.getIsProcessed());
     }
 }

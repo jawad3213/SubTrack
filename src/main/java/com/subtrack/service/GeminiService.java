@@ -15,8 +15,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Service to interact with the Google Gemini API for AI-powered features.
@@ -25,7 +23,7 @@ import java.util.logging.Logger;
 @ApplicationScoped
 public class GeminiService {
 
-    private static final Logger LOGGER = Logger.getLogger(GeminiService.class.getName());
+    private static final org.slf4j.Logger LOGGER = org.slf4j.LoggerFactory.getLogger(GeminiService.class);
     private static final AppLogger APP_LOGGER = AppLogger.getLogger(GeminiService.class);
     private static final String GEMINI_API_URL = 
         "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
@@ -67,7 +65,7 @@ public class GeminiService {
     public String sendPrompt(String prompt) {
         String apiKey = configDAO.getValue("GEMINI_API_KEY", "");
         if (apiKey.isEmpty()) {
-            LOGGER.warning("GeminiService: GEMINI_API_KEY is not configured.");
+            LOGGER.warn("GeminiService: GEMINI_API_KEY is not configured.");
             APP_LOGGER.error("GEMINI_API_KEY not configured");
             return null;
         }
@@ -115,7 +113,7 @@ public class GeminiService {
                 String finalErrorMsg = (extractedStatus != null ? "[" + extractedStatus + "] " : "") + 
                                        (extractedMessage != null ? extractedMessage : "HTTP " + responseCode);
                 
-                LOGGER.log(Level.WARNING, "Gemini API returned HTTP " + responseCode + ": " + errorStr);
+                LOGGER.warn("Gemini API returned HTTP " + responseCode + ": " + errorStr);
                 APP_LOGGER.logError("Gemini API HTTP error: " + finalErrorMsg);
                 
                 webhookService.notifyGeminiError(finalErrorMsg, prompt.substring(0, Math.min(100, prompt.length())));
@@ -124,7 +122,7 @@ public class GeminiService {
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "GeminiService: Failed to call Gemini API", e);
+            LOGGER.error("GeminiService: Failed to call Gemini API", e);
             APP_LOGGER.logError("Gemini connection failed: " + e.getMessage());
             
             webhookService.notifyGeminiError("Connection failed: " + e.getMessage(), null);
@@ -141,7 +139,7 @@ public class GeminiService {
         if (rawContent == null || rawContent.isBlank()) {
             result.setSuccess(false);
             result.setErrorMessage("Raw content is empty.");
-            LOGGER.warning("GeminiService: Raw content is empty");
+            LOGGER.warn("GeminiService: Raw content is empty");
             return result;
         }
 
@@ -162,14 +160,14 @@ public class GeminiService {
         } catch (Exception e) {
             result.setSuccess(false);
             result.setErrorMessage("Gemini API call failed: " + e.getMessage());
-            LOGGER.log(Level.WARNING, "GeminiService: API call failed during invoice parsing", e);
+            LOGGER.warn("GeminiService: API call failed during invoice parsing", e);
             return result;
         }
 
         if (response == null || response.isBlank()) {
             result.setSuccess(false);
             result.setErrorMessage("No response from Gemini API.");
-            LOGGER.warning("GeminiService: No response from Gemini API");
+            LOGGER.warn("GeminiService: No response from Gemini API");
             return result;
         }
 
@@ -188,7 +186,7 @@ public class GeminiService {
                     try {
                         result.setAmount(new BigDecimal(amountStr));
                     } catch (NumberFormatException e) {
-                        LOGGER.warning("GeminiService: Could not parse amount: " + amountStr);
+                        LOGGER.warn("GeminiService: Could not parse amount: " + amountStr);
                     }
                 }
 
@@ -202,7 +200,7 @@ public class GeminiService {
                     try {
                         result.setInvoiceDate(LocalDate.parse(dateStr, DateTimeFormatter.ISO_LOCAL_DATE));
                     } catch (DateTimeParseException e) {
-                        LOGGER.warning("GeminiService: Could not parse date: " + dateStr);
+                        LOGGER.warn("GeminiService: Could not parse date: " + dateStr);
                     }
                 }
 
@@ -218,14 +216,14 @@ public class GeminiService {
             } else {
                 result.setSuccess(false);
                 result.setErrorMessage("Unexpected AI response format: " + cleanResponse);
-                LOGGER.warning("GeminiService: Unexpected AI response format: " + cleanResponse);
+                LOGGER.warn("GeminiService: Unexpected AI response format: " + cleanResponse);
                 
                 webhookService.notifyGeminiError("Unexpected response format: " + cleanResponse, rawContent);
             }
         } catch (Exception e) {
             result.setSuccess(false);
             result.setErrorMessage("Error parsing AI response: " + e.getMessage());
-            LOGGER.log(Level.SEVERE, "GeminiService: Error parsing AI response", e);
+            LOGGER.error("GeminiService: Error parsing AI response", e);
             
             webhookService.notifyGeminiError("Error parsing AI response: " + e.getMessage(), rawContent);
         }

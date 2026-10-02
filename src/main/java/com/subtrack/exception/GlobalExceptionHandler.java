@@ -1,6 +1,5 @@
 package com.subtrack.exception;
 
-import jakarta.faces.FacesException;
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.ExceptionHandler;
 import jakarta.faces.context.ExceptionHandlerWrapper;
@@ -13,6 +12,8 @@ import java.util.Iterator;
 
 
 public class GlobalExceptionHandler extends ExceptionHandlerWrapper {
+
+    private static final org.slf4j.Logger LOGGER = org.slf4j.LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     private ExceptionHandler wrapped;
 
@@ -46,9 +47,9 @@ public class GlobalExceptionHandler extends ExceptionHandlerWrapper {
     private void logException(Throwable cause) {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
-        cause.printStackTrace(pw);
-        System.err.println("Global Exception Handler - Uncaught Exception: " + cause.getMessage());
-        System.err.println(sw.toString());
+        LOGGER.error("Unexpected error", cause);
+        LOGGER.warn("Global Exception Handler - Uncaught Exception: " + cause.getMessage());
+        LOGGER.warn(sw.toString());
     }
 
     private void addErrorMessage(Throwable cause) {
@@ -57,13 +58,8 @@ public class GlobalExceptionHandler extends ExceptionHandlerWrapper {
             return;
         }
 
-        String message = "An unexpected error occurred. Please try again.";
-        
-        if (cause instanceof IllegalArgumentException) {
-            message = cause.getMessage();
-        } else if (cause instanceof IllegalStateException) {
-            message = cause.getMessage();
-        }
+        // Only messages written for users are shown; everything else gets a generic text.
+        String message = com.subtrack.util.FacesErrors.message(cause, "An unexpected error occurred. Please try again.");
 
         FacesMessage facesMessage = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", message);
         fc.addMessage(null, facesMessage);

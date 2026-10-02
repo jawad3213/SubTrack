@@ -11,16 +11,11 @@ import com.subtrack.util.AppLogger;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import java.util.logging.Logger;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -28,7 +23,8 @@ import java.util.UUID;
 @ApplicationScoped
 public class AlertService {
 
-    private static final Logger LOGGER = Logger.getLogger(AlertService.class.getName());
+    private static final org.slf4j.Logger LOGGER = org.slf4j.LoggerFactory.getLogger(AlertService.class);
+
     private static final AppLogger APP_LOGGER = AppLogger.getLogger(AlertService.class);
 
     @Inject
@@ -80,14 +76,6 @@ public class AlertService {
         alertRuleDAO.create(alertRule);
     }
     
-    public List<AlertRule> getActiveAlerts() {
-        return alertRuleDAO.findActiveAlertRules();
-    }
-    
-    public List<AlertRule> getAlertsDueSoon(int days) {
-        return alertRuleDAO.findAlertsDueSoon(days);
-    }
-    
     public void sendEmailNotification(AlertRule alert) {
         if (alert.getSubscription() != null && alert.getSubscription().getClient() != null) {
             String clientEmail = alert.getSubscription().getClient().getEmail();
@@ -121,7 +109,7 @@ public class AlertService {
             log.setErrorMessage(error);
             notificationLogDAO.create(log);
         } catch (Exception e) {
-            System.err.println("Failed to log email notification: " + e.getMessage());
+            LOGGER.warn("Failed to log email notification", e);
         }
     }
     
@@ -188,7 +176,7 @@ public class AlertService {
             log.setErrorMessage(error);
             notificationLogDAO.create(log);
         } catch (Exception e) {
-            LOGGER.severe("Failed to log notification: " + e.getMessage());
+            LOGGER.error("Failed to log notification", e);
         }
     }
 
@@ -268,13 +256,26 @@ public class AlertService {
             log.setErrorMessage(error);
             notificationLogDAO.create(log);
         } catch (Exception e) {
-            System.err.println("Failed to log WhatsApp notification: " + e.getMessage());
+            LOGGER.warn("Failed to log WhatsApp notification", e);
         }
     }
     
+    /**
+     * Sends each active rule's reminder once per billing cycle: on the day the subscription's
+     * next billing date is exactly {@code timingDays} away. Meant to run once a day (AlertScheduler).
+     */
     public void checkAndSendAlerts() {
-        List<AlertRule> alerts = alertRuleDAO.findAlertsDueSoon(3);
-        for (AlertRule alert : alerts) {
+        checkAndSendAlerts(java.time.LocalDate.now());
+    }
+
+    void checkAndSendAlerts(java.time.LocalDate today) {
+        for (AlertRule alert : alertRuleDAO.findActiveAlertRules()) {
+            Subscription sub = alert.getSubscription();
+            if (sub == null || sub.getStatus() != com.subtrack.enums.SubscriptionStatus.ACTIVE
+                    || sub.getNextBillingDate() == null || alert.getTimingDays() == null
+                    || !sub.getNextBillingDate().equals(today.plusDays(alert.getTimingDays()))) {
+                continue;
+            }
             switch (alert.getChannel()) {
                 case EMAIL -> sendEmailNotification(alert);
                 case TELEGRAM -> sendTelegramNotification(alert);
