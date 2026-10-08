@@ -35,14 +35,17 @@ public class SubscriptionDAOImpl implements SubscriptionDAO {
 
     @Override
     public Optional<Subscription> findById(UUID id) {
-        Subscription subscription = em.find(Subscription.class, id);
-        return Optional.ofNullable(subscription);
+        return em.createQuery(
+            "SELECT s FROM Subscription s LEFT JOIN FETCH s.category WHERE s.id = :id", Subscription.class)
+            .setParameter("id", id)
+            .getResultStream()
+            .findFirst();
     }
 
     @Override
     public List<Subscription> findByClientId(UUID clientId) {
         TypedQuery<Subscription> query = em.createQuery(
-            "SELECT s FROM Subscription s WHERE s.client.id = :clientId ORDER BY s.createdAt DESC", Subscription.class);
+            "SELECT s FROM Subscription s LEFT JOIN FETCH s.category WHERE s.client.id = :clientId ORDER BY s.createdAt DESC", Subscription.class);
         query.setParameter("clientId", clientId);
         return query.getResultList();
     }
@@ -50,14 +53,14 @@ public class SubscriptionDAOImpl implements SubscriptionDAO {
     @Override
     public List<Subscription> findAll() {
         TypedQuery<Subscription> query = em.createQuery(
-            "SELECT s FROM Subscription s ORDER BY s.createdAt DESC", Subscription.class);
+            "SELECT s FROM Subscription s LEFT JOIN FETCH s.category ORDER BY s.createdAt DESC", Subscription.class);
         return query.getResultList();
     }
     
     @Override
     public List<Subscription> findByClientIdAndStatus(UUID clientId, SubscriptionStatus status) {
         TypedQuery<Subscription> query = em.createQuery(
-            "SELECT s FROM Subscription s WHERE s.client.id = :clientId AND s.status = :status ORDER BY s.createdAt DESC", 
+            "SELECT s FROM Subscription s LEFT JOIN FETCH s.category WHERE s.client.id = :clientId AND s.status = :status ORDER BY s.createdAt DESC", 
             Subscription.class);
         query.setParameter("clientId", clientId);
         query.setParameter("status", status);
@@ -67,7 +70,7 @@ public class SubscriptionDAOImpl implements SubscriptionDAO {
     @Override
     public List<Subscription> findByClientIdAndCategoryId(UUID clientId, UUID categoryId) {
         TypedQuery<Subscription> query = em.createQuery(
-            "SELECT s FROM Subscription s LEFT JOIN s.category c WHERE s.client.id = :clientId AND c.id = :categoryId ORDER BY s.createdAt DESC",
+            "SELECT s FROM Subscription s JOIN FETCH s.category c WHERE s.client.id = :clientId AND c.id = :categoryId ORDER BY s.createdAt DESC",
             Subscription.class);
         query.setParameter("clientId", clientId);
         query.setParameter("categoryId", categoryId);

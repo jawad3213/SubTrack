@@ -1,6 +1,34 @@
-# SubTrack
+<p align="center">
+  <img src="public/user_dashboard.png" alt="Tableau de bord SubTrack" width="100%">
+</p>
 
-**Plateforme de gestion et d'optimisation des abonnements SaaS.**
+<h1 align="center">SubTrack</h1>
+
+<p align="center">
+  <strong>Plateforme de gestion et d'optimisation des abonnements SaaS.</strong><br>
+  Chaque abonnement, une vue claire.
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Java-17-ED8B00?logo=openjdk&logoColor=white" alt="Java 17">
+  <img src="https://img.shields.io/badge/Jakarta%20EE-10-1D4ED8" alt="Jakarta EE 10">
+  <img src="https://img.shields.io/badge/Hibernate-6.4-59666C?logo=hibernate&logoColor=white" alt="Hibernate 6.4">
+  <img src="https://img.shields.io/badge/PostgreSQL-14%2B-4169E1?logo=postgresql&logoColor=white" alt="PostgreSQL">
+  <img src="https://img.shields.io/badge/WildFly-31-B21E2A" alt="WildFly 31">
+  <img src="https://img.shields.io/badge/PrimeFaces-JSF-0F766E" alt="PrimeFaces">
+  <img src="https://img.shields.io/badge/IA-Google%20Gemini-8E75B2?logo=googlegemini&logoColor=white" alt="Google Gemini">
+</p>
+
+<p align="center">
+  <a href="#-aperçu">Aperçu</a> ·
+  <a href="#le-problème-que-subtrack-résout">Problème</a> ·
+  <a href="#fonctionnalités">Fonctionnalités</a> ·
+  <a href="#architecture">Architecture</a> ·
+  <a href="#installation-et-lancement">Installation</a> ·
+  <a href="#documentation">Documentation</a>
+</p>
+
+---
 
 Netflix, Spotify, Slack, Adobe, iCloud, ChatGPT… Les abonnements s'accumulent, se renouvellent
 en silence et sont facturés dans des devises différentes. SubTrack les réunit en un seul endroit :
@@ -9,6 +37,50 @@ repérez les abonnements inutiles.
 
 **Stack :** Java 17 · Jakarta EE 10 (Faces, CDI, JPA, EJB Timers) · Hibernate 6.4 · PostgreSQL ·
 Flyway · PrimeFaces · WildFly 31 · Google Gemini
+
+---
+
+## 📸 Aperçu
+
+### Tableau de bord utilisateur *(capture en haut de page)*
+
+Dépenses mensuelles et annuelles converties en MAD, nombre d'abonnements actifs, prochain
+renouvellement, suggestion d'économies (doublons / abonnements inutilisés), échéances des
+30 prochains jours et répartition des dépenses par catégorie.
+
+### Mes abonnements
+
+Liste complète des abonnements avec prix, fréquence, coût mensuel ramené, statut et date du
+prochain prélèvement. Chaque ligne peut être modifiée, mise en pause, annulée ou réactivée.
+
+<p align="center">
+  <img src="public/Subscriptions.png" alt="Liste des abonnements" width="90%">
+</p>
+
+### Inscription
+
+Création de compte (usage personnel, freelance ou entreprise) avec indicateur de robustesse du
+mot de passe, et présentation des trois étapes clés : ajouter ses outils, connecter Gmail,
+recevoir des alertes.
+
+<p align="center">
+  <img src="public/signup_page.png" alt="Page d'inscription" width="90%">
+</p>
+
+### Espace administrateur
+
+<table>
+  <tr>
+    <td width="50%" align="center">
+      <img src="public/subscriptions%20list.png" alt="Catalogue SaaS (admin)"><br>
+      <sub><b>Catalogue SaaS</b> : ajout de services avec catégorie, prix et devise par défaut.</sub>
+    </td>
+    <td width="50%" align="center">
+      <img src="public/exchange%20rate.png" alt="Taux de change (admin)"><br>
+      <sub><b>Taux de change</b> : taux stockés en base (base USD), fraîcheur et rafraîchissement manuel.</sub>
+    </td>
+  </tr>
+</table>
 
 ---
 
@@ -103,6 +175,7 @@ SubTrack/
 ├── pom.xml
 ├── .env.example                  # toutes les variables d'environnement utilisées
 ├── wildfly/                      # scripts CLI WildFly exécutés par le plugin Maven
+├── public/                       # captures d'écran utilisées dans ce README
 ├── docs/                         # rapport du projet, modèle de données, charte graphique, choix techniques
 └── src/
     ├── main/

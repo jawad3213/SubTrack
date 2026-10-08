@@ -6,14 +6,15 @@
     
     <display-name>SubTrack - SaaS Subscription Management</display-name>
 
-    <!-- Credentials come from environment variables. WildFly only resolves ${...}
+    <!-- Credentials come from environment variables, or from system properties loaded from .env
+         (see the "dotenv" profile in pom.xml). WildFly only resolves ${...}
          here when spec-descriptor-property-replacement is enabled (see wildfly/enable-property-replacement.cli). -->
     <data-source>
         <name>java:global/SubtrackDS</name>
         <class-name>org.postgresql.ds.PGSimpleDataSource</class-name>
-        <url>${env.SUBTRACK_DB_URL:jdbc:postgresql://localhost:5432/subtrack}</url>
-        <user>${env.SUBTRACK_DB_USER:postgres}</user>
-        <password>${env.SUBTRACK_DB_PASSWORD}</password>
+        <url>${env.SUBTRACK_DB_URL,SUBTRACK_DB_URL:jdbc:postgresql://localhost:5432/subtrack}</url>
+        <user>${env.SUBTRACK_DB_USER,SUBTRACK_DB_USER:postgres}</user>
+        <password>${env.SUBTRACK_DB_PASSWORD,SUBTRACK_DB_PASSWORD}</password>
     </data-source>
     
     <!-- Jakarta Faces Configuration -->
@@ -39,7 +40,7 @@
         <session-timeout>30</session-timeout>
         <cookie-config>
             <http-only>true</http-only>
-            <secure>${env.SUBTRACK_SECURE_COOKIES:true}</secure>
+            <secure>${env.SUBTRACK_SECURE_COOKIES,SUBTRACK_SECURE_COOKIES:true}</secure>
         </cookie-config>
         <tracking-mode>COOKIE</tracking-mode>
     </session-config>
@@ -53,7 +54,7 @@
     <!-- Project Stage: Production unless SUBTRACK_PROJECT_STAGE=Development is set -->
     <context-param>
         <param-name>jakarta.faces.PROJECT_STAGE</param-name>
-        <param-value>${env.SUBTRACK_PROJECT_STAGE:Production}</param-value>
+        <param-value>${env.SUBTRACK_PROJECT_STAGE,SUBTRACK_PROJECT_STAGE:Production}</param-value>
     </context-param>
     
     <!-- Default Resource Bundle -->

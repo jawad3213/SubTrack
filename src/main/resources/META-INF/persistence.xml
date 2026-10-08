@@ -29,8 +29,8 @@
             <!-- Schema is managed by Flyway (src/main/resources/db/migration), not by Hibernate -->
             <property name="hibernate.hbm2ddl.auto" value="none"/>
             <!-- SQL logging is off unless SUBTRACK_SHOW_SQL=true -->
-            <property name="hibernate.show_sql" value="${env.SUBTRACK_SHOW_SQL:false}"/>
-            <property name="hibernate.format_sql" value="${env.SUBTRACK_SHOW_SQL:false}"/>
+            <property name="hibernate.show_sql" value="${env.SUBTRACK_SHOW_SQL,SUBTRACK_SHOW_SQL:false}"/>
+            <property name="hibernate.format_sql" value="${env.SUBTRACK_SHOW_SQL,SUBTRACK_SHOW_SQL:false}"/>
             
             <!-- Connection Pool -->
             <property name="hibernate.connection.pool_size" value="10"/>

@@ -158,4 +158,29 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <!-- Active automatically when a .env file exists at the project root: wildfly:run / wildfly:dev
+             (from IntelliJ or the terminal) load it as server system properties, which web.xml,
+             persistence.xml and DatabaseInitializer read after real environment variables. -->
+        <profile>
+            <id>dotenv</id>
+            <activation>
+                <file>
+                    <exists>${basedir}/.env</exists>
+                </file>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.wildfly.plugins</groupId>
+                        <artifactId>wildfly-maven-plugin</artifactId>
+                        <configuration>
+                            <properties-file>${project.basedir}/.env</properties-file>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

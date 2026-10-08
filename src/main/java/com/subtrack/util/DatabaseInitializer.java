@@ -110,6 +110,8 @@ public class DatabaseInitializer implements ServletContextListener {
 
     private static String envOrDotEnv(String key, java.util.Properties dotEnv) {
         String value = System.getenv(key);
+        // Set by the "dotenv" Maven profile, which loads .env as WildFly system properties
+        if (value == null || value.isBlank()) value = System.getProperty(key);
         if (value == null || value.isBlank()) value = dotEnv.getProperty(key);
         return (value == null || value.isBlank()) ? null : value.trim();
     }

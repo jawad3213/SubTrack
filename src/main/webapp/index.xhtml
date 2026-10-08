@@ -5,424 +5,437 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
 <h:head>
-    <f:facet name="first">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-    </f:facet>
-    <title>SubTrack - The Leading Subscription Intelligence Platform</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap"
-        rel="stylesheet" />
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Inter', sans-serif;
-            overflow-x: hidden;
-            color: #1e293b;
-            background: white;
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1.2rem 4rem;
-            border-bottom: 1px solid #e2e8f0;
-            background: white;
-            position: relative;
-            z-index: 10;
-        }
-
-        .logo {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: #042C53;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            text-decoration: none;
-            letter-spacing: -0.5px;
-        }
-
-        .logo span {
-            color: #185FA5;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 2.5rem;
-        }
-
-        .nav-links a {
-            text-decoration: none;
-            color: #475569;
-            font-weight: 500;
-            font-size: 1rem;
-            transition: color 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 0.2rem;
-        }
-
-        .nav-links a:hover {
-            color: #185FA5;
-        }
-
-        .nav-links a::after {
-            content: " ⌄";
-            font-size: 0.8em;
-            margin-top: -2px;
-        }
-
-        .nav-actions {
-            display: flex;
-            gap: 1.5rem;
-            align-items: center;
-        }
-
-        .btn-login {
-            text-decoration: none;
-            color: #042C53;
-            font-weight: 600;
-            font-size: 1rem;
-            transition: color 0.2s;
-        }
-
-        .btn-login:hover {
-            color: #185FA5;
-        }
-
-        .btn-primary {
-            background: #185FA5;
-            color: white;
-            padding: 0.7rem 1.8rem;
-            border-radius: 6px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.2s;
-            border: none;
-            cursor: pointer;
-        }
-
-        .btn-primary:hover {
-            background: #0C447C;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(24, 95, 165, 0.2);
-        }
-
-        .hero-section {
-            display: flex;
-            height: calc(100vh - 84px);
-            position: relative;
-            overflow: hidden;
-            align-items: center;
-        }
-
-        .hero-content {
-            flex: 1;
-            padding: 0 2rem 0 6rem;
-            max-width: 650px;
-            z-index: 2;
-            margin-top: -5vh;
-        }
-
-        .hero-subtitle {
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: #185FA5;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin-bottom: 1.5rem;
-            display: block;
-        }
-
-        .hero-title {
-            font-size: 3.8rem;
-            font-weight: 700;
-            line-height: 1.15;
-            color: #0f172a;
-            margin-bottom: 1.5rem;
-            letter-spacing: -1px;
-        }
-
-        .hero-title span {
-            color: #27500A;
-        }
-
-        /* Reusing success green from app */
-        .hero-desc {
-            font-size: 1.3rem;
-            font-weight: 500;
-            color: #1e293b;
-            margin-bottom: 2.5rem;
-        }
-
-        .hero-buttons {
-            display: flex;
-            gap: 1rem;
-        }
-
-        .btn-large {
-            padding: 0.9rem 2.2rem;
-            font-size: 1.1rem;
-            border-radius: 4px;
-        }
-
-        .btn-secondary {
-            background: white;
-            color: #185FA5;
-            border: 1.5px solid #185FA5;
-        }
-
-        .btn-secondary:hover {
-            background: #f4f7fe;
-            transform: translateY(-1px);
-        }
-
-        /* The Wave / Graphic container */
-        .hero-graphic {
-            flex: 1.2;
-            position: relative;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-        }
-
-        .wave-bg {
-            position: absolute;
-            right: 0;
-            top: 0;
-            bottom: 0;
-            width: 110%;
-            background: #0f172a;
-            border-radius: 50% 0 0 50% / 50% 0 0 50%;
-            overflow: hidden;
-            box-shadow: -15px 0 40px rgba(0, 0, 0, 0.15);
-            transform: translateX(5%);
-        }
-
-        .dashboard-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            opacity: 0.95;
-            mix-blend-mode: screen;
-            filter: contrast(1.1) saturate(1.2);
-        }
-
-        /* Floating interactive elements layered on the image */
-        .ui-element {
-            position: absolute;
-            z-index: 3;
-            background: rgba(15, 23, 42, 0.7);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            transition: transform 0.4s ease;
-            cursor: pointer;
-        }
-
-        .ui-element:hover {
-            transform: translateY(-5px) scale(1.02);
-        }
-
-        .ui-card-1 {
-            top: 20%;
-            left: 5%;
-            padding: 1.5rem;
-            width: 220px;
-            animation: float 6s ease-in-out infinite;
-        }
-
-        .ui-card-2 {
-            bottom: 15%;
-            right: 15%;
-            padding: 1.5rem;
-            width: 280px;
-            animation: float 7s ease-in-out infinite reverse;
-        }
-
-        .circle-pulse {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            border: 3px solid #185FA5;
-            border-top-color: transparent;
-            animation: spin 1.5s linear infinite;
-            margin-bottom: 15px;
-        }
-
-        .line-mock {
-            height: 6px;
-            background: rgba(255, 255, 255, 0.15);
-            border-radius: 3px;
-            margin-bottom: 10px;
-            width: 100%;
-        }
-
-        .line-mock.short {
-            width: 60%;
-        }
-
-        .line-mock.green {
-            background: #639922;
-        }
-
-        @keyframes spin {
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-
-        @keyframes float {
-            0% {
-                transform: translateY(0px);
-            }
-
-            50% {
-                transform: translateY(-15px);
-            }
-
-            100% {
-                transform: translateY(0px);
-            }
-        }
-
-        @media (max-width: 1100px) {
-            .hero-title {
-                font-size: 3rem;
-            }
-
-            .hero-content {
-                padding-left: 4rem;
-            }
-        }
-
-        @media (max-width: 992px) {
-            .header {
-                padding: 1rem 2rem;
-            }
-
-            .nav-links {
-                display: none;
-            }
-
-            .hero-section {
-                flex-direction: column;
-                height: auto;
-            }
-
-            .hero-content {
-                padding: 4rem 2rem;
-                text-align: center;
-                max-width: 100%;
-                margin-top: 0;
-            }
-
-            .hero-buttons {
-                justify-content: center;
-            }
-
-            .hero-graphic {
-                width: 100%;
-                height: 60vh;
-                min-height: 500px;
-                justify-content: center;
-            }
-
-            .wave-bg {
-                width: 150%;
-                border-radius: 50% 50% 0 0 / 20% 20% 0 0;
-                transform: translateX(0) translateY(10%);
-                right: auto;
-                top: auto;
-                bottom: -20%;
-                left: -25%;
-                height: 120%;
-            }
-
-            .ui-card-1 {
-                top: 10%;
-                left: 50%;
-                transform: translateX(-50%);
-            }
-        }
-    </style>
+    <title>SubTrack - Every subscription, one clear view</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="description" content="SubTrack tracks every SaaS subscription you pay for, imports invoices from Gmail, warns you before renewals and shows where your money goes."/>
+    <h:outputStylesheet name="css/landing.css"/>
 </h:head>
-<h:body>
-    <div class="header">
-        <h:outputLink value="#{request.contextPath}/" styleClass="logo">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#185FA5" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round" style="margin-right:2px">
-                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-            </svg>
-            Sub<span>Track</span>
-        </h:outputLink>
-        <div class="nav-links">
-            <a href="#">Products</a>
-            <a href="#">Use Cases</a>
-            <a href="#">Developers</a>
-            <a href="#">AI Systems</a>
-            <a href="#">Learn</a>
-            <a href="#" style="font-weight:600">Pricing</a>
-        </div>
-        <div class="nav-actions">
-            <h:outputLink value="#{request.contextPath}/login.xhtml" styleClass="btn-login">Login</h:outputLink>
-            <h:outputLink value="#{request.contextPath}/register.xhtml" styleClass="btn-primary">Get Started Free</h:outputLink>
-        </div>
-    </div>
+<h:body styleClass="landing">
 
-    <div class="hero-section">
-        <div class="hero-content">
-            <span class="hero-subtitle">THE WORLD'S LEADING SUBSCRIPTION PLATFORM</span>
-            <h1 class="hero-title">Take Control of Your SaaS and <span>Optimize Costs In Real-Time</span></h1>
-            <p class="hero-desc">AI-ready analytics and automation by design.</p>
-            <div class="hero-buttons">
-                <h:outputLink value="#{request.contextPath}/register.xhtml" styleClass="btn-primary btn-large">Start Building</h:outputLink>
-                <a href="#learn-more" class="btn-primary btn-secondary btn-large">Learn More</a>
+    <!-- ============ NAV ============ -->
+    <header class="nav" id="nav">
+        <div class="container nav-inner">
+            <a href="#{request.contextPath}/" class="brand">
+                <span class="brand-mark">
+                    <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </span>
+                SubTrack
+            </a>
+            <nav class="nav-links">
+                <a href="#idea">The idea</a>
+                <a href="#features">Features</a>
+                <a href="#how">How it works</a>
+                <a href="#benefits">Benefits</a>
+                <a href="#faq">FAQ</a>
+            </nav>
+            <div class="nav-actions">
+                <h:link outcome="/login" value="Sign in" styleClass="nav-signin" rendered="#{not userContext.loggedIn}"/>
+                <h:link outcome="/register" value="Get started" styleClass="btn btn-primary btn-sm" rendered="#{not userContext.loggedIn}"/>
+                <h:link outcome="#{userContext.admin ? '/admin/dashboard' : '/dashboard'}" value="Go to dashboard"
+                        styleClass="btn btn-primary btn-sm" rendered="#{userContext.loggedIn}"/>
             </div>
         </div>
-        <div class="hero-graphic">
-            <div class="wave-bg">
-                <!-- Fallback background gradient if image fails to load -->
-                <div
-                    style="position:absolute; width:100%; height:100%; background:linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #4338ca 100%); opacity:0.5; z-index:-1;">
-                </div>
+    </header>
 
-                <img src="#{resource['images/hero_dashboard.png']}" alt="Dashboard Mockup" class="dashboard-img"
-                    onerror="this.style.opacity='0.2';" />
-            </div>
-
-            <div class="ui-element ui-card-1">
-                <div
-                    style="font-size: 11px; color:#94a3b8; font-weight:600; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px;">
-                    Auto Sync</div>
-                <div class="circle-pulse"></div>
-                <div class="line-mock"></div>
-                <div class="line-mock short"></div>
-            </div>
-
-            <div class="ui-element ui-card-2" style="display:flex; align-items:center; gap: 15px;">
-                <div
-                    style="width:50px; height:50px; border-radius:8px; background:rgba(99,153,34,0.2); display:flex; align-items:center; justify-content:center;">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#639922" stroke-width="2">
-                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                    </svg>
-                </div>
-                <div style="flex:1;">
-                    <div style="font-size: 14px; color:white; font-weight:600; margin-bottom:4px;">Savings Detected
+    <main>
+        <!-- ============ HERO ============ -->
+        <section class="hero">
+            <div class="hero-glow" aria-hidden="true"></div>
+            <div class="container hero-grid">
+                <div class="hero-copy">
+                    <span class="eyebrow hero-anim">
+                        <span class="dot"></span> Subscription management for people and teams
+                    </span>
+                    <h1 class="hero-title">
+                        <span class="line"><span class="line-inner">Every subscription.</span></span>
+                        <span class="line"><span class="line-inner accent">One clear view.</span></span>
+                    </h1>
+                    <p class="hero-lead hero-anim">
+                        SubTrack gathers every SaaS tool you pay for in one place, reads your invoices
+                        straight from Gmail, and warns you before anything renews. No more surprise charges,
+                        no more forgotten trials.
+                    </p>
+                    <div class="hero-ctas hero-anim">
+                        <h:link outcome="/register" styleClass="btn btn-primary btn-lg">
+                            Start tracking for free
+                            <svg class="btn-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                        </h:link>
+                        <a href="#how" class="btn btn-ghost btn-lg">See how it works</a>
                     </div>
-                    <div class="line-mock green" style="width: 80%;"></div>
-                    <div style="font-size: 11px; color:#94a3b8;">$1,240 / year optimized</div>
+                    <ul class="hero-points hero-anim">
+                        <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg> Free to start</li>
+                        <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg> Works in any currency</li>
+                        <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg> Set up in minutes</li>
+                    </ul>
+                </div>
+
+                <!-- Product mockup, built with the same components as the real dashboard -->
+                <div class="hero-visual" aria-hidden="true">
+                    <div class="mock">
+                        <div class="mock-bar">
+                            <span></span><span></span><span></span>
+                            <div class="mock-url">subtrack.app/dashboard</div>
+                        </div>
+                        <div class="mock-body">
+                            <aside class="mock-side">
+                                <div class="mock-side-logo">
+                                    <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                                </div>
+                                <i class="active"></i><i></i><i></i><i></i><i></i>
+                            </aside>
+                            <div class="mock-main">
+                                <div class="mock-kpis">
+                                    <div class="mock-kpi">
+                                        <small>Monthly spend</small>
+                                        <strong><span class="count" data-to="1284" data-decimals="0">1,284</span> <em>MAD</em></strong>
+                                    </div>
+                                    <div class="mock-kpi">
+                                        <small>Active subscriptions</small>
+                                        <strong><span class="count" data-to="18" data-decimals="0">18</span></strong>
+                                    </div>
+                                    <div class="mock-kpi">
+                                        <small>Renewing this week</small>
+                                        <strong class="warn"><span class="count" data-to="3" data-decimals="0">3</span></strong>
+                                    </div>
+                                </div>
+                                <div class="mock-chart">
+                                    <div class="mock-chart-head">
+                                        <b>Spend over 6 months</b>
+                                        <span class="pill green">−12% vs last month</span>
+                                    </div>
+                                    <div class="mock-bars">
+                                        <i style="--h:62%"></i><i style="--h:74%"></i><i style="--h:58%"></i>
+                                        <i style="--h:88%"></i><i style="--h:79%"></i><i class="current" style="--h:68%"></i>
+                                    </div>
+                                </div>
+                                <div class="mock-list">
+                                    <div class="mock-row">
+                                        <span class="app-ico" style="--c:#4A154B">S</span>
+                                        <span class="name">Slack Pro</span>
+                                        <span class="pill amber">in 3 days</span>
+                                        <span class="amt">87.50</span>
+                                    </div>
+                                    <div class="mock-row">
+                                        <span class="app-ico" style="--c:#0D0D0D">N</span>
+                                        <span class="name">Notion Plus</span>
+                                        <span class="pill blue">in 9 days</span>
+                                        <span class="amt">100.00</span>
+                                    </div>
+                                    <div class="mock-row">
+                                        <span class="app-ico" style="--c:#A259FF">F</span>
+                                        <span class="name">Figma</span>
+                                        <span class="pill green">active</span>
+                                        <span class="amt">150.00</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="float-card fc-invoice">
+                        <span class="fc-ico blue">
+                            <svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z" opacity="0"/><path d="M22 6l-10 7L2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
+                        </span>
+                        <div>
+                            <b>Invoice imported</b>
+                            <small>Adobe · 239.88 MAD · from Gmail</small>
+                        </div>
+                    </div>
+                    <div class="float-card fc-alert">
+                        <span class="fc-ico amber">
+                            <svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                        </span>
+                        <div>
+                            <b>Slack renews in 3 days</b>
+                            <small>Reminder sent on Telegram</small>
+                        </div>
+                    </div>
+                    <div class="float-card fc-save">
+                        <span class="fc-ico green">
+                            <svg viewBox="0 0 24 24"><path d="M23 6l-9.5 9.5-5-5L1 18"/><path d="M17 6h6v6"/></svg>
+                        </span>
+                        <div>
+                            <b>Unused tool spotted</b>
+                            <small>Cancel Zoom, save 1,440 MAD / yr</small>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
-</h:body>
 
+            <!-- Tool marquee -->
+            <div class="marquee-wrap">
+                <p class="marquee-label">Keep an eye on the tools you already pay for</p>
+                <div class="marquee">
+                    <div class="marquee-track">
+                        <span>Slack</span><span>Notion</span><span>Figma</span><span>GitHub</span><span>Adobe</span>
+                        <span>Zoom</span><span>Spotify</span><span>Canva</span><span>Dropbox</span><span>Atlassian</span>
+                        <span>ChatGPT</span><span>Microsoft 365</span><span>Google Workspace</span><span>Netflix</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ THE IDEA ============ -->
+        <section class="section idea" id="idea">
+            <div class="container">
+                <div class="section-head reveal">
+                    <span class="eyebrow">The idea</span>
+                    <h2>Subscriptions are easy to start and easy to forget.</h2>
+                    <p>
+                        A free trial here, a team seat there. A few months later, money leaves your account
+                        every week for tools nobody opens. SubTrack started from a simple question:
+                        <strong>what if every recurring charge was visible in one place, before it hits?</strong>
+                    </p>
+                </div>
+
+                <div class="idea-grid">
+                    <article class="idea-card problem reveal-card">
+                        <span class="tag red">Without SubTrack</span>
+                        <ul>
+                            <li>Charges scattered across cards, accounts and inboxes</li>
+                            <li>Renewals you only notice on your bank statement</li>
+                            <li>Invoices lost in email when it is time to file expenses</li>
+                            <li>Prices in dollars, euros and dirhams that never add up</li>
+                        </ul>
+                    </article>
+                    <div class="idea-arrow" aria-hidden="true">
+                        <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                    </div>
+                    <article class="idea-card solution reveal-card">
+                        <span class="tag green">With SubTrack</span>
+                        <ul>
+                            <li>One list of every subscription, its price and its next billing date</li>
+                            <li>A reminder days before each renewal, on the channel you choose</li>
+                            <li>Invoices pulled from Gmail and attached automatically</li>
+                            <li>Every amount converted to your currency with daily rates</li>
+                        </ul>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ FEATURES ============ -->
+        <section class="section features" id="features">
+            <div class="container">
+                <div class="section-head reveal">
+                    <span class="eyebrow">Features</span>
+                    <h2>Everything you need to stay in control.</h2>
+                    <p>Built around the questions you actually ask: what am I paying for, when is it due, and is it worth it?</p>
+                </div>
+
+                <div class="feature-grid">
+                    <article class="feature reveal-card feature-wide">
+                        <div class="feature-ico blue">
+                            <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+                        </div>
+                        <h3>All your subscriptions in one list</h3>
+                        <p>Add a tool in seconds from the built-in SaaS catalog, or create your own. Track price, billing cycle, category and status, and pause or cancel with one click.</p>
+                        <div class="feature-demo chips">
+                            <span class="pill green">Active</span><span class="pill amber">Paused</span><span class="pill red">Cancelled</span>
+                            <span class="pill blue">Monthly</span><span class="pill blue">Yearly</span>
+                        </div>
+                    </article>
+
+                    <article class="feature reveal-card">
+                        <div class="feature-ico green">
+                            <svg viewBox="0 0 24 24"><path d="M12 3l1.9 5.8H20l-4.9 3.6 1.9 5.8-5-3.6-5 3.6 1.9-5.8L4 8.8h6.1z"/></svg>
+                        </div>
+                        <h3>AI invoice import from Gmail</h3>
+                        <p>Connect Gmail once. SubTrack finds billing emails, and Gemini AI reads the vendor, amount and date for you.</p>
+                    </article>
+
+                    <article class="feature reveal-card">
+                        <div class="feature-ico amber">
+                            <svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                        </div>
+                        <h3>Renewal alerts that reach you</h3>
+                        <p>Choose how many days ahead you want to know, and get the reminder by Email, Telegram or WhatsApp.</p>
+                    </article>
+
+                    <article class="feature reveal-card">
+                        <div class="feature-ico blue">
+                            <svg viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+                        </div>
+                        <h3>Clear spending analytics</h3>
+                        <p>Monthly trends, spend by category and your biggest costs, so you see where the money goes at a glance.</p>
+                    </article>
+
+                    <article class="feature reveal-card">
+                        <div class="feature-ico green">
+                            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg>
+                        </div>
+                        <h3>Multi-currency, done right</h3>
+                        <p>Pay in USD, EUR or MAD. Exchange rates update every day, and totals are shown in your own currency.</p>
+                    </article>
+
+                    <article class="feature reveal-card">
+                        <div class="feature-ico amber">
+                            <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5M12 15V3"/></svg>
+                        </div>
+                        <h3>Export in one click</h3>
+                        <p>Download your subscriptions and invoices as CSV, Excel or JSON for your accountant or your own reports.</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ HOW IT WORKS ============ -->
+        <section class="section how" id="how">
+            <div class="container">
+                <div class="section-head reveal">
+                    <span class="eyebrow">How it works</span>
+                    <h2>From scattered charges to full control in three steps.</h2>
+                </div>
+
+                <div class="steps">
+                    <div class="steps-line" aria-hidden="true"><span class="steps-line-fill"></span></div>
+                    <div class="step">
+                        <span class="step-num">1</span>
+                        <h3>Create your account</h3>
+                        <p>Sign up as an individual, a freelancer or a business, and pick your main currency.</p>
+                    </div>
+                    <div class="step">
+                        <span class="step-num">2</span>
+                        <h3>Add or import your tools</h3>
+                        <p>Pick subscriptions from the catalog, or connect Gmail and let SubTrack find the invoices.</p>
+                    </div>
+                    <div class="step">
+                        <span class="step-num">3</span>
+                        <h3>Relax and get notified</h3>
+                        <p>Your dashboard stays up to date, and you hear from us before every renewal.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ BENEFITS ============ -->
+        <section class="section benefits" id="benefits">
+            <div class="container benefits-grid">
+                <div class="benefits-copy">
+                    <span class="eyebrow light">Benefits</span>
+                    <h2 class="reveal">Spend less time tracking, and less money on what you don't use.</h2>
+                    <p class="reveal">SubTrack does the tedious part, so you can make decisions with the full picture in front of you.</p>
+
+                    <ul class="benefit-list">
+                        <li class="benefit">
+                            <span class="benefit-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></span>
+                            <div><b>Never miss a renewal</b><small>Decide to keep or cancel before you are charged, not after.</small></div>
+                        </li>
+                        <li class="benefit">
+                            <span class="benefit-ico"><svg viewBox="0 0 24 24"><path d="M23 6l-9.5 9.5-5-5L1 18"/><path d="M17 6h6v6"/></svg></span>
+                            <div><b>Cut the tools nobody uses</b><small>See duplicate and forgotten subscriptions side by side.</small></div>
+                        </li>
+                        <li class="benefit">
+                            <span class="benefit-ico"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8"/></svg></span>
+                            <div><b>Invoices ready when you need them</b><small>Every receipt linked to its subscription, ready to export.</small></div>
+                        </li>
+                        <li class="benefit">
+                            <span class="benefit-ico"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+                            <div><b>Made for every kind of account</b><small>Personal budgets, freelance tools or a whole company stack.</small></div>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="savings-card" aria-hidden="true">
+                    <div class="savings-head">
+                        <small>Example yearly overview</small>
+                        <span class="pill green">Optimized</span>
+                    </div>
+                    <div class="savings-total">
+                        <span class="count" data-to="4380" data-decimals="0">4,380</span><em>MAD saved / year</em>
+                    </div>
+                    <div class="savings-rows">
+                        <div class="savings-row">
+                            <span>Unused tools cancelled</span>
+                            <div class="meter"><i style="--w:72%"></i></div>
+                            <b>2,640</b>
+                        </div>
+                        <div class="savings-row">
+                            <span>Duplicates merged</span>
+                            <div class="meter"><i style="--w:44%"></i></div>
+                            <b>1,140</b>
+                        </div>
+                        <div class="savings-row">
+                            <span>Switched to yearly billing</span>
+                            <div class="meter"><i style="--w:22%"></i></div>
+                            <b>600</b>
+                        </div>
+                    </div>
+                    <p class="savings-note">Illustrative figures for a small team.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ FAQ ============ -->
+        <section class="section faq" id="faq">
+            <div class="container faq-inner">
+                <div class="section-head reveal">
+                    <span class="eyebrow">FAQ</span>
+                    <h2>Questions, answered.</h2>
+                </div>
+                <div class="faq-list">
+                    <details class="faq-item reveal-card">
+                        <summary>Is SubTrack free to use?<span class="faq-plus"></span></summary>
+                        <p>Yes. You can create an account and start tracking your subscriptions for free.</p>
+                    </details>
+                    <details class="faq-item reveal-card">
+                        <summary>What does SubTrack do with my Gmail?<span class="faq-plus"></span></summary>
+                        <p>Connecting Gmail is optional. When you do, SubTrack only looks for billing and invoice emails so it can attach them to your subscriptions. You can disconnect at any time from your settings.</p>
+                    </details>
+                    <details class="faq-item reveal-card">
+                        <summary>Which currencies are supported?<span class="faq-plus"></span></summary>
+                        <p>You can record each subscription in the currency you pay in. SubTrack refreshes exchange rates daily and shows totals in your main currency.</p>
+                    </details>
+                    <details class="faq-item reveal-card">
+                        <summary>How do renewal alerts work?<span class="faq-plus"></span></summary>
+                        <p>You create alert rules that choose how many days before a renewal you want a reminder, and where to receive it: Email, Telegram or WhatsApp. Each reminder is sent once per billing cycle.</p>
+                    </details>
+                    <details class="faq-item reveal-card">
+                        <summary>Can I take my data with me?<span class="faq-plus"></span></summary>
+                        <p>Always. Export your subscriptions and invoices as CSV, Excel or JSON whenever you want.</p>
+                    </details>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ CTA ============ -->
+        <section class="cta">
+            <div class="container">
+                <div class="cta-card">
+                    <h2>Know exactly what you pay for, starting today.</h2>
+                    <p>Create your free account and add your first subscription in under a minute.</p>
+                    <div class="cta-actions">
+                        <h:link outcome="/register" styleClass="btn btn-white btn-lg">
+                            Get started for free
+                            <svg class="btn-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                        </h:link>
+                        <h:link outcome="/login" value="I already have an account" styleClass="btn btn-outline-light btn-lg"/>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container footer-inner">
+            <a href="#{request.contextPath}/" class="brand">
+                <span class="brand-mark">
+                    <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </span>
+                SubTrack
+            </a>
+            <nav class="footer-links">
+                <a href="#features">Features</a>
+                <a href="#how">How it works</a>
+                <a href="#faq">FAQ</a>
+                <h:link outcome="/login" value="Sign in"/>
+            </nav>
+            <small>© 2026 SubTrack. All rights reserved.</small>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="#{resource['js/landing.js']}"></script>
+</h:body>
 </html>

@@ -3,174 +3,219 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
-      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:pt="http://xmlns.jcp.org/jsf/passthrough">
 <h:head>
-    <title>Register - SubTrack</title>
+    <title>Create account - SubTrack</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <h:outputStylesheet name="css/auth.css"/>
+    <h:outputStylesheet name="css/auth-page.css"/>
 </h:head>
-<h:body>
-    <div class="auth-wrapper">
-        <div class="auth-card">
-            
-            <div class="logo-block">
-                <div class="logo-icon">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                    </svg>
-                </div>
-                <span class="brand-name">SubTrack</span>
-            </div>
-            
-            <div class="auth-header" style="margin-bottom: 1.5rem;">
-                <h1 class="page-title">Create account</h1>
-                <p class="page-subtitle">Join us to manage subscriptions easily</p>
-            </div>
-            
-            <h:form id="registerForm" prependId="false" styleClass="auth-form">
-                
-                <div class="form-group" style="margin-bottom: 12px;">
-                    <div class="segmented-control">
-                        <div class="segment-btn active" onclick="selectType(this, 'B2C')">Personal</div>
-                        <div class="segment-btn" onclick="selectType(this, 'FREELANCE')">Freelance</div>
-                        <div class="segment-btn" onclick="selectType(this, 'B2B')">Business</div>
-                    </div>
-                    <h:inputHidden id="accountType" value="#{authController.accountType}" required="true" requiredMessage="Account Type is required"/>
-                    <h:message for="accountType" styleClass="field-error"/>
-                </div>
+<h:body styleClass="auth-page">
+    <div class="auth-split">
 
-                <div style="display: flex; gap: 12px; margin-bottom: 12px;">
-                    <div class="form-group" style="flex: 1; margin: 0;">
-                        <h:outputLabel for="firstName" value="First name" styleClass="form-label" />
-                        <h:inputText id="firstName" 
-                                     value="#{authController.firstName}" 
-                                     required="true"
-                                     requiredMessage="First name required"
-                                     styleClass="form-input"
-                                     html5:placeholder="First"
-                                     xmlns:html5="http://xmlns.jcp.org/jsf/passthrough"/>
-                        <h:message for="firstName" styleClass="field-error"/>
-                    </div>
-                    
-                    <div class="form-group" style="flex: 1; margin: 0;">
-                        <h:outputLabel for="lastName" value="Last name" styleClass="form-label" />
-                        <h:inputText id="lastName" 
-                                     value="#{authController.lastName}" 
-                                     required="true"
-                                     requiredMessage="Last name required"
-                                     styleClass="form-input"
-                                     html5:placeholder="Last"
-                                     xmlns:html5="http://xmlns.jcp.org/jsf/passthrough"/>
-                        <h:message for="lastName" styleClass="field-error"/>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <h:outputLabel for="email" value="Email address" styleClass="form-label" />
-                    <h:inputText id="email" 
-                                 value="#{authController.email}" 
-                                 required="true"
-                                 requiredMessage="Email is required"
-                                 validatorMessage="Invalid email format"
-                                 styleClass="form-input"
-                                 html5:placeholder="name@company.com" 
-                                 xmlns:html5="http://xmlns.jcp.org/jsf/passthrough">
-                        <f:validateRegex pattern="^[^@\s]+@[^@\s]+\.[^@\s]+$" />
-                    </h:inputText>
-                    <h:message for="email" styleClass="field-error"/>
-                </div>
-                
-                <div class="form-group">
-                    <h:outputLabel for="password" value="Password" styleClass="form-label" />
-                    <div style="position: relative;">
-                        <h:inputSecret id="password" 
-                                       value="#{authController.password}" 
-                                       required="true"
-                                       requiredMessage="Password is required"
-                                       styleClass="form-input password-input"
-                                       html5:placeholder="Create a password"
-                                       xmlns:html5="http://xmlns.jcp.org/jsf/passthrough" />
-                        <button type="button" class="password-toggle" onclick="togglePassword('password')">
-                            <svg viewBox="0 0 24 24">
-                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                <circle cx="12" cy="12" r="3"></circle>
-                            </svg>
-                        </button>
-                    </div>
-                    <h:message for="password" styleClass="field-error"/>
-                </div>
+        <!-- ============ FORM PANEL ============ -->
+        <section class="auth-panel">
+            <header class="auth-top">
+                <a href="#{request.contextPath}/" class="brand">
+                    <span class="brand-mark">
+                        <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    </span>
+                    SubTrack
+                </a>
+                <span class="auth-switch">
+                    Have an account? <h:link outcome="login" value="Sign in"/>
+                </span>
+            </header>
 
-                <div class="form-group">
-                    <h:outputLabel for="confirmPassword" value="Confirm password" styleClass="form-label" />
-                    <div style="position: relative;">
-                        <h:inputSecret id="confirmPassword" 
-                                       value="#{authController.confirmPassword}" 
-                                       required="true"
-                                       requiredMessage="Confirmation is required"
-                                       styleClass="form-input password-input"
-                                       html5:placeholder="Confirm password"
-                                       xmlns:html5="http://xmlns.jcp.org/jsf/passthrough" />
-                        <button type="button" class="password-toggle" onclick="togglePassword('confirmPassword')">
-                            <svg viewBox="0 0 24 24">
-                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                <circle cx="12" cy="12" r="3"></circle>
-                            </svg>
-                        </button>
+            <div class="auth-body">
+                <div class="auth-form-wrap">
+                    <div class="auth-heading anim">
+                        <h1>Create your account</h1>
+                        <p>Free to start. Track your first subscription in under a minute.</p>
                     </div>
-                    <h:message for="confirmPassword" styleClass="field-error"/>
+
+                    <h:form id="registerForm" prependId="false" styleClass="auth-form">
+                        <h:messages globalOnly="true" styleClass="auth-messages anim"
+                                    errorClass="msg-error" infoClass="msg-success" warnClass="msg-warn"/>
+
+                        <div class="field anim">
+                            <span class="field-label">I'm using SubTrack as</span>
+                            <div class="type-picker" role="radiogroup" aria-label="Account type">
+                                <button type="button" class="type-opt" data-type="B2C" role="radio" aria-checked="false">
+                                    <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                    <b>Personal</b>
+                                </button>
+                                <button type="button" class="type-opt" data-type="FREELANCE" role="radio" aria-checked="false">
+                                    <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+                                    <b>Freelance</b>
+                                </button>
+                                <button type="button" class="type-opt" data-type="B2B" role="radio" aria-checked="false">
+                                    <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                                    <b>Business</b>
+                                </button>
+                            </div>
+                            <h:inputHidden id="accountType" value="#{authController.accountType}"
+                                           required="true" requiredMessage="Account type is required"/>
+                            <h:message for="accountType" styleClass="field-error"/>
+                        </div>
+
+                        <div class="field-row anim">
+                            <div class="field">
+                                <h:outputLabel for="firstName" value="First name" styleClass="field-label"/>
+                                <div class="input-wrap">
+                                    <h:inputText id="firstName"
+                                                 value="#{authController.firstName}"
+                                                 required="true"
+                                                 requiredMessage="First name required"
+                                                 styleClass="input no-ico"
+                                                 pt:placeholder="Youssef"
+                                                 pt:autocomplete="given-name"/>
+                                </div>
+                                <h:message for="firstName" styleClass="field-error"/>
+                            </div>
+                            <div class="field">
+                                <h:outputLabel for="lastName" value="Last name" styleClass="field-label"/>
+                                <div class="input-wrap">
+                                    <h:inputText id="lastName"
+                                                 value="#{authController.lastName}"
+                                                 required="true"
+                                                 requiredMessage="Last name required"
+                                                 styleClass="input no-ico"
+                                                 pt:placeholder="El Amrani"
+                                                 pt:autocomplete="family-name"/>
+                                </div>
+                                <h:message for="lastName" styleClass="field-error"/>
+                            </div>
+                        </div>
+
+                        <div class="field anim">
+                            <h:outputLabel for="email" value="Email address" styleClass="field-label"/>
+                            <div class="input-wrap">
+                                <svg class="input-ico" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg>
+                                <h:inputText id="email"
+                                             value="#{authController.email}"
+                                             required="true"
+                                             requiredMessage="Email is required"
+                                             validatorMessage="Invalid email format"
+                                             styleClass="input"
+                                             pt:placeholder="name@company.com"
+                                             pt:autocomplete="email">
+                                    <f:validateRegex pattern="^[^@\s]+@[^@\s]+\.[^@\s]+$"/>
+                                </h:inputText>
+                            </div>
+                            <h:message for="email" styleClass="field-error"/>
+                        </div>
+
+                        <div class="field anim">
+                            <h:outputLabel for="password" value="Password" styleClass="field-label"/>
+                            <div class="input-wrap">
+                                <svg class="input-ico" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                                <h:inputSecret id="password"
+                                               value="#{authController.password}"
+                                               required="true"
+                                               requiredMessage="Password is required"
+                                               styleClass="input has-toggle"
+                                               pt:placeholder="Create a password"
+                                               pt:autocomplete="new-password"/>
+                                <button type="button" class="pw-toggle" data-target="password" aria-label="Show password">
+                                    <svg class="eye-open" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                    <svg class="eye-closed" viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19M14.12 14.12a3 3 0 1 1-4.24-4.24M1 1l22 22"/></svg>
+                                </button>
+                            </div>
+                            <div class="pw-meter" id="pwMeter" data-score="0"><i></i><i></i><i></i><i></i></div>
+                            <!-- Mirrors PasswordUtil.isPasswordStrong -->
+                            <ul class="pw-rules" id="pwRules">
+                                <li data-rule="length">8+ characters</li>
+                                <li data-rule="upper">Uppercase letter</li>
+                                <li data-rule="lower">Lowercase letter</li>
+                                <li data-rule="digit">Number</li>
+                            </ul>
+                            <h:message for="password" styleClass="field-error"/>
+                        </div>
+
+                        <div class="field anim">
+                            <h:outputLabel for="confirmPassword" value="Confirm password" styleClass="field-label"/>
+                            <div class="input-wrap">
+                                <svg class="input-ico" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+                                <h:inputSecret id="confirmPassword"
+                                               value="#{authController.confirmPassword}"
+                                               required="true"
+                                               requiredMessage="Confirmation is required"
+                                               styleClass="input has-toggle"
+                                               pt:placeholder="Repeat your password"
+                                               pt:autocomplete="new-password"/>
+                                <button type="button" class="pw-toggle" data-target="confirmPassword" aria-label="Show password">
+                                    <svg class="eye-open" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                    <svg class="eye-closed" viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19M14.12 14.12a3 3 0 1 1-4.24-4.24M1 1l22 22"/></svg>
+                                </button>
+                            </div>
+                            <span class="match-hint" id="matchHint"></span>
+                            <h:message for="confirmPassword" styleClass="field-error"/>
+                        </div>
+
+                        <div class="submit-wrap anim">
+                            <h:commandButton value="Create account"
+                                             action="#{authController.register}"
+                                             styleClass="btn-submit"/>
+                            <span class="spinner" aria-hidden="true"></span>
+                        </div>
+
+                        <p class="auth-alt anim">
+                            Already have an account? <h:link outcome="login" value="Sign in"/>
+                        </p>
+                    </h:form>
                 </div>
-                
-                <h:messages globalOnly="true" styleClass="msg-error"/>
-                
-                <h:commandButton value="Create account" 
-                                 action="#{authController.register}" 
-                                 styleClass="btn-primary"/>
-                                 
-                <div class="auth-footer">
-                    Already have an account? <h:link outcome="login" value="Sign in" styleClass="auth-link"/>
+            </div>
+
+            <footer class="auth-bottom">
+                <span>© 2026 SubTrack</span>
+                <a href="#{request.contextPath}/">Back to home</a>
+            </footer>
+        </section>
+
+        <!-- ============ BRAND PANEL ============ -->
+        <aside class="brand-panel" aria-hidden="true">
+            <div class="bp-glow"></div>
+            <div class="bp-grid"></div>
+            <div class="bp-inner">
+                <span class="bp-eyebrow bp-anim">Get started in minutes</span>
+                <h2 class="bp-title bp-anim">Every subscription. One clear view.</h2>
+                <p class="bp-lead bp-anim">Join SubTrack and stop paying for tools you forgot about.</p>
+
+                <ol class="bp-steps">
+                    <li class="bp-step">
+                        <span class="bp-step-num">1</span>
+                        <div><b>Add your tools</b><small>Pick from the SaaS catalog or create your own.</small></div>
+                    </li>
+                    <li class="bp-step">
+                        <span class="bp-step-num">2</span>
+                        <div><b>Connect Gmail</b><small>Invoices are found and read for you by AI.</small></div>
+                    </li>
+                    <li class="bp-step">
+                        <span class="bp-step-num">3</span>
+                        <div><b>Get alerted before renewals</b><small>By Email, Telegram or WhatsApp.</small></div>
+                    </li>
+                </ol>
+
+                <div class="bp-stage bp-stage-sm">
+                    <div class="bp-card bp-saved">
+                        <div class="bp-card-head">
+                            <small>Example yearly savings</small>
+                            <span class="pill green">Optimized</span>
+                        </div>
+                        <strong class="bp-amount green"><span class="count" data-to="4380">4,380</span> <em>MAD / year</em></strong>
+                        <div class="bp-meter"><i style="--w:72%"></i></div>
+                    </div>
+                    <div class="bp-float bpf-3">
+                        <span class="fc-ico green"><svg viewBox="0 0 24 24"><path d="M23 6l-9.5 9.5-5-5L1 18"/><path d="M17 6h6v6"/></svg></span>
+                        <div><b>Unused tool spotted</b><small>Cancel Zoom, save 1,440 MAD</small></div>
+                    </div>
                 </div>
-            </h:form>
-        </div>
+            </div>
+        </aside>
     </div>
-    
-    <script>
-        function togglePassword(id) {
-            var pwdField = document.getElementById(id);
-            if (pwdField.type === 'password') {
-                pwdField.type = 'text';
-            } else {
-                pwdField.type = 'password';
-            }
-        }
 
-        function selectType(btn, type) {
-            // Update UI buttons
-            var buttons = document.querySelectorAll('.segment-btn');
-            buttons.forEach(function(b) {
-                b.classList.remove('active');
-            });
-            btn.classList.add('active');
-            
-            // Set hidden input value for JSF submission
-            document.getElementById('accountType').value = type;
-        }
-
-        // Initialize segmented control based on prepopulated value (if any), fallback to B2C
-        window.addEventListener('load', function() {
-            var input = document.getElementById('accountType');
-            if(!input.value) {
-                input.value = 'B2C'; // Default to Personal
-            } else {
-                var buttons = document.querySelectorAll('.segment-btn');
-                buttons.forEach(function(b) {
-                    if(b.getAttribute('onclick').includes(input.value)) {
-                        b.classList.add('active');
-                    } else {
-                        b.classList.remove('active');
-                    }
-                });
-            }
-        });
-    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="#{resource['js/auth.js']}"></script>
 </h:body>
 </html>

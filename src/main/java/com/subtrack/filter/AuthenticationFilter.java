@@ -35,6 +35,9 @@ public class AuthenticationFilter implements Filter {
         "/forgot-password.xhtml", "/reset-password.xhtml"
     );
 
+    /** Pages that make no sense for a user who is already signed in. */
+    private static final Set<String> AUTH_PAGES = Set.of("/login.xhtml", "/register.xhtml");
+
     @Inject
     private ClientDAO clientDAO;
 
@@ -50,6 +53,16 @@ public class AuthenticationFilter implements Filter {
         String path = request.getRequestURI().substring(request.getContextPath().length());
 
         if (isPublic(path)) {
+            if (AUTH_PAGES.contains(path) && "GET".equals(request.getMethod())) {
+                HttpSession session = request.getSession(false);
+                Client sessionUser = session != null ? (Client) session.getAttribute(SESSION_USER) : null;
+                if (sessionUser != null) {
+                    // Already signed in: go back to the app instead of asking for credentials again.
+                    String home = sessionUser.getRole() == Role.ADMIN ? "/admin/dashboard.xhtml" : "/dashboard.xhtml";
+                    response.sendRedirect(request.getContextPath() + home);
+                    return;
+                }
+            }
             chain.doFilter(req, res);
             return;
         }

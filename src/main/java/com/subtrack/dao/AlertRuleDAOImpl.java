@@ -41,14 +41,14 @@ public class AlertRuleDAOImpl implements AlertRuleDAO {
     @Override
     public List<AlertRule> findAll() {
         TypedQuery<AlertRule> query = em.createQuery(
-            "SELECT a FROM AlertRule a ORDER BY a.createdAt DESC", AlertRule.class);
+            "SELECT a FROM AlertRule a JOIN FETCH a.subscription ORDER BY a.createdAt DESC", AlertRule.class);
         return query.getResultList();
     }
 
     @Override
     public List<AlertRule> findBySubscriptionId(UUID subscriptionId) {
         TypedQuery<AlertRule> query = em.createQuery(
-            "SELECT a FROM AlertRule a WHERE a.subscription.id = :subscriptionId", AlertRule.class);
+            "SELECT a FROM AlertRule a JOIN FETCH a.subscription WHERE a.subscription.id = :subscriptionId", AlertRule.class);
         query.setParameter("subscriptionId", subscriptionId);
         return query.getResultList();
     }
@@ -56,7 +56,7 @@ public class AlertRuleDAOImpl implements AlertRuleDAO {
     @Override
     public List<AlertRule> findActiveAlertRules() {
         TypedQuery<AlertRule> query = em.createQuery(
-            "SELECT a FROM AlertRule a WHERE a.isActive = true", AlertRule.class);
+            "SELECT a FROM AlertRule a JOIN FETCH a.subscription s JOIN FETCH s.client WHERE a.isActive = true", AlertRule.class);
         return query.getResultList();
     }
 
